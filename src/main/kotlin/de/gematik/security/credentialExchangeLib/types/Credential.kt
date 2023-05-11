@@ -64,7 +64,7 @@ class Credential(json: Map<String, Any>) : JsonLDObject(json) {
         // contexts
         JsonLDUtils.jsonLdAddAsJsonArray(
             this,
-            "context",
+            "@context",
             mutableListOf<String>().apply {
                 addAll(DEFAULT_JSONLD_CONTEXTS.map { it.toString() })
                 addAll(context.map { it.toString() })
