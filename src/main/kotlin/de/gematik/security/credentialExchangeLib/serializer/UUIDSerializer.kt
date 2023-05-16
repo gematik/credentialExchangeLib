@@ -1,4 +1,4 @@
-package de.gematik.security.mobilewallet.serializer
+package de.gematik.security.credentialExchangeLib.serializer
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind

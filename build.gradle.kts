@@ -17,10 +17,14 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.20-RC")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.4.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
-    implementation("org.json:json:20230227")
+
     implementation("com.github.mattrglobal:bbs.signatures:1.6-SNAPSHOT")
-    implementation("decentralized-identity:jsonld-common-java:1.2-SNAPSHOT")
-    implementation("info.weboftrust:ld-signatures-java:1.2-SNAPSHOT")
+    implementation("com.apicatalog:titanium-json-ld-jre8:1.3.2")
+    implementation("org.glassfish:jakarta.json:2.0.1")
+    implementation("io.setl:rdf-urdna:1.2")
+    implementation("io.github.novacrypto:Base58:2022.01.17")
+
+    testImplementation("org.junit.platform:junit-platform-suite-engine:1.9.1")
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.20-RC")
 }
 

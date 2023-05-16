@@ -1,7 +1,7 @@
 package de.gematik.security.mobilewallet.types
 
-import de.gematik.security.mobilewallet.serializer.URISerializer
-import de.gematik.security.mobilewallet.serializer.UUIDSerializer
+import de.gematik.security.credentialExchangeLib.serializer.URISerializer
+import de.gematik.security.credentialExchangeLib.serializer.UUIDSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.net.URI
