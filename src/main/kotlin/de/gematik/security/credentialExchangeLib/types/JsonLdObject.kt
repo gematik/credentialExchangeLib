@@ -1,21 +1,21 @@
 package de.gematik.security.credentialExchangeLib.types
 
-import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
-import de.gematik.security.credentialExchangeLib.serializer.URISerializer
-import de.gematik.security.credentialExchangeLib.serializer.UUIDSerializer
-import kotlinx.serialization.SerialName
+import de.gematik.security.credentialExchangeLib.serializer.JsonLdObjectSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
+import okhttp3.internal.toImmutableList
 import java.net.URI
 import java.util.*
 
-@Serializable
-open class JsonLdObject(
-    var id: @Serializable(with = UUIDSerializer::class)UUID? = null,
-    @SerialName("@context") var atContext: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<@Serializable(with = URISerializer::class) URI>,
-    var type: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<String>? = null
-){
-    abstract class Defaults {
-        abstract val DEFAULT_JSONLD_CONTEXTS: List<URI>
-        abstract val DEFAULT_JSONLD_TYPES: List<String>
-    }
+@Serializable(JsonLdObjectSerializer::class)
+public class JsonLdObject(
+    private val content: Map<String, JsonElement>
+) : Map<String, JsonElement> by content, LdObject {
+    override val id: String? = content.get("id")?.jsonPrimitive?.content
+    override val atContext: List<URI> = content.get("@context")?.jsonArray?.map{URI(it.jsonPrimitive.content)}?: listOf()
+    override val type: List<String>? = content.get("type")?.jsonArray?.map{it.jsonPrimitive.content}
+    public override fun equals(other: Any?): Boolean = content == other
+    public override fun hashCode(): Int = content.hashCode()
 }

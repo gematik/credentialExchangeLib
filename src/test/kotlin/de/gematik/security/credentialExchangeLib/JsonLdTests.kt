@@ -1,57 +1,125 @@
 package de.gematik.security.credentialExchangeLib
 
+import com.apicatalog.jsonld.JsonLd
+import com.apicatalog.jsonld.document.JsonDocument
+import com.apicatalog.jsonld.document.RdfDocument
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.normalize
+import de.gematik.security.credentialExchangeLib.extensions.toJsonDocument
+import de.gematik.security.credentialExchangeLib.types.JsonLdObject
 import de.gematik.security.credentialExchangeLib.types.LdProof
 import de.gematik.security.credentialExchangeLib.types.ProofPurpose
 import de.gematik.security.mobilewallet.types.Credential
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.*
 import org.junit.jupiter.api.Test
 import java.net.URI
 import java.util.*
 import kotlin.test.assertEquals
 
 class JsonLdTests {
-    @Test
-    fun clone(){
-        val credential = Credential(
-            atContext = listOf(URI.create("https://w3id.org/vaccination/v1")),
-            type = listOf("VaccinationCertificate"),
-            credentialSubject = JsonObject(
+
+    val date = Date(1684152736408)
+
+    val credential = Credential(
+        atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
+        type = Credential.DEFAULT_JSONLD_TYPES + listOf("VaccinationCertificate"),
+        credentialSubject = JsonObject(
+            mapOf(
+                "type" to JsonPrimitive("VaccinationEvent"),
+                "batchNumber" to JsonPrimitive(1626382736),
+                "dateOfVaccination" to JsonPrimitive("2021-06-23T13:40:12Z"),
+                "administeringCentre" to JsonPrimitive("Praxis Sommergarten"),
+                "healthProfessional" to JsonPrimitive("883110000015376"),
+                "countryOfVaccination" to JsonPrimitive("GE"),
+                "nextVaccinationDate" to JsonPrimitive("2021-08-16T13:40:12Z"),
+                "order" to JsonPrimitive("3/3"),
+                "recipient" to JsonObject(
+                    mapOf(
+                        "type" to JsonPrimitive("VaccineRecipient"),
+                        "givenName" to JsonPrimitive("Marion"),
+                        "familyName" to JsonPrimitive("Mustermann"),
+                        "gender" to JsonPrimitive("Female"),
+                        "birthDate" to JsonPrimitive("1961-08-17")
+                    )
+                ),
+                "vaccine" to JsonObject(
+                    mapOf(
+                        "type" to JsonPrimitive("Vaccine"),
+                        "atcCode" to JsonPrimitive("J07BX03"),
+                        "medicinalProductName" to JsonPrimitive("COVID-19 Vaccine Moderna"),
+                        "marketingAuthorizationHolder" to JsonPrimitive("Moderna Biotech")
+                    )
+                )
+            )
+        ),
+        issuanceDate = date,
+        issuer = URI.create("did:key:test")
+    )
+
+    val emptyCredentialFrame = JsonLdObject(
+        content = mapOf(
+            "@context" to JsonArray(
+                listOf(
+                    JsonPrimitive("https://www.w3.org/2018/credentials/v1"),
+                    JsonPrimitive("https://w3id.org/vaccination/v1"),
+                    JsonPrimitive("https://w3id.org/security/bbs/v1")
+                )
+            ),
+            "type" to JsonArray(
+                listOf(
+                    JsonPrimitive("VerifiableCredential"),
+                    JsonPrimitive("VaccinationCertificate")
+                )
+            )
+        )
+    )
+
+    val CredentialFrame = JsonLdObject(
+        content = mapOf(
+            "@context" to JsonArray(
+                listOf(
+                    JsonPrimitive("https://www.w3.org/2018/credentials/v1"),
+                    JsonPrimitive("https://w3id.org/vaccination/v1"),
+                    JsonPrimitive("https://w3id.org/security/bbs/v1")
+                )
+            ),
+            "type" to JsonArray(
+                listOf(
+                    JsonPrimitive("VerifiableCredential"),
+                    JsonPrimitive("VaccinationCertificate")
+                )
+            ),
+            "credentialSubject" to JsonObject(
                 mapOf(
-                    "type" to JsonPrimitive("VaccinationEvent"),
-                    "batchNumber" to JsonPrimitive(1626382736),
-                    "dateOfVaccination" to JsonPrimitive("2021-06-23T13:40:12Z"),
-                    "administeringCentre" to JsonPrimitive("Praxis Sommergarten"),
-                    "healthProfessional" to JsonPrimitive("883110000015376"),
-                    "countryOfVaccination" to JsonPrimitive("GE"),
-                    "nextVaccinationDate" to JsonPrimitive("2021-08-16T13:40:12Z"),
-                    "order" to JsonPrimitive("3/3"),
-                    "recipient" to JsonObject(
-                        mapOf(
-                            "type" to JsonPrimitive("VaccineRecipient"),
-                            "givenName" to JsonPrimitive("Marion"),
-                            "familyName" to JsonPrimitive("Mustermann"),
-                            "gender" to JsonPrimitive("Female"),
-                            "birthDate" to JsonPrimitive("1961-08-17")
+                    "@explicit" to JsonPrimitive(true),
+                    "type" to JsonArray(
+                        listOf(
+                            JsonPrimitive("VaccinationEvent")
                         )
                     ),
-                    "vaccine" to JsonObject(
+                    "batchNumber" to JsonObject(mapOf()),
+                    "administeringCentre" to JsonObject(mapOf()),
+                    "countryOfVaccination" to JsonObject(mapOf()),
+                    "recipient" to JsonObject(
                         mapOf(
-                            "type" to JsonPrimitive("Vaccine"),
-                            "atcCode" to JsonPrimitive("J07BX03"),
-                            "medicinalProductName" to JsonPrimitive("COVID-19 Vaccine Moderna"),
-                            "marketingAuthorizationHolder" to JsonPrimitive("Moderna Biotech")
+                            "@explicit" to JsonPrimitive(true),
+                            "id" to JsonObject(mapOf()),
+                            "type" to JsonArray(
+                                listOf(
+                                    JsonPrimitive("VaccineRecipient")
+                                )
+                            )
                         )
                     )
                 )
-            ),
-            issuanceDate = Date(),
-            issuer = URI.create("did:key:test")
+            )
         )
+    )
+
+    @Test
+    fun clone(){
         val clone = credential.deepCopy()
         assert(clone != credential) // different objects
         assertEquals( // but same content
@@ -61,12 +129,22 @@ class JsonLdTests {
     }
 
     @Test
+    fun frameCredential(){
+        val transformedRdf = credential.normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
+        val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream())).get())
+        val frameDocument = emptyCredentialFrame.toJsonDocument()
+        val jsonObject =  JsonLd.frame(inputDocument, frameDocument).ordered().get()
+        val framedCredential = Json.decodeFromString<Credential>(jsonObject.toString())
+        val framedRdf = framedCredential.normalize().trim().replace(Regex("<urn:bnid:(_:c14n[0-9]*)>"), "$1")
+        assertEquals(credential.normalize().trim(), framedRdf)
+    }
+
+    @Test
     fun normalize(){
         val ldProof = LdProof(
-            atContext = listOf(),
             type = listOf("https://w3id.org/security#BbsBlsSignature2020"),
             creator = URI.create("did:key:test"),
-            created = Date(1684152736408),
+            created = date,
             proofPurpose = ProofPurpose.ASSERTION_METHOD,
             verificationMethod = URI("did:key:test#test")
         )
