@@ -1,24 +1,15 @@
 package de.gematik.security.mobilewallet.types
 
-import bbs.signatures.ProofMessage
-import com.apicatalog.jsonld.JsonLd
-import com.apicatalog.jsonld.document.JsonDocument
-import com.apicatalog.jsonld.document.RdfDocument
-import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.crypto.Signer
-import de.gematik.security.credentialExchangeLib.extensions.*
-import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
 import de.gematik.security.credentialExchangeLib.serializer.URISerializer
 import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
 import de.gematik.security.credentialExchangeLib.types.LdObject
 import de.gematik.security.credentialExchangeLib.types.LdProof
 import de.gematik.security.credentialExchangeLib.types.Verifiable
-import jakarta.json.JsonValue
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.JsonObject
 import java.net.URI
 import java.util.*

@@ -4,6 +4,7 @@ import com.apicatalog.jsonld.JsonLd
 import com.apicatalog.jsonld.document.JsonDocument
 import com.apicatalog.rdf.RdfDataset
 import com.apicatalog.rdf.io.nquad.NQuadsWriter
+import de.gematik.security.credentialExchangeLib.defaultJsonLdOptions
 import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.types.LdObject
 import io.setl.rdf.normalization.RdfNormalize
@@ -24,7 +25,7 @@ inline fun <reified T : LdObject> T.toJsonDocument(): JsonDocument {
 }
 
 inline fun <reified T : LdObject> T.toDataset(): RdfDataset {
-    return JsonLd.toRdf(toJsonDocument()).get()
+    return JsonLd.toRdf(toJsonDocument()).options(defaultJsonLdOptions).get()
 }
 
 inline fun <reified T : LdObject> T.toNQuads(): String {

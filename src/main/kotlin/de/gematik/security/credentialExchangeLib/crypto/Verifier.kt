@@ -1,7 +1,5 @@
 package de.gematik.security.credentialExchangeLib.crypto
 
-import java.security.PrivateKey
-
 interface Verifier {
     val publicKey: ByteArray
     fun verify(content: List<ByteArray>, signature: ByteArray) : Boolean

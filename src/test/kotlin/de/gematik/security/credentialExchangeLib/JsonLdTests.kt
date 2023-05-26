@@ -134,10 +134,10 @@ class JsonLdTests {
         val transformedRdf = credential.normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
         val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream())).get())
         val frameDocument = emptyCredentialFrame.toJsonDocument()
-        val jsonObject = JsonLd.frame(inputDocument, frameDocument).ordered().get()
+        val jsonObject = JsonLd.frame(inputDocument, frameDocument).options(defaultJsonLdOptions).get()
         val framedCredential = Json.decodeFromString<Credential>(jsonObject.toString())
         val framedRdf = framedCredential.normalize().trim().replace(Regex("<urn:bnid:(_:c14n[0-9]*)>"), "$1")
-//        assertEquals(credential.normalize().trim(), framedRdf)
+        assertEquals(credential.normalize().trim(), framedRdf)
         println(json.encodeToString(framedCredential))
     }
 

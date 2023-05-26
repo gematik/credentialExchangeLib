@@ -1,7 +1,6 @@
 package de.gematik.security.credentialExchangeLib.types
 
 import java.net.URI
-import java.util.*
 
 interface LdObject{
     val id: String?

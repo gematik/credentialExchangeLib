@@ -5,6 +5,7 @@ import com.apicatalog.jsonld.JsonLd
 import com.apicatalog.jsonld.document.JsonDocument
 import com.apicatalog.jsonld.document.RdfDocument
 import de.gematik.security.credentialExchangeLib.crypto.*
+import de.gematik.security.credentialExchangeLib.defaultJsonLdOptions
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.normalize
 import de.gematik.security.credentialExchangeLib.extensions.toBls12381G2PublicKey
@@ -69,7 +70,7 @@ class LdProof(
         }
         // 1.4 frame
         val framedCredential = json.decodeFromString<Credential>(
-            JsonLd.frame(expandedInputDocument, frame.toJsonDocument()).get().toString()
+            JsonLd.frame(expandedInputDocument, frame.toJsonDocument()).options(defaultJsonLdOptions).get().toString()
         )
         // 1.5 revert black node identifier to internal blank node identifiers
         val normalizedFramedCredential =

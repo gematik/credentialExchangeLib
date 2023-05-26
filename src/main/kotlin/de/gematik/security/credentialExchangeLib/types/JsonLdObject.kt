@@ -5,9 +5,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
-import okhttp3.internal.toImmutableList
 import java.net.URI
-import java.util.*
 
 @Serializable(JsonLdObjectSerializer::class)
 public class JsonLdObject(

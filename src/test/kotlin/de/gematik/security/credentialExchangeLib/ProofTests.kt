@@ -45,7 +45,7 @@ class ProofTests {
         credentialSubject = JsonObject(
             mapOf(
                 "type" to JsonPrimitive("VaccinationEvent"),
-                "batchNumber" to JsonPrimitive(1626382736),
+                "batchNumber" to JsonPrimitive("1626382736"),
                 "dateOfVaccination" to JsonPrimitive("2021-06-23T13:40:12Z"),
                 "administeringCentre" to JsonPrimitive("Praxis Sommergarten"),
                 "healthProfessional" to JsonPrimitive("883110000015376"),
@@ -138,7 +138,7 @@ class ProofTests {
     fun deriveCredential() {
         credential.sign(
             LdProof(
-                type = listOf(ProofType.BbsBlsSignature2020.id),
+                type = listOf(ProofType.BbsBlsSignature2020.name),
                 creator = URI.create(didKeyIssuer),
                 created = Date(1684152736408),
                 proofPurpose = ProofPurpose.ASSERTION_METHOD,
