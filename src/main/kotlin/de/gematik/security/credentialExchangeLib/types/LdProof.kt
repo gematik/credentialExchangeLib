@@ -30,7 +30,7 @@ class LdProof(
         with = URISerializer::class
     ) URI> = DEFAULT_JSONLD_CONTEXTS,
     @Required override var type: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<String>? = DEFAULT_JSONLD_TYPES,
-    val creator: @Serializable(with = URISerializer::class) URI,
+    val creator: @Serializable(with = URISerializer::class) URI? = null,
     val created: @Serializable(with = DateSerializer::class) Date,
     val domain: String? = null,
     val challenge: String? = null,
@@ -130,8 +130,31 @@ class LdProof(
         }
     }
 
-    fun verifyProof() : Boolean {
-        return true
+    fun verifyProof(credential: Credential) : Boolean {
+        check(type?.size == 1 && type?.get(0) == ProofType.BbsBlsSignatureProof2020.name){"invalid proof type"}
+        // 1 prepare original proof
+        val ldProofWithoutProofValue = deepCopy().apply {
+            // 1.1 remove proof value
+            proofValue = null
+            //1.2 remove nonce
+            nonce = null
+            //1.3 set original proof type
+            type = listOf(ProofType.BbsBlsSignature2020.name)
+        }
+        // 2 prepare credential
+        val credentialWithoutProof = credential.deepCopy().apply { proof = null }
+        // 3 normalize credential and ldproof and revert uri blank node identifier (urn:bnid) back into internal blank node identifiers
+        val statements = listOf(
+            ldProofWithoutProofValue.normalize().trim().replace(Regex("<urn:bnid:(_:c14n[0-9]*)>"), "$1").split('\n'),
+            credentialWithoutProof.normalize().trim().replace(Regex("<urn:bnid:(_:c14n[0-9]*)>"), "$1").split('\n')
+        ).flatMap { it.map { it.toByteArray() } }
+        // 4 get verifier and verify revealed messages
+        val verifier = type?.let{getVerifier(it, verificationMethod.toBls12381G2PublicKey())}
+        return verifier?.verifyProof(
+            statements,
+            Base64.getDecoder().decode(proofValue),
+            Base64.getDecoder().decode(nonce)
+        )?:false
     }
 
 }

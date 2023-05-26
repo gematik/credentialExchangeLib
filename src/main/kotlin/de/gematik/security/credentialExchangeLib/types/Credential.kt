@@ -1,5 +1,6 @@
 package de.gematik.security.mobilewallet.types
 
+import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.crypto.Signer
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
@@ -47,8 +48,12 @@ class Credential(
     override fun verify() : Boolean {
         val pr = proof?.get(0)
         check(pr!=null){"credential doesn't contain a proof for verification"}
-        check(proof?.size == 1){"verfication of multi signature not supported yet"}
-        return pr.verify(this)
+        check(proof?.size == 1){"verification of multi signature not supported yet"}
+        return when(pr.type?.get(0)){
+            ProofType.BbsBlsSignature2020.name -> pr.verify(this)
+            ProofType.BbsBlsSignatureProof2020.name -> pr.verifyProof(this)
+            else -> false
+        }
     }
 
     fun derive(frame: Credential) : Credential {
@@ -57,5 +62,6 @@ class Credential(
         check(proof?.size == 1){"derive credential with multiple proofs is not supported yet"}
         return pr.deriveProof(this, frame)
     }
+
 }
 

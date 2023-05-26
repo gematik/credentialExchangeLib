@@ -144,8 +144,7 @@ class JsonLdTests {
     @Test
     fun normalize() {
         val ldProof = LdProof(
-            type = listOf(ProofType.BbsBlsSignature2020.id),
-            creator = URI.create("did:key:test"),
+            type = listOf(ProofType.BbsBlsSignature2020.name),
             created = date,
             proofPurpose = ProofPurpose.ASSERTION_METHOD,
             verificationMethod = URI("did:key:test#test")
@@ -153,7 +152,6 @@ class JsonLdTests {
         val normalized = ldProof.normalize()
         val expectedNormalized = """
             _:c14n0 <http://purl.org/dc/terms/created> "2023-05-15T12:12:16Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
-            _:c14n0 <http://purl.org/dc/terms/creator> <did:key:test> .
             _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/security#BbsBlsSignature2020> .
             _:c14n0 <https://w3id.org/security#proofPurpose> <https://w3id.org/security#assertionMethod> .
             _:c14n0 <https://w3id.org/security#verificationMethod> <did:key:test#test> .

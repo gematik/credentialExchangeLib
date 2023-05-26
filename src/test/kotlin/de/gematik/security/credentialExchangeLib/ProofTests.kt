@@ -42,7 +42,6 @@ class ProofTests {
 
     val ldProofIssuer = LdProof(
         type = listOf(ProofType.BbsBlsSignature2020.name),
-        creator = URI.create(didKeyIssuer),
         created = Date(1684152736408),
         proofPurpose = ProofPurpose.ASSERTION_METHOD,
         verificationMethod = verificationMethodIssuer
@@ -50,7 +49,6 @@ class ProofTests {
 
     val ldProofHolder = LdProof(
         type = listOf(ProofType.BbsBlsSignature2020.name),
-        creator = URI.create(didKeyHolder),
         created = Date(1684152736408),
         proofPurpose = ProofPurpose.AUTHENTICATION,
         verificationMethod = verificationMethodHolder
@@ -128,9 +126,11 @@ class ProofTests {
     }
 
     @Test
-    fun deriveCredential() {
+    fun deriveAndVerifyCredential() {
         val signedCredential = credential.deepCopy().apply { sign(ldProofIssuer, BbsPlusSigner(keyPairIssuer)) }
         val derivedCredential = signedCredential.derive(emptyCredentialFrame)
+        val result = derivedCredential.verify()
+        assert(result)
         println(json.encodeToString(derivedCredential))
     }
 

@@ -15,4 +15,12 @@ class BbsPlusVerifier(override val publicKey : ByteArray) : Verifier {
             Bbs.blsVerify(publicKey, signature, content.toTypedArray());
         }.onFailure{throw GeneralSecurityException(it.message) }.getOrThrow()
     }
+
+    fun verifyProof(content : List<ByteArray>, proof: ByteArray, nonce: ByteArray) : Boolean {
+        return runCatching {
+            Bbs.blsVerifyProof(publicKey, proof, nonce, content.toTypedArray());
+        }.onFailure{throw GeneralSecurityException(it.message) }.getOrThrow()
+    }
+
+
 }
