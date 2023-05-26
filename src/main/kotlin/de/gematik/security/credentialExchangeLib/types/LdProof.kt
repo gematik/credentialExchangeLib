@@ -29,7 +29,7 @@ class LdProof(
     @Required @SerialName("@context") override val atContext: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<@Serializable(
         with = URISerializer::class
     ) URI> = DEFAULT_JSONLD_CONTEXTS,
-    @Required override val type: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<String>? = DEFAULT_JSONLD_TYPES,
+    @Required override var type: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<String>? = DEFAULT_JSONLD_TYPES,
     val creator: @Serializable(with = URISerializer::class) URI,
     val created: @Serializable(with = DateSerializer::class) Date,
     val domain: String? = null,
@@ -42,9 +42,32 @@ class LdProof(
 
     companion object : LdObject.Defaults() {
         override val DEFAULT_JSONLD_CONTEXTS = listOf(
-            URI("https://w3id.org/security/v2")
+            URI("https://w3id.org/security/bbs/v1")
         )
         override val DEFAULT_JSONLD_TYPES = listOf<String>()
+    }
+
+    inline fun <reified T> sign(jsonLdObject: T, signer: Signer) where T : LdObject, T : Verifiable {
+        check(proofValue == null) { "proof already contains proof value" }
+        check(jsonLdObject.proof == null) { "jsonLdObject already signed" }
+        val statements = listOf(
+            normalize().trim().split('\n'),
+            jsonLdObject.normalize<T>().trim().split('\n')
+        ).flatMap { it.map { it.toByteArray() } }
+        proofValue = String(Base64.getEncoder().encode(signer.sign(statements)))
+    }
+
+    inline fun <reified T> verify(
+        jsonLdObject: T
+    ): Boolean where T : LdObject, T : Verifiable {
+        val ldProofWithoutProofValue = deepCopy().apply { proofValue = null }
+        val jsonLdObjectWithoutProof = jsonLdObject.deepCopy<T>().apply { proof = null }
+        val statements = listOf(
+            ldProofWithoutProofValue.normalize().trim().split('\n'),
+            jsonLdObjectWithoutProof.normalize<T>().trim().split('\n')
+        ).flatMap { it.map { it.toByteArray() } }
+        val verifier = type?.let{getVerifier(it, verificationMethod.toBls12381G2PublicKey())}
+        return verifier?.verify(statements, Base64.getDecoder().decode(proofValue))?:false
     }
 
     fun deriveProof(credential: Credential, frame: Credential): Credential {
@@ -94,40 +117,21 @@ class LdProof(
             proofMessages.add(ProofMessage(type, it.toByteArray(), null))
         }
         // 3 calculate signature
-        check(type != null) { "type required to derive proof" }
-        val signer = getSigner(type, KeyPair(publicKey = verificationMethod.toBls12381G2PublicKey()))
+        val signer = type?.let{getSigner(it, KeyPair(publicKey = verificationMethod.toBls12381G2PublicKey()))}
         val nonce = Random.nextBytes(32)
         val signature = signer?.deriveProof(Base64.getDecoder().decode(proofValue), nonce, proofMessages)
         // 4 complete new proof, add to new credential and return
         return framedCredential.apply {
             proof = listOf(newLdProof.apply {
+                type = listOf(ProofType.BbsBlsSignatureProof2020.name)
                 proofValue = Base64.getEncoder().encodeToString(signature)
                 this.nonce = Base64.getEncoder().encodeToString(nonce)
             })
         }
     }
 
-    inline fun <reified T> sign(jsonLdObject: T, signer: Signer) where T : LdObject, T : Verifiable {
-        check(proofValue == null) { "proof already contains proof value" }
-        check(jsonLdObject.proof == null) { "jsonLdObject already signed" }
-        val statements = listOf(
-            normalize().trim().split('\n'),
-            jsonLdObject.normalize<T>().trim().split('\n')
-        ).flatMap { it.map { it.toByteArray() } }
-        proofValue = String(Base64.getEncoder().encode(signer.sign(statements)))
+    fun verifyProof() : Boolean {
+        return true
     }
 
-    inline fun <reified T> verify(
-        jsonLdObject: T
-    ): Boolean where T : LdObject, T : Verifiable {
-        val ldProofWithoutProofValue = deepCopy().apply { proofValue = null }
-        val jsonLdObjectWithoutProof = jsonLdObject.deepCopy<T>().apply { proof = null }
-        val statements = listOf(
-            ldProofWithoutProofValue.normalize().trim().split('\n'),
-            jsonLdObjectWithoutProof.normalize<T>().trim().split('\n')
-        ).flatMap { it.map { it.toByteArray() } }
-        check(type != null) { "type required to sign link data proof" }
-        val verifier = getVerifier(type, verificationMethod.toBls12381G2PublicKey())
-        return verifier?.verify(statements, Base64.getDecoder().decode(proofValue))?:false
-    }
 }

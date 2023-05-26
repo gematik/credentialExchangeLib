@@ -1,6 +1,7 @@
 package de.gematik.security.mobilewallet.types
 
 import de.gematik.security.credentialExchangeLib.crypto.Signer
+import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
 import de.gematik.security.credentialExchangeLib.serializer.URISerializer
 import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
@@ -11,6 +12,7 @@ import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
+import okhttp3.internal.toImmutableList
 import java.net.URI
 import java.util.*
 
@@ -34,9 +36,12 @@ class Credential(
         )
     }
 
-    override fun sign(ldProof: LdProof, signer: Signer){
-        ldProof.sign(this, signer)
-        proof = (proof?: emptyList()) + listOf(ldProof)
+    override fun sign(ldProof: LdProof, signer: Signer) {
+        val signedProof = ldProof.deepCopy().apply { sign(this@Credential, signer)}
+        proof = (proof?:emptyList()).toMutableList().apply {
+            add(signedProof)
+            toImmutableList()
+        }
     }
 
     override fun verify() : Boolean {

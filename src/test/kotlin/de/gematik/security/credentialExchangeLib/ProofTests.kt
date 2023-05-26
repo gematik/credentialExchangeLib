@@ -3,8 +3,8 @@ package de.gematik.security.credentialExchangeLib
 import de.gematik.security.credentialExchangeLib.crypto.BbsPlusSigner
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
+import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.hexToByteArray
-import de.gematik.security.credentialExchangeLib.extensions.toJsonDocument
 import de.gematik.security.credentialExchangeLib.types.*
 import de.gematik.security.mobilewallet.types.Credential
 import kotlinx.serialization.encodeToString
@@ -39,6 +39,23 @@ class ProofTests {
     val date = Date(1684152736408)
     val presentationDefinitionId = UUID.fromString("250787ea-f892-11ed-b67e-0242ac120002")
     val inputDescriptorId = UUID.fromString("3aa55a6e-f892-11ed-b67e-0242ac120002")
+
+    val ldProofIssuer = LdProof(
+        type = listOf(ProofType.BbsBlsSignature2020.name),
+        creator = URI.create(didKeyIssuer),
+        created = Date(1684152736408),
+        proofPurpose = ProofPurpose.ASSERTION_METHOD,
+        verificationMethod = verificationMethodIssuer
+    )
+
+    val ldProofHolder = LdProof(
+        type = listOf(ProofType.BbsBlsSignature2020.name),
+        creator = URI.create(didKeyHolder),
+        created = Date(1684152736408),
+        proofPurpose = ProofPurpose.AUTHENTICATION,
+        verificationMethod = verificationMethodHolder
+    )
+
     val credential = Credential(
         atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
         type = Credential.DEFAULT_JSONLD_TYPES + listOf("VaccinationCertificate"),
@@ -97,58 +114,33 @@ class ProofTests {
                 )
             )
         ),
-        verifiableCredential = listOf(credential)
+        verifiableCredential = listOf(credential.deepCopy().apply {
+            sign(ldProofIssuer, BbsPlusSigner(keyPairIssuer))
+        }.derive(emptyCredentialFrame))
     )
 
     @Test
     fun signVerifyCredential() {
-        credential.sign(
-            LdProof(
-                type = listOf(ProofType.BbsBlsSignature2020.name),
-                creator = URI.create(didKeyIssuer),
-                created = Date(1684152736408),
-                proofPurpose = ProofPurpose.ASSERTION_METHOD,
-                verificationMethod = verificationMethodIssuer,
-            ),
-            BbsPlusSigner(keyPairIssuer)
-        )
-        val result = credential.verify()
+        val signedCredential = credential.deepCopy().apply { sign(ldProofIssuer, BbsPlusSigner(keyPairIssuer)) }
+        val result = signedCredential.verify()
         assert(result)
-        println(json.encodeToString(credential))
-    }
-
-    @Test
-    fun signVerifyPresentation() {
-        presentation.sign(
-            LdProof(
-                type = listOf(ProofType.BbsBlsSignature2020.name),
-                creator = URI.create(didKeyHolder),
-                created = Date(1684152736408),
-                proofPurpose = ProofPurpose.AUTHENTICATION,
-                verificationMethod = verificationMethodHolder,
-            ),
-            BbsPlusSigner(keyPairHolder)
-        )
-        val result = presentation.verify()
-        assert(result)
-        println(json.encodeToString(presentation))
+        println(json.encodeToString(signedCredential))
     }
 
     @Test
     fun deriveCredential() {
-        credential.sign(
-            LdProof(
-                type = listOf(ProofType.BbsBlsSignature2020.name),
-                creator = URI.create(didKeyIssuer),
-                created = Date(1684152736408),
-                proofPurpose = ProofPurpose.ASSERTION_METHOD,
-                verificationMethod = verificationMethodIssuer,
-            ),
-            BbsPlusSigner(keyPairIssuer)
-        )
-        val jsondoc = emptyCredentialFrame.toJsonDocument()
-        val deriveCredential = credential.derive(emptyCredentialFrame)
-        println(json.encodeToString(deriveCredential))
+        val signedCredential = credential.deepCopy().apply { sign(ldProofIssuer, BbsPlusSigner(keyPairIssuer)) }
+        val derivedCredential = signedCredential.derive(emptyCredentialFrame)
+        println(json.encodeToString(derivedCredential))
+    }
+
+    @Test
+    fun signVerifyPresentation() {
+        val signedPresentation = presentation.deepCopy()
+        signedPresentation.sign(ldProofHolder, BbsPlusSigner(keyPairHolder))
+        val result = signedPresentation.verify()
+        assert(result)
+        println(json.encodeToString(signedPresentation))
     }
 
 }
