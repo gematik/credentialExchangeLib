@@ -1,5 +1,6 @@
 package de.gematik.security.credentialExchangeLib
 
+import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.extensions.toJsonDocument
 import de.gematik.security.credentialExchangeLib.extensions.toJsonLdObject
 import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
@@ -178,7 +179,7 @@ class SerializerTests {
     fun serializeLdProof() {
         val ldProof = LdProof(
             atContext = listOf(),
-            type = listOf("https://w3id.org/security#BbsBlsSignature2020"),
+            type = listOf("ProofType.BbsBlsSignature2020.name"),
             creator = URI.create("did:key:test"),
             created = date,
             proofPurpose = ProofPurpose.ASSERTION_METHOD,

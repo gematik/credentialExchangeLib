@@ -1,17 +1,13 @@
 package de.gematik.security.credentialExchangeLib.types
 
 import de.gematik.security.credentialExchangeLib.crypto.Signer
-import de.gematik.security.credentialExchangeLib.extensions.sign
-import de.gematik.security.credentialExchangeLib.extensions.verify
 import de.gematik.security.credentialExchangeLib.serializer.URISerializer
-import de.gematik.security.credentialExchangeLib.serializer.UUIDSerializer
 import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
 import de.gematik.security.mobilewallet.types.Credential
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.net.URI
-import java.util.*
 
 @Serializable
 class Presentation(
@@ -37,8 +33,11 @@ class Presentation(
         proof = listOf(ldProof)
     }
 
-    override fun verify(ldProof: LdProof) : Boolean {
-        return ldProof.verify(this)
+    override fun verify() : Boolean {
+        val pr = proof?.get(0)
+        check(pr!=null){"presenation doesn't contain a proof for verification"}
+        check(proof?.size == 1){"verfication of multi signature not supported yet"}
+        return pr.verify(this)
     }
 
 }

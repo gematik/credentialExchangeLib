@@ -1,9 +1,10 @@
 package de.gematik.security.credentialExchangeLib
 
-import de.gematik.security.credentialExchangeLib.extensions.verify
 import de.gematik.security.credentialExchangeLib.crypto.BbsPlusSigner
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
+import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.extensions.hexToByteArray
+import de.gematik.security.credentialExchangeLib.extensions.toJsonDocument
 import de.gematik.security.credentialExchangeLib.types.*
 import de.gematik.security.mobilewallet.types.Credential
 import kotlinx.serialization.encodeToString
@@ -74,12 +75,26 @@ class ProofTests {
         issuer = URI.create(didKeyIssuer)
     )
 
+    val emptyCredentialFrame = Credential(
+        atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(
+            URI("https://w3id.org/vaccination/v1"),
+            URI("https://w3id.org/security/bbs/v1")
+        ),
+        type = Credential.DEFAULT_JSONLD_TYPES + listOf(
+            "VaccinationCertificate"
+        )
+    )
+
     val presentation = Presentation(
         atContext = Presentation.DEFAULT_JSONLD_CONTEXTS + PresentationSubmission.DEFAULT_JSONLD_CONTEXTS,
         presentationSubmission = PresentationSubmission(
             definitionId = presentationDefinitionId,
             descriptorMap = listOf(
-                PresentationSubmission.DescriptorMapEntry(inputDescriptorId, ClaimFormat.LDP_VC, path = "\$.verifiableCredential[0]")
+                PresentationSubmission.DescriptorMapEntry(
+                    inputDescriptorId,
+                    ClaimFormat.LDP_VC,
+                    path = "\$.verifiableCredential[0]"
+                )
             )
         ),
         verifiableCredential = listOf(credential)
@@ -89,7 +104,7 @@ class ProofTests {
     fun signVerifyCredential() {
         credential.sign(
             LdProof(
-                type = listOf("https://w3id.org/security#BbsBlsSignature2020"),
+                type = listOf(ProofType.BbsBlsSignature2020.name),
                 creator = URI.create(didKeyIssuer),
                 created = Date(1684152736408),
                 proofPurpose = ProofPurpose.ASSERTION_METHOD,
@@ -97,7 +112,7 @@ class ProofTests {
             ),
             BbsPlusSigner(keyPairIssuer)
         )
-        val result = credential.proof?.get(0)?.let { credential.verify(it)}?:false
+        val result = credential.verify()
         assert(result)
         println(json.encodeToString(credential))
     }
@@ -106,7 +121,7 @@ class ProofTests {
     fun signVerifyPresentation() {
         presentation.sign(
             LdProof(
-                type = listOf("https://w3id.org/security#BbsBlsSignature2020"),
+                type = listOf(ProofType.BbsBlsSignature2020.name),
                 creator = URI.create(didKeyHolder),
                 created = Date(1684152736408),
                 proofPurpose = ProofPurpose.AUTHENTICATION,
@@ -114,9 +129,26 @@ class ProofTests {
             ),
             BbsPlusSigner(keyPairHolder)
         )
-        val result = presentation.proof?.get(0)?.let { presentation.verify(it)}?:false
+        val result = presentation.verify()
         assert(result)
         println(json.encodeToString(presentation))
+    }
+
+    @Test
+    fun deriveCredential() {
+        credential.sign(
+            LdProof(
+                type = listOf(ProofType.BbsBlsSignature2020.id),
+                creator = URI.create(didKeyIssuer),
+                created = Date(1684152736408),
+                proofPurpose = ProofPurpose.ASSERTION_METHOD,
+                verificationMethod = verificationMethodIssuer,
+            ),
+            BbsPlusSigner(keyPairIssuer)
+        )
+        val jsondoc = emptyCredentialFrame.toJsonDocument()
+        val deriveCredential = credential.derive(emptyCredentialFrame)
+        println(json.encodeToString(deriveCredential))
     }
 
 }
