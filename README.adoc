@@ -1,0 +1,50 @@
+= Credential Exchange Library for kotlin
+
+== Issuer
+Please note that the issuer acts as verifier if he needs additional data from the holder to issue the credential.
+
+[plantuml]
+.state diagram issuer
+----
+@startuml
+
+state c1 <<choice>>
+
+[*] --> WaitForCredentialRequest
+WaitForCredentialRequest : Offer Credential
+WaitForCredentialRequest --> c1 <<choice>> : Receive Request
+c1 --> [*] : [Holder Verification not required] Issue Credential
+c1 --> HolderVerification : [Holder Verification required]
+HolderVerification : Request Presentation
+HolderVerification : Verify Presentation
+HolderVerification --> HolderVerification : Receive Presentation
+HolderVerification --> [*] : [Verification Success] Issue Credential
+HolderVerification --> [*] : [Verification failed]
+
+@enduml
+----
+
+== Holder
+Please note that the holder should always verify the trustworthiness of the issuer before present credentials. Nevertheless, the step is optional in the credential exchange protocol, because the verification may be provided somewhere else (e.g. client/server authentication on transport layer).
+
+[plantuml]
+.state diagram holder
+----
+@startuml
+
+state c1 <<choice>>
+
+[*] --> WaitForOffer
+WaitForOffer --> c1 : Receive Offer
+c1 --> WaitForCredential : [Issuer Verification not required]
+c1 --> IssuerVerification : [Issuer Verification required]
+IssuerVerification : Request Presenation
+IssuerVerification : Verify Presenation
+IssuerVerification --> IssuerVerification : Receive Presentation
+IssuerVerification --> WaitForCredential : Verification Success
+IssuerVerification --> [*] : Verification failed
+WaitForCredential : Request Credential
+WaitForCredential --> [*] : Receive Credential
+
+@enduml
+----
