@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.8.0"
+    id("io.ktor.plugin") version "2.3.1"
     kotlin("plugin.serialization") version "1.8.21"
     `maven-publish`
     `java-library`
@@ -24,8 +25,16 @@ dependencies {
     implementation("io.setl:rdf-urdna:1.2")
     implementation("io.github.novacrypto:Base58:2022.01.17")
 
+    implementation("io.ktor:ktor-server-core")
+    implementation("io.ktor:ktor-server-cio")
+    implementation("io.ktor:ktor-server-websockets")
+    implementation("io.ktor:ktor-client-core")
+    implementation("io.ktor:ktor-client-cio")
+    implementation("io.ktor:ktor-client-websockets")
+    implementation("io.ktor:ktor-serialization-kotlinx-json")
+
     testImplementation("org.junit.platform:junit-platform-suite-engine:1.9.1")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.20-RC")
+    testImplementation(kotlin("test"))
 
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation("ch.qos.logback:logback-classic:1.4.8")
