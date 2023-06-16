@@ -7,10 +7,10 @@ import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.normalize
 import de.gematik.security.credentialExchangeLib.extensions.toJsonDocument
+import de.gematik.security.credentialExchangeLib.types.Credential
 import de.gematik.security.credentialExchangeLib.types.JsonLdObject
 import de.gematik.security.credentialExchangeLib.types.LdProof
 import de.gematik.security.credentialExchangeLib.types.ProofPurpose
-import de.gematik.security.mobilewallet.types.Credential
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
@@ -59,13 +59,12 @@ class JsonLdTests {
         issuer = URI.create("did:key:test")
     )
 
-    val emptyCredentialFrame = JsonLdObject(
+    val emptyVaccinationCredentialFrame = JsonLdObject(
         content = mapOf(
             "@context" to JsonArray(
                 listOf(
                     JsonPrimitive("https://www.w3.org/2018/credentials/v1"),
-                    JsonPrimitive("https://w3id.org/vaccination/v1"),
-                    JsonPrimitive("https://w3id.org/security/bbs/v1")
+                    JsonPrimitive("https://w3id.org/vaccination/v1")
                 )
             ),
             "type" to JsonArray(
@@ -82,8 +81,7 @@ class JsonLdTests {
             "@context" to JsonArray(
                 listOf(
                     JsonPrimitive("https://www.w3.org/2018/credentials/v1"),
-                    JsonPrimitive("https://w3id.org/vaccination/v1"),
-                    JsonPrimitive("https://w3id.org/security/bbs/v1")
+                    JsonPrimitive("https://w3id.org/vaccination/v1")
                 )
             ),
             "type" to JsonArray(
@@ -133,7 +131,7 @@ class JsonLdTests {
     fun frameCredential() {
         val transformedRdf = credential.normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
         val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream())).get())
-        val frameDocument = emptyCredentialFrame.toJsonDocument()
+        val frameDocument = emptyVaccinationCredentialFrame.toJsonDocument()
         val jsonObject = JsonLd.frame(inputDocument, frameDocument).options(defaultJsonLdOptions).get()
         val framedCredential = Json.decodeFromString<Credential>(jsonObject.toString())
         val framedRdf = framedCredential.normalize().trim().replace(Regex("<urn:bnid:(_:c14n[0-9]*)>"), "$1")

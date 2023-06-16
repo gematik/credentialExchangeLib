@@ -1,5 +1,6 @@
 package de.gematik.security.credentialExchangeLib.types
 
+import kotlinx.serialization.Serializable
 import java.net.URI
 
 interface LdObject{

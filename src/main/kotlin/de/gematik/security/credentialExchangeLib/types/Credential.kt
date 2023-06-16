@@ -1,4 +1,4 @@
-package de.gematik.security.mobilewallet.types
+package de.gematik.security.credentialExchangeLib.types
 
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.crypto.Signer

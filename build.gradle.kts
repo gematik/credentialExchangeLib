@@ -26,6 +26,9 @@ dependencies {
 
     testImplementation("org.junit.platform:junit-platform-suite-engine:1.9.1")
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.20-RC")
+
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
+    implementation("ch.qos.logback:logback-classic:1.4.8")
 }
 
 tasks.test {

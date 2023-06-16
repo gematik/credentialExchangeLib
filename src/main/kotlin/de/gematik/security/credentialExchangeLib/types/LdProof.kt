@@ -14,7 +14,6 @@ import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
 import de.gematik.security.credentialExchangeLib.serializer.URISerializer
 import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
-import de.gematik.security.mobilewallet.types.Credential
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

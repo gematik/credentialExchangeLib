@@ -1,6 +1,5 @@
 package de.gematik.security.credentialExchangeLib
 
-import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.extensions.toJsonDocument
 import de.gematik.security.credentialExchangeLib.extensions.toJsonLdObject
 import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
@@ -8,8 +7,6 @@ import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
 import de.gematik.security.credentialExchangeLib.serializer.URISerializer
 import de.gematik.security.credentialExchangeLib.serializer.UUIDSerializer
 import de.gematik.security.credentialExchangeLib.types.*
-import de.gematik.security.mobilewallet.types.*
-import jakarta.json.JsonValue
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -35,7 +32,7 @@ class SerializerTests {
         credentialSubject = JsonObject(
             mapOf(
                 "type" to JsonPrimitive("VaccinationEvent"),
-                "batchNumber" to JsonPrimitive(1626382736),
+                "batchNumber" to JsonPrimitive("1626382736"),
                 "dateOfVaccination" to JsonPrimitive("2021-06-23T13:40:12Z"),
                 "administeringCentre" to JsonPrimitive("Praxis Sommergarten"),
                 "healthProfessional" to JsonPrimitive("883110000015376"),
@@ -104,12 +101,57 @@ class SerializerTests {
 
     @Test
     fun serializeInvitation() {
-        val atId = UUID.randomUUID()
-        val services = listOf(Service(SERVICE_PX_OVER_HTTP, URI.create("http://example.com")))
-        val invitation = Invitation(MESSAGE_INVITATION, atId, "test", "goal_code_test", "goal_test", services)
-        val serializedInvitation = Json.encodeToString(invitation)
-        assertEquals(invitation, Json.decodeFromString<Invitation>(serializedInvitation))
-        println(json.encodeToJsonElement(invitation))
+        val atId = UUID.randomUUID().toString()
+        val invitation = Invitation(
+            atId,
+            label = "Issuer of vaccination certificates",
+            service = listOf(Service(serviceEndpoint = URI.create("http://example.com")))
+        )
+        val serializedInvitation = json.encodeToString(invitation)
+        assertEquals(
+            invitation.service.get(0).serviceEndpoint,
+            json.decodeFromString<Invitation>(serializedInvitation).service.get(0).serviceEndpoint)
+        println(serializedInvitation)
+    }
+
+    @Test
+    fun serializeCredentialOffer() {
+        val atId = UUID.randomUUID().toString()
+        val credentialOffer = CredentialOffer(
+            atId,
+            outputDescriptor = JsonLdObject(content = emptyMap())
+        )
+        val serializedCredentialOffer = json.encodeToString(credentialOffer)
+        assert(
+            json.decodeFromString<CredentialOffer>(serializedCredentialOffer).outputDescriptor.isEmpty())
+        println(serializedCredentialOffer)
+    }
+
+    @Test
+    fun serializeCredentialRequest() {
+        val atId = UUID.randomUUID().toString()
+        val credentialRequest = CredentialRequest(
+            atId,
+            outputDescriptor = JsonLdObject(content = emptyMap())
+        )
+        val serializedCredentialRequest = json.encodeToString(credentialRequest)
+        assert(
+            json.decodeFromString<CredentialRequest>(serializedCredentialRequest).outputDescriptor.isEmpty())
+        println(serializedCredentialRequest)
+    }
+
+    @Test
+    fun serializeCredentialSubmit() {
+        val atId = UUID.randomUUID().toString()
+        val credentialSubmit = CredentialSubmit(
+            atId,
+            credential = credential
+        )
+        val serializedCredentialSubmit = json.encodeToString(credentialSubmit)
+        assertEquals(
+            credentialSubmit.credential.issuer,
+            json.decodeFromString<CredentialSubmit>(serializedCredentialSubmit).credential.issuer)
+        println(serializedCredentialSubmit)
     }
 
     @Test
@@ -119,8 +161,7 @@ class SerializerTests {
                 "@context" to JsonArray(
                     listOf(
                         JsonPrimitive("https://www.w3.org/2018/credentials/v1"),
-                        JsonPrimitive("https://w3id.org/vaccination/v1"),
-                        JsonPrimitive("https://w3id.org/security/bbs/v1")
+                        JsonPrimitive("https://w3id.org/vaccination/v1")
                     )
                 ),
                 "type" to JsonArray(
@@ -131,34 +172,44 @@ class SerializerTests {
                 ),
                 "credentialSubject" to JsonObject(
                     mapOf(
-                        "@explicit" to JsonPrimitive(true),
-                        "type" to JsonArray(
-                            listOf(
-                                JsonPrimitive("VaccinationEvent")
-                            )
-                        ),
-                        "batchNumber" to JsonObject(mapOf()),
-                        "administeringCentre" to JsonObject(mapOf()),
-                        "countryOfVaccination" to JsonObject(mapOf()),
+                        "type" to JsonPrimitive("VaccinationEvent"),
+                        "batchNumber" to JsonPrimitive("1626382736"),
+                        "dateOfVaccination" to JsonPrimitive("2021-06-23T13:40:12Z"),
+                        "administeringCentre" to JsonPrimitive("Praxis Sommergarten"),
+                        "healthProfessional" to JsonPrimitive("883110000015376"),
+                        "countryOfVaccination" to JsonPrimitive("GE"),
+                        "nextVaccinationDate" to JsonPrimitive("2021-08-16T13:40:12Z"),
+                        "order" to JsonPrimitive("3/3"),
                         "recipient" to JsonObject(
                             mapOf(
-                                "@explicit" to JsonPrimitive(true),
-                                "id" to JsonObject(mapOf()),
-                                "type" to JsonArray(
-                                    listOf(
-                                        JsonPrimitive("VaccineRecipient")
-                                    )
-                                )
+                                "type" to JsonPrimitive("VaccineRecipient"),
+                                "givenName" to JsonPrimitive("Marion"),
+                                "familyName" to JsonPrimitive("Mustermann"),
+                                "gender" to JsonPrimitive("Female"),
+                                "birthDate" to JsonPrimitive("1961-08-17")
+                            )
+                        ),
+                        "vaccine" to JsonObject(
+                            mapOf(
+                                "type" to JsonPrimitive("Vaccine"),
+                                "atcCode" to JsonPrimitive("J07BX03"),
+                                "medicinalProductName" to JsonPrimitive("COVID-19 Vaccine Moderna"),
+                                "marketingAuthorizationHolder" to JsonPrimitive("Moderna Biotech")
                             )
                         )
                     )
-                )
+                ),
+                "issuanceDate" to JsonPrimitive("2021-06-23T13:40:12Z"),
+                "issuer" to JsonPrimitive("did:key:test")
             )
         )
 
         val serialized = json.encodeToString(jsonLdObject)
+        assertEquals(
+            "1626382736",
+            json.decodeFromString<JsonLdObject>(serialized).get("credentialSubject")?.jsonObject?.get("batchNumber")?.jsonPrimitive?.content
+        )
         println(serialized)
-
     }
 
     @Test
@@ -186,12 +237,20 @@ class SerializerTests {
             verificationMethod = URI("did:key:test#test")
         )
         val serializedLdProof = Json.encodeToString(ldProof)
+        assertEquals(
+            ldProof.verificationMethod,
+            json.decodeFromString<LdProof>(serializedLdProof).verificationMethod
+        )
         println(json.encodeToString(ldProof))
     }
 
     @Test
     fun serializeCredential() {
         val serializedCredential = json.encodeToString(credential)
+        assertEquals(
+            "1626382736",
+            json.decodeFromString<Credential>(serializedCredential).credentialSubject?.get("batchNumber")?.jsonPrimitive?.content
+        )
         println(json.encodeToString(credential))
     }
 
@@ -210,7 +269,7 @@ class SerializerTests {
                 ],
                 "credentialSubject": {
                     "type": "VaccinationEvent",
-                    "batchNumber": 1626382736,
+                    "batchNumber": "1626382736",
                     "dateOfVaccination": "2021-06-23T13:40:12Z",
                     "administeringCentre": "Praxis Sommergarten",
                     "healthProfessional": "883110000015376",
@@ -280,7 +339,7 @@ class SerializerTests {
                         ],
                         "credentialSubject": {
                             "type": "VaccinationEvent",
-                            "batchNumber": 1626382736,
+                            "batchNumber": "1626382736",
                             "dateOfVaccination": "2021-06-23T13:40:12Z",
                             "administeringCentre": "Praxis Sommergarten",
                             "healthProfessional": "883110000015376",

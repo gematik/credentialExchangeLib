@@ -1,6 +1,5 @@
 package de.gematik.security.credentialExchangeLib.types
 
-import de.gematik.security.credentialExchangeLib.crypto.Signer
 import de.gematik.security.credentialExchangeLib.serializer.URISerializer
 import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
 import kotlinx.serialization.Required
@@ -9,35 +8,19 @@ import kotlinx.serialization.Serializable
 import java.net.URI
 
 @Serializable
-class Presentation(
+class CredentialRequest(
     override val id: String? = null,
     @Required @SerialName("@context") override var atContext: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<@Serializable(with = URISerializer::class) URI> = DEFAULT_JSONLD_CONTEXTS,
     @Required override var type: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<String> = DEFAULT_JSONLD_TYPES,
-    val presentationSubmission: PresentationSubmission,
-    val verifiableCredential: List<Credential>,
-    override var proof: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<LdProof>? = null
-) : LdObject, Verifiable {
+    val outputDescriptor: JsonLdObject,
+) : LdObject {
 
     companion object : LdObject.Defaults() {
         override val DEFAULT_JSONLD_CONTEXTS = listOf(
-            URI("https://www.w3.org/2018/credentials/v1")
+            URI("https://gematik.de/credential-exchange/v1")
         )
         override val DEFAULT_JSONLD_TYPES = listOf(
-            "VerifiablePresentation"
+            "CredentialRequest"
         )
     }
-
-    override fun sign(ldProof: LdProof, signer: Signer){
-        ldProof.sign(this, signer)
-        proof = listOf(ldProof)
-    }
-
-    override fun verify() : Boolean {
-        val pr = proof?.get(0)
-        check(pr!=null){"presenation doesn't contain a proof for verification"}
-        check(proof?.size == 1){"verfication of multi signature not supported yet"}
-        return pr.verify(this)
-    }
-
 }
-

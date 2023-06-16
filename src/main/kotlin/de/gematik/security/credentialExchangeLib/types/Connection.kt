@@ -1,4 +1,4 @@
-package de.gematik.security.mobilewallet.types
+package de.gematik.security.credentialExchangeLib.types
 
 import kotlinx.serialization.Serializable
 

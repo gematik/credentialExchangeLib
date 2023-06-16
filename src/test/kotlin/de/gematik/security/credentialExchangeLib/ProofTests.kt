@@ -6,7 +6,6 @@ import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.hexToByteArray
 import de.gematik.security.credentialExchangeLib.types.*
-import de.gematik.security.mobilewallet.types.Credential
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -92,8 +91,7 @@ class ProofTests {
 
     val emptyCredentialFrame = Credential(
         atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(
-            URI("https://w3id.org/vaccination/v1"),
-            URI("https://w3id.org/security/bbs/v1")
+            URI("https://w3id.org/vaccination/v1")
         ),
         type = Credential.DEFAULT_JSONLD_TYPES + listOf(
             "VaccinationCertificate"
