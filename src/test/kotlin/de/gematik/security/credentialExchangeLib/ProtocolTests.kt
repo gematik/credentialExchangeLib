@@ -1,5 +1,6 @@
 package de.gematik.security.credentialExchangeLib
 
+import de.gematik.security.credentialExchangeLib.connection.WsConnection
 import de.gematik.security.credentialExchangeLib.crypto.BbsPlusSigner
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
@@ -13,7 +14,7 @@ import org.junit.jupiter.api.Test
 import java.net.URI
 import java.util.*
 
-class ProofTests {
+class ProtocolTests {
 
     val didKeyIssuer =
         "did:key:zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv"
@@ -25,32 +26,14 @@ class ProofTests {
     )
     val verificationMethodIssuer = URI.create("${didKeyIssuer}#${didKeyIssuer.drop(8)}")
 
-    val didKeyHolder =
-        "did:key:zUC7CgahEtPMHR2JsTnFSbhjFE6bYAm5i2vbFWRUdSUNc45zFAg3rCA6UVoYcDzU5DHAk1HuLV5tgcd6edL8mKLoDRhbz7qzav5yzkDWWgZMh8wTieyjcXtoTSmxNq96nWUgP5V"
-    val verkeyHolder =
-        "xr2pBCj7voA6TX7QGf1WwvjgHtSsg4NfP7qf9b1ZsAjBqZiR9Xkwg3qsTEeDYujXbnt2J5E5Jj58hkc1c415PUAtBmwtdGxVj6X7cTvVDBobMke8XbihHeMyueQDCxKotUB"
-    val keyPairHolder = KeyPair(
-        "4318a7863ecbf9b347f3bd892828c588c20e61e5fa7344b7268643adb5a2bd4e".hexToByteArray(),
-        "a21e0d512342b0b6ebf0d86ab3a2cef2a57bab0c0eeff0ffebad724107c9f33d69368531b41b1caa5728730f52aea54817b087f0d773cb1a753f1ede255468e88cea6665c6ce1591c88b079b0c4f77d0967d8211b1bc8687213e2af041ba73c4".hexToByteArray()
-    )
-    val verificationMethodHolder = URI.create("${didKeyHolder}#${didKeyHolder.drop(8)}")
 
     val date = Date(1684152736408)
-    val presentationDefinitionId = UUID.fromString("250787ea-f892-11ed-b67e-0242ac120002")
-    val inputDescriptorId = UUID.fromString("3aa55a6e-f892-11ed-b67e-0242ac120002")
 
     val ldProofIssuer = LdProof(
         type = listOf(ProofType.BbsBlsSignature2020.name),
         created = Date(1684152736408),
         proofPurpose = ProofPurpose.ASSERTION_METHOD,
         verificationMethod = verificationMethodIssuer
-    )
-
-    val ldProofHolder = LdProof(
-        type = listOf(ProofType.BbsBlsSignature2020.name),
-        created = Date(1684152736408),
-        proofPurpose = ProofPurpose.AUTHENTICATION,
-        verificationMethod = verificationMethodHolder
     )
 
     val credential = Credential(
@@ -89,56 +72,56 @@ class ProofTests {
         issuer = URI.create(didKeyIssuer)
     )
 
-    val emptyCredentialFrame = Credential(
-        atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(
-            URI("https://w3id.org/vaccination/v1")
-        ),
-        type = Credential.DEFAULT_JSONLD_TYPES + listOf(
-            "VaccinationCertificate"
-        )
-    )
-
-    val presentation = Presentation(
-        atContext = Presentation.DEFAULT_JSONLD_CONTEXTS + PresentationSubmission.DEFAULT_JSONLD_CONTEXTS,
-        presentationSubmission = PresentationSubmission(
-            definitionId = presentationDefinitionId,
-            descriptorMap = listOf(
-                PresentationSubmission.DescriptorMapEntry(
-                    inputDescriptorId,
-                    ClaimFormat.LDP_VC,
-                    path = "\$.verifiableCredential[0]"
+    @Test
+    fun issueCredential() {
+        CredentialExchangeIssuer.listen(WsConnection) {
+            assert(it.receive().type?.contains("Invitation") ?: false)
+            it.sendOffer(
+                CredentialOffer(
+                    UUID.randomUUID().toString(),
+                    outputDescriptor = Credential(
+                        atContext = Credential.DEFAULT_JSONLD_CONTEXTS + URI("https://w3id.org/vaccination/v1"),
+                        type = Credential.DEFAULT_JSONLD_TYPES + "VaccinationCertificate"
+                    )
                 )
             )
-        ),
-        verifiableCredential = listOf(credential.deepCopy().apply {
-            sign(ldProofIssuer, BbsPlusSigner(keyPairIssuer))
-        }.derive(emptyCredentialFrame))
-    )
+            assert(it.receive() is CredentialRequest)
 
-    @Test
-    fun signVerifyCredential() {
-        val signedCredential = credential.deepCopy().apply { sign(ldProofIssuer, BbsPlusSigner(keyPairIssuer)) }
-        val result = signedCredential.verify()
-        assert(result)
-        println(json.encodeToString(signedCredential))
-    }
+            it.submitCredential(
+                CredentialSubmit(
+                    UUID.randomUUID().toString(),
+                    credential = credential.deepCopy().apply { sign(ldProofIssuer, BbsPlusSigner(keyPairIssuer)) }
 
-    @Test
-    fun deriveAndVerifyCredential() {
-        val signedCredential = credential.deepCopy().apply { sign(ldProofIssuer, BbsPlusSigner(keyPairIssuer)) }
-        val derivedCredential = signedCredential.derive(emptyCredentialFrame)
-        val result = derivedCredential.verify()
-        assert(result)
-        println(json.encodeToString(derivedCredential))
-    }
+                )
+            )
+            println("\"issuer\": ${json.encodeToString(it.protocolState)}")
+        }
 
-    @Test
-    fun signVerifyPresentation() {
-        val signedPresentation = presentation.deepCopy()
-        signedPresentation.sign(ldProofHolder, BbsPlusSigner(keyPairHolder))
-        val result = signedPresentation.verify()
-        assert(result)
-        println(json.encodeToString(signedPresentation))
+        CredentialExchangeHolder.connect(WsConnection, "127.0.0.1", 8080) {
+            it.sendInvitation(
+                Invitation(
+                    UUID.randomUUID().toString(),
+                    label = "test",
+                    service = listOf(
+                        Service(
+                            serviceEndpoint = URI("ws://127.0.0.1:8080/ws")
+                        )
+                    )
+                )
+            )
+            val credentialOffer = it.receive()
+            assert(credentialOffer is CredentialOffer)
+            it.requestCredential(
+                CredentialRequest(
+                    UUID.randomUUID().toString(),
+                    outputDescriptor = (credentialOffer as CredentialOffer).outputDescriptor
+                )
+            )
+            assert(it.receive() is CredentialSubmit)
+            it.close()
+            println("\"holder\": ${json.encodeToString(it.protocolState)}")
+        }
     }
 
 }
+

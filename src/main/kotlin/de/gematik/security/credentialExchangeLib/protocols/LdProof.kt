@@ -1,4 +1,4 @@
-package de.gematik.security.credentialExchangeLib.types
+package de.gematik.security.credentialExchangeLib.protocols
 
 import bbs.signatures.ProofMessage
 import com.apicatalog.jsonld.JsonLd
@@ -17,7 +17,6 @@ import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValu
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import java.net.URI
 import java.util.*
 import kotlin.random.Random

@@ -1,10 +1,8 @@
 package de.gematik.security.credentialExchangeLib
 
 import de.gematik.security.credentialExchangeLib.connection.Message
-import de.gematik.security.credentialExchangeLib.connection.MessageType
 import de.gematik.security.credentialExchangeLib.connection.WsConnection
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 

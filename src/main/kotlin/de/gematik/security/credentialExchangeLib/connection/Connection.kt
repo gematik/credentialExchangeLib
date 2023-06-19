@@ -3,7 +3,7 @@ import mu.KotlinLogging
 import java.io.Closeable
 import java.util.*
 
-abstract class Connection : Closeable {
+sealed class Connection : Closeable {
 
     companion object {
         @JvmStatic
@@ -18,7 +18,7 @@ abstract class Connection : Closeable {
 
     val logger = KotlinLogging.logger {}
 
-    val id = UUID.randomUUID()
+    val id : UUID = UUID.randomUUID()
 
     init{
         logger.info { "new connection: $id" }

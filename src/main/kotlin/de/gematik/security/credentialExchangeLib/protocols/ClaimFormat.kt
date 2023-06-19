@@ -1,4 +1,4 @@
-package de.gematik.security.credentialExchangeLib.types
+package de.gematik.security.credentialExchangeLib.protocols
 
 import kotlinx.serialization.SerialName
 

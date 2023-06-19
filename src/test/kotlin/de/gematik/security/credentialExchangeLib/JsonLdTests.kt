@@ -7,11 +7,10 @@ import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.normalize
 import de.gematik.security.credentialExchangeLib.extensions.toJsonDocument
-import de.gematik.security.credentialExchangeLib.types.Credential
-import de.gematik.security.credentialExchangeLib.types.JsonLdObject
-import de.gematik.security.credentialExchangeLib.types.LdProof
-import de.gematik.security.credentialExchangeLib.types.ProofPurpose
-import kotlinx.serialization.decodeFromString
+import de.gematik.security.credentialExchangeLib.protocols.Credential
+import de.gematik.security.credentialExchangeLib.protocols.JsonLdObject
+import de.gematik.security.credentialExchangeLib.protocols.LdProof
+import de.gematik.security.credentialExchangeLib.protocols.ProofPurpose
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import org.junit.jupiter.api.Test

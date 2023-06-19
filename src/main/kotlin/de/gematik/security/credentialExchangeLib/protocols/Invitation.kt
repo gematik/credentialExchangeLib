@@ -1,4 +1,4 @@
-package de.gematik.security.credentialExchangeLib.types
+package de.gematik.security.credentialExchangeLib.protocols
 
 import de.gematik.security.credentialExchangeLib.serializer.URISerializer
 import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
@@ -8,18 +8,19 @@ import kotlinx.serialization.Serializable
 import java.net.URI
 
 @Serializable
-class Service(
+class Invitation(
     override val id: String? = null,
     @Required @SerialName("@context") override val atContext: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<@Serializable(
         with = URISerializer::class
     ) URI> = DEFAULT_JSONLD_CONTEXTS,
     @Required override var type: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<String>? = DEFAULT_JSONLD_TYPES,
-    val serviceEndpoint: @Serializable(with = URISerializer::class) URI? = null,
+    val label: String,
+    val service: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<Service>,
 ) : LdObject {
     companion object : LdObject.Defaults() {
         override val DEFAULT_JSONLD_CONTEXTS = listOf(
             URI("https://gematik.de/credential-exchange/v1/")
         )
-        override val DEFAULT_JSONLD_TYPES = listOf("BasicService")
+        override val DEFAULT_JSONLD_TYPES = listOf("Invitation")
     }
 }

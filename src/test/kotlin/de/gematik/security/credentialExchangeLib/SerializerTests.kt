@@ -2,13 +2,12 @@ package de.gematik.security.credentialExchangeLib
 
 import de.gematik.security.credentialExchangeLib.extensions.toJsonDocument
 import de.gematik.security.credentialExchangeLib.extensions.toJsonLdObject
-import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
+import de.gematik.security.credentialExchangeLib.protocols.*
 import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
 import de.gematik.security.credentialExchangeLib.serializer.URISerializer
 import de.gematik.security.credentialExchangeLib.serializer.UUIDSerializer
-import de.gematik.security.credentialExchangeLib.types.*
+import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import org.junit.jupiter.api.Test
@@ -119,11 +118,11 @@ class SerializerTests {
         val atId = UUID.randomUUID().toString()
         val credentialOffer = CredentialOffer(
             atId,
-            outputDescriptor = JsonLdObject(content = emptyMap())
+            outputDescriptor = Credential()
         )
         val serializedCredentialOffer = json.encodeToString(credentialOffer)
         assert(
-            json.decodeFromString<CredentialOffer>(serializedCredentialOffer).outputDescriptor.isEmpty())
+            json.decodeFromString<CredentialOffer>(serializedCredentialOffer).outputDescriptor.credentialSubject==null)
         println(serializedCredentialOffer)
     }
 
@@ -132,11 +131,11 @@ class SerializerTests {
         val atId = UUID.randomUUID().toString()
         val credentialRequest = CredentialRequest(
             atId,
-            outputDescriptor = JsonLdObject(content = emptyMap())
+            outputDescriptor = Credential()
         )
         val serializedCredentialRequest = json.encodeToString(credentialRequest)
         assert(
-            json.decodeFromString<CredentialRequest>(serializedCredentialRequest).outputDescriptor.isEmpty())
+            json.decodeFromString<CredentialRequest>(serializedCredentialRequest).outputDescriptor.credentialSubject==null)
         println(serializedCredentialRequest)
     }
 

@@ -1,6 +1,6 @@
 package de.gematik.security.credentialExchangeLib.serializer
 
-import de.gematik.security.credentialExchangeLib.types.JsonLdObject
+import de.gematik.security.credentialExchangeLib.protocols.JsonLdObject
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor

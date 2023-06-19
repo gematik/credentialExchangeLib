@@ -6,9 +6,8 @@ import com.apicatalog.rdf.RdfDataset
 import com.apicatalog.rdf.io.nquad.NQuadsWriter
 import de.gematik.security.credentialExchangeLib.defaultJsonLdOptions
 import de.gematik.security.credentialExchangeLib.json
-import de.gematik.security.credentialExchangeLib.types.LdObject
+import de.gematik.security.credentialExchangeLib.protocols.LdObject
 import io.setl.rdf.normalization.RdfNormalize
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement

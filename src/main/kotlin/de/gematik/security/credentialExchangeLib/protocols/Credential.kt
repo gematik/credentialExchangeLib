@@ -1,4 +1,4 @@
-package de.gematik.security.credentialExchangeLib.types
+package de.gematik.security.credentialExchangeLib.protocols
 
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.crypto.Signer
@@ -6,9 +6,6 @@ import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
 import de.gematik.security.credentialExchangeLib.serializer.URISerializer
 import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
-import de.gematik.security.credentialExchangeLib.types.LdObject
-import de.gematik.security.credentialExchangeLib.types.LdProof
-import de.gematik.security.credentialExchangeLib.types.Verifiable
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

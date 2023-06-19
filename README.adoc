@@ -10,16 +10,19 @@ Please note that the issuer acts as verifier if he needs additional data from th
 
 state c1 <<choice>>
 
-[*] --> WaitForCredentialRequest
-WaitForCredentialRequest : Offer Credential
-WaitForCredentialRequest --> c1 <<choice>> : Receive Request
-c1 --> [*] : [Holder Verification not required] Issue Credential
-c1 --> HolderVerification : [Holder Verification required]
-HolderVerification : Request Presentation
-HolderVerification : Verify Presentation
-HolderVerification --> HolderVerification : Receive Presentation
-HolderVerification --> [*] : [Verification Success] Issue Credential
-HolderVerification --> [*] : [Verification failed]
+[*] --> Initialized
+Initialized --> SendOffer : receive invitation
+SendOffer --> WaitForRequest : send offer
+SendOffer --> Closed : close
+WaitForRequest --> SubmitCredential : receive request
+WaitForRequest --> Closed : close
+SubmitCredential --> CredentialSubmitted : send credential
+SubmitCredential --> HolderVerification : send presentation request
+SubmitCredential --> Closed : close
+HolderVerification --> SubmitCredential : receive credential
+HolderVerification --> Closed : close
+CredentialSubmitted --> Closed : close
+Closed --> [*]
 
 @enduml
 ----

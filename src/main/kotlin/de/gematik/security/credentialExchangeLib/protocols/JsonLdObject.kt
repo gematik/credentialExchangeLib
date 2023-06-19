@@ -1,4 +1,4 @@
-package de.gematik.security.credentialExchangeLib.types
+package de.gematik.security.credentialExchangeLib.protocols
 
 import de.gematik.security.credentialExchangeLib.serializer.JsonLdObjectSerializer
 import kotlinx.serialization.Serializable
