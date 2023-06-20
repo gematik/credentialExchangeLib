@@ -5,32 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="246e1cc3-192b-491f-8ba1-e76025f33fb5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeHolder.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeIssuer.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProtocolTests.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.adoc" beforeDir="false" afterPath="$PROJECT_DIR$/README.adoc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/Connection.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/Connection.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/extensions/JsonLd.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/extensions/JsonLd.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/serializer/JsonLdObjectSerializer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/serializer/JsonLdObjectSerializer.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/types/ClaimFormat.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/ClaimFormat.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/types/Credential.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Credential.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/types/CredentialOffer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialOffer.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/types/CredentialRecord.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/types/CredentialRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialRequest.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/types/CredentialSubmit.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialSubmit.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/types/Invitation.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Invitation.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/types/JsonLdObject.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/JsonLdObject.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/types/LdObject.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdObject.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/types/LdProof.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/types/Presentation.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Presentation.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/types/PresentationSubmission.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/PresentationSubmission.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/types/ProofPurpose.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/ProofPurpose.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/types/Service.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Service.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/types/Verifiable.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Verifiable.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ConnectionTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ConnectionTests.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/JsonLdTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/JsonLdTests.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProofTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProofTests.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Credential.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Credential.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProtocolTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProtocolTests.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/SerializerTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/SerializerTests.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -60,6 +38,12 @@
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="credentialExchangeLib" type="f1a62948:ProjectNode" />
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="credentialExchangeLib" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="publishing" type="c8890929:TasksNode$1" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
@@ -103,7 +87,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "ignore.virus.scanning.warn.message": "true",
-    "ktor.last.update.timestamp": "1687162016681",
+    "ktor.last.update.timestamp": "1687252185461",
     "last_opened_file_path": "C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -139,7 +123,7 @@
       <recent name="de.gematik.security.credentialExchangeLib.serializer" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.ProtocolTests.issueCredential">
+  <component name="RunManager" selected="Gradle.TestSuite">
     <configuration name="ConnectionTests" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -262,8 +246,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Gradle.ProtocolTests.issueCredential" />
         <item itemvalue="Gradle.TestSuite" />
+        <item itemvalue="Gradle.ProtocolTests.issueCredential" />
         <item itemvalue="Gradle.SerializerTests.serializeCredentialOffer" />
         <item itemvalue="Gradle.ConnectionTests" />
         <item itemvalue="Gradle.ConnectionTests.pingPong2" />
@@ -290,7 +274,7 @@
       <workItem from="1686908340036" duration="11196000" />
       <workItem from="1686921994906" duration="87000" />
       <workItem from="1686922101273" duration="7835000" />
-      <workItem from="1687161870628" duration="24177000" />
+      <workItem from="1687161870628" duration="34141000" />
     </task>
     <task id="LOCAL-00001" summary="initial check in">
       <created>1683117220289</created>
@@ -369,7 +353,14 @@
       <option name="project" value="LOCAL" />
       <updated>1686931894300</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="feat: add credential exchange state machine">
+      <created>1687191678208</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1687191678208</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -398,14 +389,15 @@
     <MESSAGE value="chore: add state diagrams for issuer and holder" />
     <MESSAGE value="feat: add credential exchange types" />
     <MESSAGE value="feat: add web socket connections" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add web socket connections" />
+    <MESSAGE value="feat: add credential exchange state machine" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add credential exchange state machine" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/SerializerTests.kt</url>
-          <line>367</line>
+          <line>368</line>
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">

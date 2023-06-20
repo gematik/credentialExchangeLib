@@ -19,9 +19,9 @@ class Credential(
     override val id: String? = null,
     @Required @SerialName("@context") override var atContext: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<@Serializable(with = URISerializer::class) URI> = DEFAULT_JSONLD_CONTEXTS,
     @Required override var type: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<String> = DEFAULT_JSONLD_TYPES,
-    val credentialSubject: JsonObject? = null,
-    val issuer: @Serializable(with = URISerializer::class) URI? = null,
-    val issuanceDate: @Serializable(with = DateSerializer::class) Date? = null,
+    var credentialSubject: JsonObject? = null,
+    var issuer: @Serializable(with = URISerializer::class) URI? = null,
+    var issuanceDate: @Serializable(with = DateSerializer::class) Date? = null,
     override var proof: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<LdProof>? = null
 ) : LdObject, Verifiable {
 

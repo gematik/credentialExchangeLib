@@ -131,7 +131,8 @@ class SerializerTests {
         val atId = UUID.randomUUID().toString()
         val credentialRequest = CredentialRequest(
             atId,
-            outputDescriptor = Credential()
+            outputDescriptor = Credential(),
+            holderKey = "did:key:holder"
         )
         val serializedCredentialRequest = json.encodeToString(credentialRequest)
         assert(
