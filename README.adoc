@@ -8,10 +8,9 @@ Please note that the issuer acts as verifier if he needs additional data from th
 ----
 @startuml
 
-state c1 <<choice>>
-
 [*] --> Initialized
 Initialized --> SendOffer : receive invitation
+Initialized --> Closed : close
 SendOffer --> WaitForRequest : send offer
 SendOffer --> Closed : close
 WaitForRequest --> SubmitCredential : receive request
@@ -35,19 +34,19 @@ Please note that the holder should always verify the trustworthiness of the issu
 ----
 @startuml
 
-state c1 <<choice>>
-
-[*] --> WaitForOffer
-WaitForOffer --> c1 : Receive Offer
-c1 --> WaitForCredential : [Issuer Verification not required]
-c1 --> IssuerVerification : [Issuer Verification required]
-IssuerVerification : Request Presenation
-IssuerVerification : Verify Presenation
-IssuerVerification --> IssuerVerification : Receive Presentation
-IssuerVerification --> WaitForCredential : Verification Success
-IssuerVerification --> [*] : Verification failed
-WaitForCredential : Request Credential
-WaitForCredential --> [*] : Receive Credential
+[*] --> Initialized
+Initialized --> WaitForOffer : send invitation
+Initialized --> Closed : close
+WaitForOffer --> SendRequest : receive offer
+WaitForOffer --> Closed : close
+SendRequest --> WaitForCredential : send request
+SendRequest --> Closed : close
+WaitForCredential --> CredentialReceived : receive credential
+WaitForCredential --> HolderVerification : receive presentation request
+WaitForCredential --> Closed : close
+HolderVerification --> WaitForCredential : send presentation
+HolderVerification --> Closed : close
+CredentialReceived --> Closed : close
 
 @enduml
 ----
