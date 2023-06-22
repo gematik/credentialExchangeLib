@@ -26,7 +26,7 @@ class WsConnection private constructor(val session: DefaultWebSocketSession) : C
 
         override fun listen(wait: Boolean, connectionHandler: suspend (Connection) -> Unit): ApplicationEngine {
 
-            val engine = embeddedServer(io.ktor.server.cio.CIO, port = 8080) {
+            val engine = embeddedServer(io.ktor.server.cio.CIO, port = 8090) {
                 install(io.ktor.server.websocket.WebSockets) {
                     contentConverter = KotlinxWebsocketSerializationConverter(Json)
                 }
