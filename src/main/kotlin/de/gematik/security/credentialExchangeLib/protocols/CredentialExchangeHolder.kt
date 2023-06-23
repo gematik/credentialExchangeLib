@@ -5,8 +5,10 @@ import de.gematik.security.credentialExchangeLib.connection.ConnectionFactory
 import de.gematik.security.credentialExchangeLib.connection.Message
 import de.gematik.security.credentialExchangeLib.connection.MessageType
 import de.gematik.security.credentialExchangeLib.json
+import io.ktor.server.engine.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import java.security.InvalidParameterException
 
@@ -33,20 +35,38 @@ class CredentialExchangeHolder private constructor(val connection: Connection) {
     val protocolState = ProtocolState()
 
     companion object Factory {
-        fun listen(factory: ConnectionFactory, protocolHandler: suspend (CredentialExchangeHolder) -> Unit) {
-            factory.listen {
+        fun listen(
+            host: String = "0.0.0.0",
+            port: Int = 8090,
+            path: String = "ws",
+            factory: ConnectionFactory, protocolHandler: suspend (CredentialExchangeHolder) -> Unit
+        ) : ApplicationEngine {
+            return factory.listen(host, port, path) {
                 protocolHandler(CredentialExchangeHolder(it))
             }
         }
 
-        fun connect(
+        suspend fun connect(
             factory: ConnectionFactory,
-            host: String,
-            port: Int,
+            host: String = "127.0.0.1",
+            port: Int = 8090,
+            path: String = "ws",
+            invitation: Invitation? = null,
             protocolHandler: suspend (CredentialExchangeHolder) -> Unit
         ) {
-            factory.connect(host, port) {
-                protocolHandler(CredentialExchangeHolder(it))
+            check(!(path.contains("oob=") && invitation!=null))
+            factory.connect(host, port, path + if(invitation!=null) "?oob=${invitation.toBase64()}" else "") {
+                protocolHandler(CredentialExchangeHolder(it).apply {
+                    invitation?.let{
+                        protocolState.invitation = invitation
+                        protocolState.state = State.WAIT_FOR_OFFER
+                    }
+                    if(path.contains("oob=")){
+                        val oob = path.substringAfter("oob=").substringBefore("&")
+                        protocolState.invitation = Invitation.fromBase64(oob)
+                        protocolState.state = State.WAIT_FOR_OFFER
+                    }
+                })
             }
         }
     }
@@ -56,6 +76,14 @@ class CredentialExchangeHolder private constructor(val connection: Connection) {
         while (pm == null) {
             val message = connection.receive()
             pm = when (message.type) {
+                MessageType.INVITATION_ACCEPT -> {
+                    check(protocolState.state == State.INITIALIZED) { "invalid state: ${protocolState.state.name}" }
+                    json.decodeFromString<Invitation>(message.content).also {
+                        protocolState.invitation = it
+                        protocolState.state = State.WAIT_FOR_OFFER
+                    }
+                }
+
                 MessageType.CREDENTIAL_OFFER -> {
                     check(protocolState.state == State.WAIT_FOR_OFFER) { "invalid state: ${protocolState.state.name}" }
                     json.decodeFromString<CredentialOffer>(message.content).also {
@@ -74,7 +102,15 @@ class CredentialExchangeHolder private constructor(val connection: Connection) {
 
                 MessageType.BYE -> JsonLdObject(
                     mapOf(
-                        "error" to JsonPrimitive("coonection closed by peer")
+                        "type" to JsonArray(listOf(JsonPrimitive("Error"))),
+                        "description" to JsonPrimitive("Bye from peer with message: ${message.content}")
+                    )
+                )
+
+                MessageType.CLOSED -> JsonLdObject(
+                    mapOf(
+                        "type" to JsonArray(listOf(JsonPrimitive("Error"))),
+                        "description" to JsonPrimitive("Connection closed")
                     )
                 )
 

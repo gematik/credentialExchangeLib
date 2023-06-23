@@ -5,8 +5,10 @@ import de.gematik.security.credentialExchangeLib.connection.ConnectionFactory
 import de.gematik.security.credentialExchangeLib.connection.Message
 import de.gematik.security.credentialExchangeLib.connection.MessageType
 import de.gematik.security.credentialExchangeLib.json
+import io.ktor.server.engine.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import java.security.InvalidParameterException
 
@@ -33,20 +35,39 @@ class CredentialExchangeIssuer private constructor(val connection: Connection) {
     val protocolState = ProtocolState()
 
     companion object Factory {
-        fun listen(factory: ConnectionFactory, protocolHandler: suspend (CredentialExchangeIssuer) -> Unit) {
-            factory.listen {
+        fun listen (
+            factory: ConnectionFactory,
+            host: String = "0.0.0.0",
+            port: Int = 8090,
+            path: String = "ws",
+            protocolHandler: suspend (CredentialExchangeIssuer) -> Unit
+        ) : ApplicationEngine {
+            return factory.listen(host, port, path) {
                 protocolHandler(CredentialExchangeIssuer(it))
             }
         }
 
-        fun connect(
+        suspend fun connect(
             factory: ConnectionFactory,
-            host: String,
-            port: Int,
+            host: String = "127.0.0.1",
+            port: Int = 8090,
+            path: String = "ws",
+            invitation: Invitation? = null,
             protocolHandler: suspend (CredentialExchangeIssuer) -> Unit
         ) {
-            factory.connect(host, port) {
-                protocolHandler(CredentialExchangeIssuer(it))
+            check(!(path.contains("oob=") && invitation!=null))
+            factory.connect(host, port, path + if(invitation!=null) "?oob=${invitation.toBase64()}" else "") {
+                protocolHandler(CredentialExchangeIssuer(it).apply {
+                    invitation?.let{
+                        protocolState.invitation = invitation
+                        protocolState.state = State.SEND_OFFER
+                    }
+                    if(path.contains("oob=")){
+                        val oob = path.substringAfter("oob=").substringBefore("&")
+                        protocolState.invitation = Invitation.fromBase64(oob)
+                        protocolState.state = State.SEND_OFFER
+                    }
+                })
             }
         }
     }
@@ -74,7 +95,15 @@ class CredentialExchangeIssuer private constructor(val connection: Connection) {
 
                 MessageType.BYE -> JsonLdObject(
                     mapOf(
-                        "error" to JsonPrimitive("coonection closed by peer")
+                        "type" to JsonArray(listOf(JsonPrimitive("Error"))),
+                        "description" to JsonPrimitive("Bye from peer with message: ${message.content}")
+                    )
+                )
+
+                MessageType.CLOSED -> JsonLdObject(
+                    mapOf(
+                        "type" to JsonArray(listOf(JsonPrimitive("Error"))),
+                        "description" to JsonPrimitive("Connection closed")
                     )
                 )
 

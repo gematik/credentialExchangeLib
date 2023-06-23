@@ -6,6 +6,7 @@ import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.hexToByteArray
 import de.gematik.security.credentialExchangeLib.protocols.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonObject
@@ -117,10 +118,50 @@ class ProtocolTests {
         issuer = URI.create(didKeyIssuer)
     )
 
+    val invitation = Invitation(
+        UUID.randomUUID().toString(),
+        label = "credential issuer",
+        service = listOf(
+            Service(
+                serviceEndpoint = URI("ws://127.0.0.1:8090/ws")
+            )
+        )
+    )
+
+    @Test
+    fun acceptInvitation() {
+        val engine = CredentialExchangeIssuer.listen(WsConnection) {
+            assert(it.receive() is Invitation)
+            println("\"issuer\": ${json.encodeToString(it.protocolState)}")
+        }
+        runBlocking {
+            CredentialExchangeHolder.connect(WsConnection, invitation = invitation) {
+                it.receive()
+            }
+        }
+        engine.stop()
+    }
+
+    @Test
+    fun acceptInvitationInPath() {
+        val engine = CredentialExchangeIssuer.listen(WsConnection) {
+            assert(it.receive() is Invitation)
+            println("\"issuer\": ${json.encodeToString(it.protocolState)}")
+        }
+        runBlocking {
+            CredentialExchangeHolder.connect(WsConnection, path = "ws?oob=${invitation.toBase64()}") {
+                it.receive()
+            }
+        }
+        engine.stop()
+    }
+
     @Test
     fun issueCredential() {
-        CredentialExchangeIssuer.listen(WsConnection) {
-            assert(it.receive().type?.contains("Invitation") ?: false)
+
+        //start issuer
+        val engine = CredentialExchangeIssuer.listen(WsConnection) {
+            assert(it.receive() is Invitation)
             it.sendOffer(
                 CredentialOffer(
                     UUID.randomUUID().toString(),
@@ -137,7 +178,8 @@ class ProtocolTests {
             credentialSubject.recipient =
                 credentialSubject.recipient?.apply { id = (credentialRequest as CredentialRequest).holderKey }
             val updatedCredential = credential.deepCopy().apply {
-                this.credentialSubject = json.encodeToJsonElement(CredentialSubject.serializer(), credentialSubject).jsonObject
+                this.credentialSubject =
+                    json.encodeToJsonElement(CredentialSubject.serializer(), credentialSubject).jsonObject
             }
 
             it.submitCredential(
@@ -149,32 +191,30 @@ class ProtocolTests {
             println("\"issuer\": ${json.encodeToString(it.protocolState)}")
         }
 
-        CredentialExchangeHolder.connect(WsConnection, "127.0.0.1", 8080)
-        {
-            it.sendInvitation(
-                Invitation(
-                    UUID.randomUUID().toString(),
-                    label = "test",
-                    service = listOf(
-                        Service(
-                            serviceEndpoint = URI("ws://127.0.0.1:8080/ws")
-                        )
+        // start holder
+        runBlocking {
+            CredentialExchangeHolder.connect(
+                WsConnection,
+                invitation = invitation,
+            )
+            {
+                val credentialOffer = it.receive()
+                assert(credentialOffer is CredentialOffer)
+                it.requestCredential(
+                    CredentialRequest(
+                        UUID.randomUUID().toString(),
+                        outputDescriptor = (credentialOffer as CredentialOffer).outputDescriptor,
+                        holderKey = didKeyHolder
                     )
                 )
-            )
-            val credentialOffer = it.receive()
-            assert(credentialOffer is CredentialOffer)
-            it.requestCredential(
-                CredentialRequest(
-                    UUID.randomUUID().toString(),
-                    outputDescriptor = (credentialOffer as CredentialOffer).outputDescriptor,
-                    holderKey = didKeyHolder
-                )
-            )
-            assert(it.receive() is CredentialSubmit)
-            it.close()
-            println("\"holder\": ${json.encodeToString(it.protocolState)}")
+                assert(it.receive() is CredentialSubmit)
+                it.close()
+                println("\"holder\": ${json.encodeToString(it.protocolState)}")
+            }
+
         }
+
+        engine.stop()
     }
 
 }

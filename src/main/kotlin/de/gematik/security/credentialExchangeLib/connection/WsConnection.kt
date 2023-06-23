@@ -1,5 +1,6 @@
 package de.gematik.security.credentialExchangeLib.connection
 
+import de.gematik.security.credentialExchangeLib.connection.WsConnection.Companion.getConnection
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.websocket.*
@@ -7,70 +8,58 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
+import io.ktor.server.http.content.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.util.*
 
-class WsConnection private constructor(val session: DefaultWebSocketSession) : Connection() {
+internal lateinit var serverPath: String
+internal lateinit var serverConnectionHandler: suspend (Connection) -> Unit
+
+class WsConnection private constructor(private val session: DefaultWebSocketSession) : Connection() {
 
     companion object : ConnectionFactory {
-        val client = HttpClient(CIO) {
+        private val client = HttpClient(CIO) {
             install(io.ktor.client.plugins.websocket.WebSockets) {
                 contentConverter = KotlinxWebsocketSerializationConverter(Json)
             }
         }
 
-        override fun listen(wait: Boolean, connectionHandler: suspend (Connection) -> Unit): ApplicationEngine {
-
-            val engine = embeddedServer(io.ktor.server.cio.CIO, port = 8090) {
-                install(io.ktor.server.websocket.WebSockets) {
-                    contentConverter = KotlinxWebsocketSerializationConverter(Json)
-                }
-                routing {
-                    webSocket("/ws") {
-                        getConnection(this).use {
-                            connectionHandler(it)
-                        }
-                    }
-                }
-            }
-            engine.start(wait)
+        override fun listen(
+            host: String,
+            port: Int,
+            path: String,
+            connectionHandler: suspend (Connection) -> Unit
+        ): ApplicationEngine {
+            serverConnectionHandler = connectionHandler
+            serverPath = path
+            val engine = embeddedServer(io.ktor.server.cio.CIO, host = host, port = port, module = Application::module)
+            engine.start()
             return engine
         }
 
-        override fun connect(host: String, port: Int, wait: Boolean, connectionHandler: suspend (Connection) -> Unit) {
-            runBlocking {
-                if (wait) {
-                    connectInternal(host, port, wait, connectionHandler)
-                } else {
-                    launch {
-                        connectInternal(host, port, wait, connectionHandler)
-                    }
-                }
-            }
-        }
-
-        private suspend fun connectInternal(
+        override suspend fun connect(
             host: String,
             port: Int,
-            wait: Boolean,
+            path: String,
             connectionHandler: suspend (Connection) -> Unit
         ) {
-            client.webSocket(method = HttpMethod.Get, host = host, port = port, path = "/ws") {
+            client.webSocket(method = HttpMethod.Get, host = host, port = port, path = path) {
                 getConnection(this).use {
                     connectionHandler(it)
                 }
             }
         }
 
-        private fun getConnection(session: Any?): Connection {
+        internal fun getConnection(session: Any?): Connection {
             require(session is DefaultWebSocketSession)
             val connection = WsConnection(session)
-            connections.put(connection.id, connection)
+            connections[connection.id] = connection
             return connection
         }
     }
@@ -97,13 +86,46 @@ class WsConnection private constructor(val session: DefaultWebSocketSession) : C
         }
     }
 
+    private var isFirstReceive = true
     override suspend fun receive(): Message {
         val message = when (session) {
-            is DefaultClientWebSocketSession -> session.receiveDeserialized<Message>()
-            is DefaultWebSocketServerSession -> session.receiveDeserialized<Message>()
+            is DefaultClientWebSocketSession -> kotlin.runCatching {
+                session.receiveDeserialized<Message>()
+            }.getOrDefault(Message("connection closed", MessageType.CLOSED))
+            is DefaultWebSocketServerSession -> {
+                if (isFirstReceive && session.call.parameters.contains("oob")) {
+                    Message(
+                        String(Base64.getDecoder().decode(session.call.parameters["oob"])),
+                        MessageType.INVITATION_ACCEPT
+                    )
+                } else {
+                    kotlin.runCatching {
+                        session.receiveDeserialized<Message>()
+                    }.getOrDefault(Message("connection closed", MessageType.CLOSED))
+                }
+            }
+
             else -> throw IllegalStateException("wrong session type")
         }
+        isFirstReceive = false
         logger.info { "receive: ${Json.encodeToString(message)}" }
         return message
+    }
+}
+
+fun Application.module() {
+    install(io.ktor.server.websocket.WebSockets) {
+        contentConverter = KotlinxWebsocketSerializationConverter(Json)
+    }
+    routing {
+        staticResources("/static", "files")
+        webSocket(serverPath) {
+            getConnection(this).use {
+                serverConnectionHandler(it)
+            }
+        }
+        get("/") {
+            call.respondRedirect("static/about.html")
+        }
     }
 }

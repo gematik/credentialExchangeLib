@@ -8,6 +8,7 @@ import org.junit.platform.suite.api.Suite
     JsonLdTests::class,
     ProofTests::class,
     SerializerTests::class,
-    ConnectionTests::class
+    ConnectionTests::class,
+    ProtocolTests::class
 )
 class TestSuite

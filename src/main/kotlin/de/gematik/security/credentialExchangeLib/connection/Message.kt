@@ -11,5 +11,6 @@ enum class MessageType {
     CREDENTIAL_OFFER,
     CREDENTIAL_REQUEST,
     CREDENTIAL_SUBMIT,
-    BYE
+    BYE,
+    CLOSED
 }

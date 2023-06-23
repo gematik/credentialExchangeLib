@@ -4,12 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="246e1cc3-192b-491f-8ba1-e76025f33fb5" name="Changes" comment="">
+    <list default="true" id="246e1cc3-192b-491f-8ba1-e76025f33fb5" name="Changes" comment="chore: refactor wsconnection handling&#10;feat: add about info">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/files/IdentityCard.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/files/about.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Credential.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Credential.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/ConnectionFactory.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/ConnectionFactory.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/Message.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/Message.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/WsConnection.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/WsConnection.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/extensions/JsonLd.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/extensions/JsonLd.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeHolder.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeHolder.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeIssuer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeIssuer.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Invitation.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Invitation.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ConnectionTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ConnectionTests.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProtocolTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProtocolTests.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/SerializerTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/SerializerTests.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/TestSuite.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/TestSuite.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +51,12 @@
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="credentialExchangeLib" type="f1a62948:ProjectNode" />
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="build" type="c8890929:TasksNode$1" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="credentialExchangeLib" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
                 <item name="publishing" type="c8890929:TasksNode$1" />
               </path>
               <path>
@@ -71,10 +85,18 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="a08f7c47fa8a1750253cf658ae68d7ea0d84e650" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="zk06m39o" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectId" id="2PHVdNZpMZsGUAvFBFXO1wzX8no" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -87,22 +109,23 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "ignore.virus.scanning.warn.message": "true",
-    "ktor.last.update.timestamp": "1687252185461",
-    "last_opened_file_path": "C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources",
+    "ktor.last.update.timestamp": "1687522247824",
+    "last_opened_file_path": "C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources/files",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.31034482",
     "settings.editor.selected.configurable": "AndroidSdkUpdater",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\rk\IntelliJIDEAProjects\credentialExchangeLib\src\main\resources\files" />
       <recent name="C:\Users\rk\IntelliJIDEAProjects\credentialExchangeLib\src\main\resources" />
       <recent name="C:\Users\rk\IntelliJIDEAProjects\credentialExchangeLib\src\test\resources" />
     </key>
@@ -124,30 +147,6 @@
     </key>
   </component>
   <component name="RunManager" selected="Gradle.TestSuite">
-    <configuration name="ConnectionTests" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":test" />
-            <option value="--tests" />
-            <option value="&quot;de.gematik.security.credentialExchangeLib.ConnectionTests&quot;" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <ForceTestExec>true</ForceTestExec>
-      <method v="2" />
-    </configuration>
     <configuration name="ConnectionTests.pingPong2" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -162,54 +161,6 @@
             <option value=":test" />
             <option value="--tests" />
             <option value="&quot;de.gematik.security.credentialExchangeLib.ConnectionTests.pingPong2&quot;" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <ForceTestExec>true</ForceTestExec>
-      <method v="2" />
-    </configuration>
-    <configuration name="ProtocolTests.issueCredential" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":test" />
-            <option value="--tests" />
-            <option value="&quot;de.gematik.security.credentialExchangeLib.ProtocolTests.issueCredential&quot;" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <ForceTestExec>true</ForceTestExec>
-      <method v="2" />
-    </configuration>
-    <configuration name="SerializerTests.serializeCredentialOffer" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":test" />
-            <option value="--tests" />
-            <option value="&quot;de.gematik.security.credentialExchangeLib.SerializerTests.serializeCredentialOffer&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -244,12 +195,78 @@
       <ForceTestExec>true</ForceTestExec>
       <method v="2" />
     </configuration>
+    <configuration name="credentialExchangeLib [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="clean" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>false</ForceTestExec>
+      <method v="2" />
+    </configuration>
+    <configuration name="credentialExchangeLib [jar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="jar" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>false</ForceTestExec>
+      <method v="2" />
+    </configuration>
+    <configuration name="credentialExchangeLib [publishToMavenLocal]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="publishToMavenLocal" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>false</ForceTestExec>
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.TestSuite" />
-        <item itemvalue="Gradle.ProtocolTests.issueCredential" />
-        <item itemvalue="Gradle.SerializerTests.serializeCredentialOffer" />
-        <item itemvalue="Gradle.ConnectionTests" />
+        <item itemvalue="Gradle.credentialExchangeLib [clean]" />
+        <item itemvalue="Gradle.credentialExchangeLib [publishToMavenLocal]" />
+        <item itemvalue="Gradle.credentialExchangeLib [jar]" />
         <item itemvalue="Gradle.ConnectionTests.pingPong2" />
       </list>
     </recent_temporary>
@@ -275,6 +292,7 @@
       <workItem from="1686921994906" duration="87000" />
       <workItem from="1686922101273" duration="7835000" />
       <workItem from="1687161870628" duration="34141000" />
+      <workItem from="1687433362449" duration="35760000" />
     </task>
     <task id="LOCAL-00001" summary="initial check in">
       <created>1683117220289</created>
@@ -360,7 +378,14 @@
       <option name="project" value="LOCAL" />
       <updated>1687191678208</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="chore: change required to produced and publish artifact as library">
+      <created>1687422645739</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1687422645739</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -390,7 +415,9 @@
     <MESSAGE value="feat: add credential exchange types" />
     <MESSAGE value="feat: add web socket connections" />
     <MESSAGE value="feat: add credential exchange state machine" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add credential exchange state machine" />
+    <MESSAGE value="chore: change required to produced and publish artifact as library" />
+    <MESSAGE value="chore: refactor wsconnection handling&#10;feat: add about info" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: refactor wsconnection handling&#10;feat: add about info" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -419,6 +446,19 @@
           <url>file://$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/SerializerTests.kt</url>
           <line>124</line>
           <option name="timeStamp" value="41" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeIssuer.kt</url>
+          <line>75</line>
+          <option name="timeStamp" value="49" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/WsConnection.kt</url>
+          <line>52</line>
+          <properties>
+            <option name="lambda-ordinal" value="-1" />
+          </properties>
+          <option name="timeStamp" value="57" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
