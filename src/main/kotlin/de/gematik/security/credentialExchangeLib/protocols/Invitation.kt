@@ -12,7 +12,7 @@ import java.util.*
 
 @Serializable
 class Invitation(
-    override val id: String? = null,
+    override val id: String,
     @Required @SerialName("@context") override val atContext: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<@Serializable(
         with = URISerializer::class
     ) URI> = DEFAULT_JSONLD_CONTEXTS,
