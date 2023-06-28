@@ -3,6 +3,8 @@ import mu.KotlinLogging
 import java.io.Closeable
 import java.util.*
 
+private val logger = KotlinLogging.logger {}
+
 sealed class Connection : Closeable {
 
     companion object {
@@ -16,7 +18,6 @@ sealed class Connection : Closeable {
         }
     }
 
-    val logger = KotlinLogging.logger {}
 
     val id : UUID = UUID.randomUUID()
 

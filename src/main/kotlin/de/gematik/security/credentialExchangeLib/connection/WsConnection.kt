@@ -16,10 +16,13 @@ import io.ktor.websocket.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mu.KotlinLogging
 import java.util.*
 
 internal lateinit var serverPath: String
 internal lateinit var serverConnectionHandler: suspend (Connection) -> Unit
+
+private val logger = KotlinLogging.logger {}
 
 class WsConnection private constructor(private val session: DefaultWebSocketSession) : Connection() {
 
