@@ -1,5 +1,6 @@
 package de.gematik.security.credentialExchangeLib
 
+import de.gematik.security.credentialExchangeLib.crypto.BbsCryptoCredentials
 import de.gematik.security.credentialExchangeLib.crypto.BbsPlusSigner
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
@@ -15,25 +16,18 @@ import java.util.*
 
 class ProofTests {
 
-    val didKeyIssuer =
-        "did:key:zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv"
-    val verkeyIssuer =
-        "tmA6gAFiKH67j6EXv1wFrorCcc4C24ndsYPxJkvDaaB61JfNyUu8FtbAeYCr9gBG55cWbLWemqYexSHWi1PXM5MWZaZgpeFdSucQry8u44q1bHVzJw2FiUgaJYeBE4WPrLc"
-    val keyPairIssuer = KeyPair(
-        "4b72cad121e0459dce3c5ead7683e82185459a77ac33a9bcd84423c36683acf5".hexToByteArray(),
-        "9642f47f8f970fe5a36f67d74841cf0885141ccc8eae92685b4dbda5891b42ab132ab0b8c8df8ec11316bdddddbed330179ca7dc7c6dbbd7bf74584831087bb9884d504a76afd4d8f03c14c1e6acccb7bf76b4e2068725456f65fca1bdc184b5".hexToByteArray()
+    val credentialIssuer = BbsCryptoCredentials(
+        KeyPair(
+            "4b72cad121e0459dce3c5ead7683e82185459a77ac33a9bcd84423c36683acf5".hexToByteArray(),
+            "9642f47f8f970fe5a36f67d74841cf0885141ccc8eae92685b4dbda5891b42ab132ab0b8c8df8ec11316bdddddbed330179ca7dc7c6dbbd7bf74584831087bb9884d504a76afd4d8f03c14c1e6acccb7bf76b4e2068725456f65fca1bdc184b5".hexToByteArray()
+        )
     )
-    val verificationMethodIssuer = URI.create("${didKeyIssuer}#${didKeyIssuer.drop(8)}")
-
-    val didKeyHolder =
-        "did:key:zUC7CgahEtPMHR2JsTnFSbhjFE6bYAm5i2vbFWRUdSUNc45zFAg3rCA6UVoYcDzU5DHAk1HuLV5tgcd6edL8mKLoDRhbz7qzav5yzkDWWgZMh8wTieyjcXtoTSmxNq96nWUgP5V"
-    val verkeyHolder =
-        "xr2pBCj7voA6TX7QGf1WwvjgHtSsg4NfP7qf9b1ZsAjBqZiR9Xkwg3qsTEeDYujXbnt2J5E5Jj58hkc1c415PUAtBmwtdGxVj6X7cTvVDBobMke8XbihHeMyueQDCxKotUB"
-    val keyPairHolder = KeyPair(
-        "4318a7863ecbf9b347f3bd892828c588c20e61e5fa7344b7268643adb5a2bd4e".hexToByteArray(),
-        "a21e0d512342b0b6ebf0d86ab3a2cef2a57bab0c0eeff0ffebad724107c9f33d69368531b41b1caa5728730f52aea54817b087f0d773cb1a753f1ede255468e88cea6665c6ce1591c88b079b0c4f77d0967d8211b1bc8687213e2af041ba73c4".hexToByteArray()
+    val credentialHolder = BbsCryptoCredentials(
+        KeyPair(
+            "4318a7863ecbf9b347f3bd892828c588c20e61e5fa7344b7268643adb5a2bd4e".hexToByteArray(),
+            "a21e0d512342b0b6ebf0d86ab3a2cef2a57bab0c0eeff0ffebad724107c9f33d69368531b41b1caa5728730f52aea54817b087f0d773cb1a753f1ede255468e88cea6665c6ce1591c88b079b0c4f77d0967d8211b1bc8687213e2af041ba73c4".hexToByteArray()
+        )
     )
-    val verificationMethodHolder = URI.create("${didKeyHolder}#${didKeyHolder.drop(8)}")
 
     val date = Date(1684152736408)
     val presentationDefinitionId = UUID.fromString("250787ea-f892-11ed-b67e-0242ac120002")
@@ -43,14 +37,14 @@ class ProofTests {
         type = listOf(ProofType.BbsBlsSignature2020.name),
         created = Date(1684152736408),
         proofPurpose = ProofPurpose.ASSERTION_METHOD,
-        verificationMethod = verificationMethodIssuer
+        verificationMethod = credentialIssuer.verificationMethod
     )
 
     val ldProofHolder = LdProof(
         type = listOf(ProofType.BbsBlsSignature2020.name),
         created = Date(1684152736408),
         proofPurpose = ProofPurpose.AUTHENTICATION,
-        verificationMethod = verificationMethodHolder
+        verificationMethod = credentialHolder.verificationMethod
     )
 
     val credential = Credential(
@@ -86,7 +80,7 @@ class ProofTests {
             )
         ),
         issuanceDate = date,
-        issuer = URI.create(didKeyIssuer)
+        issuer = credentialIssuer.didKey
     )
 
     val emptyCredentialFrame = Credential(
@@ -111,13 +105,13 @@ class ProofTests {
             )
         ),
         verifiableCredential = listOf(credential.deepCopy().apply {
-            sign(ldProofIssuer, BbsPlusSigner(keyPairIssuer))
+            sign(ldProofIssuer, BbsPlusSigner(credentialIssuer.keyPair))
         }.derive(emptyCredentialFrame))
     )
 
     @Test
     fun signVerifyCredential() {
-        val signedCredential = credential.deepCopy().apply { sign(ldProofIssuer, BbsPlusSigner(keyPairIssuer)) }
+        val signedCredential = credential.deepCopy().apply { sign(ldProofIssuer, BbsPlusSigner(credentialIssuer.keyPair)) }
         val result = signedCredential.verify()
         assert(result)
         println(json.encodeToString(signedCredential))
@@ -125,7 +119,7 @@ class ProofTests {
 
     @Test
     fun deriveAndVerifyCredential() {
-        val signedCredential = credential.deepCopy().apply { sign(ldProofIssuer, BbsPlusSigner(keyPairIssuer)) }
+        val signedCredential = credential.deepCopy().apply { sign(ldProofIssuer, BbsPlusSigner(credentialIssuer.keyPair)) }
         val derivedCredential = signedCredential.derive(emptyCredentialFrame)
         val result = derivedCredential.verify()
         assert(result)
@@ -135,7 +129,7 @@ class ProofTests {
     @Test
     fun signVerifyPresentation() {
         val signedPresentation = presentation.deepCopy()
-        signedPresentation.sign(ldProofHolder, BbsPlusSigner(keyPairHolder))
+        signedPresentation.sign(ldProofHolder, BbsPlusSigner(credentialHolder.keyPair))
         val result = signedPresentation.verify()
         assert(result)
         println(json.encodeToString(signedPresentation))

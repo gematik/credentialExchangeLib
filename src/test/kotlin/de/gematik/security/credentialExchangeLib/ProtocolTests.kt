@@ -6,6 +6,7 @@ import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.hexToByteArray
 import de.gematik.security.credentialExchangeLib.protocols.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -133,10 +134,11 @@ class ProtocolTests {
         val engine = CredentialExchangeIssuer.listen(WsConnection) {
             assert(it.receive() is Invitation)
             println("\"issuer\": ${json.encodeToString(it.protocolState)}")
+            // connection is closed automatically - close is sent to peer
         }
         runBlocking {
             CredentialExchangeHolder.connect(WsConnection, invitation = invitation) {
-                it.receive()
+                assert(it.receive() is Close)
             }
         }
         engine.stop()
@@ -147,10 +149,11 @@ class ProtocolTests {
         val engine = CredentialExchangeIssuer.listen(WsConnection) {
             assert(it.receive() is Invitation)
             println("\"issuer\": ${json.encodeToString(it.protocolState)}")
+            // connection is closed automatically - close is sent to peer
         }
         runBlocking {
             CredentialExchangeHolder.connect(WsConnection, path = "ws?oob=${invitation.toBase64()}") {
-                it.receive()
+                assert(it.receive() is Close)
             }
         }
         engine.stop()
@@ -208,7 +211,6 @@ class ProtocolTests {
                     )
                 )
                 assert(it.receive() is CredentialSubmit)
-                it.close()
                 println("\"holder\": ${json.encodeToString(it.protocolState)}")
             }
 

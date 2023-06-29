@@ -7,9 +7,9 @@ import de.gematik.security.credentialExchangeLib.connection.MessageType
 import de.gematik.security.credentialExchangeLib.json
 import io.ktor.server.engine.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
 import java.security.InvalidParameterException
 
 class CredentialExchangeHolder private constructor(val connection: Connection) {
@@ -29,7 +29,8 @@ class CredentialExchangeHolder private constructor(val connection: Connection) {
         var invitation: Invitation? = null,
         var offer: CredentialOffer? = null,
         var request: CredentialRequest? = null,
-        var submit: CredentialSubmit? = null
+        var submit: CredentialSubmit? = null,
+        var close: Close?=null
     )
 
     val protocolState = ProtocolState()
@@ -78,7 +79,7 @@ class CredentialExchangeHolder private constructor(val connection: Connection) {
             pm = when (message.type) {
                 MessageType.INVITATION_ACCEPT -> {
                     check(protocolState.state == State.INITIALIZED) { "invalid state: ${protocolState.state.name}" }
-                    json.decodeFromString<Invitation>(message.content).also {
+                    json.decodeFromJsonElement<Invitation>(message.content).also {
                         protocolState.invitation = it
                         protocolState.state = State.WAIT_FOR_OFFER
                     }
@@ -86,7 +87,7 @@ class CredentialExchangeHolder private constructor(val connection: Connection) {
 
                 MessageType.CREDENTIAL_OFFER -> {
                     check(protocolState.state == State.WAIT_FOR_OFFER) { "invalid state: ${protocolState.state.name}" }
-                    json.decodeFromString<CredentialOffer>(message.content).also {
+                    json.decodeFromJsonElement<CredentialOffer>(message.content).also {
                         protocolState.offer = it
                         protocolState.state = State.SEND_REQUEST
                     }
@@ -94,25 +95,18 @@ class CredentialExchangeHolder private constructor(val connection: Connection) {
 
                 MessageType.CREDENTIAL_SUBMIT -> {
                     check(protocolState.state == State.WAIT_FOR_CREDENTIAL) { "invalid state: ${protocolState.state.name}" }
-                    json.decodeFromString<CredentialSubmit>(message.content).also {
+                    json.decodeFromJsonElement<CredentialSubmit>(message.content).also {
                         protocolState.submit = it
                         protocolState.state = State.CREDENTIAL_RECEIVED
                     }
                 }
 
-                MessageType.BYE -> JsonLdObject(
-                    mapOf(
-                        "type" to JsonArray(listOf(JsonPrimitive("Error"))),
-                        "description" to JsonPrimitive("Bye from peer with message: ${message.content}")
-                    )
-                )
-
-                MessageType.CLOSED -> JsonLdObject(
-                    mapOf(
-                        "type" to JsonArray(listOf(JsonPrimitive("Error"))),
-                        "description" to JsonPrimitive("Connection closed")
-                    )
-                )
+                MessageType.CLOSE -> {
+                    json.decodeFromJsonElement<Close>(message.content).also {
+                        protocolState.close = it
+                        protocolState.state = State.CLOSED
+                    }
+                }
 
                 else -> throw InvalidParameterException("wrong message type: ${message.type?.name}")
             }
@@ -123,14 +117,14 @@ class CredentialExchangeHolder private constructor(val connection: Connection) {
     suspend fun sendInvitation(invitation: Invitation) {
         check(protocolState.state == State.INITIALIZED)
         protocolState.invitation = invitation
-        connection.send(Message(json.encodeToString(invitation), MessageType.INVITATION_ACCEPT))
+        connection.send(Message(json.encodeToJsonElement(invitation).jsonObject, MessageType.INVITATION_ACCEPT))
         protocolState.state = State.WAIT_FOR_OFFER
     }
 
     suspend fun requestCredential(credentialRequest: CredentialRequest) {
         check(protocolState.state == State.SEND_REQUEST)
         protocolState.request = credentialRequest
-        connection.send(Message(json.encodeToString(credentialRequest), MessageType.CREDENTIAL_REQUEST))
+        connection.send(Message(json.encodeToJsonElement(credentialRequest).jsonObject, MessageType.CREDENTIAL_REQUEST))
         protocolState.state = State.WAIT_FOR_CREDENTIAL
     }
 

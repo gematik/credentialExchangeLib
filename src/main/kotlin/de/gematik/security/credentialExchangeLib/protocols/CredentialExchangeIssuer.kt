@@ -7,9 +7,7 @@ import de.gematik.security.credentialExchangeLib.connection.MessageType
 import de.gematik.security.credentialExchangeLib.json
 import io.ktor.server.engine.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.*
 import java.security.InvalidParameterException
 
 class CredentialExchangeIssuer private constructor(val connection: Connection) {
@@ -79,7 +77,7 @@ class CredentialExchangeIssuer private constructor(val connection: Connection) {
             pm = when (message.type) {
                 MessageType.INVITATION_ACCEPT -> {
                     check(protocolState.state == State.INITIALIZED) { "invalid state: ${protocolState.state.name}" }
-                    json.decodeFromString<Invitation>(message.content).also {
+                    json.decodeFromJsonElement<Invitation>(message.content).also {
                         protocolState.invitation = it
                         protocolState.state = State.SEND_OFFER
                     }
@@ -87,25 +85,13 @@ class CredentialExchangeIssuer private constructor(val connection: Connection) {
 
                 MessageType.CREDENTIAL_REQUEST -> {
                     check(protocolState.state == State.WAIT_FOR_REQUEST) { "invalid state: ${protocolState.state.name}" }
-                    json.decodeFromString<CredentialRequest>(message.content).also {
+                    json.decodeFromJsonElement<CredentialRequest>(message.content).also {
                         protocolState.request = it
                         protocolState.state = State.SUBMIT_CREDENTIAL
                     }
                 }
 
-                MessageType.BYE -> JsonLdObject(
-                    mapOf(
-                        "type" to JsonArray(listOf(JsonPrimitive("Error"))),
-                        "description" to JsonPrimitive("Bye from peer with message: ${message.content}")
-                    )
-                )
-
-                MessageType.CLOSED -> JsonLdObject(
-                    mapOf(
-                        "type" to JsonArray(listOf(JsonPrimitive("Error"))),
-                        "description" to JsonPrimitive("Connection closed")
-                    )
-                )
+                MessageType.CLOSE -> JsonLdObject(message.content.toMap())
 
                 else -> throw InvalidParameterException("wrong message type: ${message.type?.name}")
             }
@@ -116,14 +102,14 @@ class CredentialExchangeIssuer private constructor(val connection: Connection) {
     suspend fun sendOffer(credentialOffer: CredentialOffer) {
         check(protocolState.state == State.SEND_OFFER)
         protocolState.offer = credentialOffer
-        connection.send(Message(json.encodeToString(credentialOffer), MessageType.CREDENTIAL_OFFER))
+        connection.send(Message(json.encodeToJsonElement(credentialOffer).jsonObject, MessageType.CREDENTIAL_OFFER))
         protocolState.state = State.WAIT_FOR_REQUEST
     }
 
     suspend fun submitCredential(credentialSubmit: CredentialSubmit) {
         check(protocolState.state == State.SUBMIT_CREDENTIAL)
         protocolState.submit = credentialSubmit
-        connection.send(Message(json.encodeToString(credentialSubmit), MessageType.CREDENTIAL_SUBMIT))
+        connection.send(Message(json.encodeToJsonElement(credentialSubmit).jsonObject, MessageType.CREDENTIAL_SUBMIT))
         protocolState.state = State.CREDENTIAL_SUBMITTED
     }
 
