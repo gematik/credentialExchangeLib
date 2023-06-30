@@ -1,12 +1,12 @@
 package de.gematik.security.credentialExchangeLib
 
+import de.gematik.security.credentialExchangeLib.connection.Connection
 import de.gematik.security.credentialExchangeLib.connection.WsConnection
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.hexToByteArray
 import de.gematik.security.credentialExchangeLib.protocols.*
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -131,13 +131,13 @@ class ProtocolTests {
 
     @Test
     fun acceptInvitation() {
-        val engine = CredentialExchangeIssuer.listen(WsConnection) {
+        val engine = CredentialExchangeIssuerContext.listen(WsConnection) {
             assert(it.receive() is Invitation)
             println("\"issuer\": ${json.encodeToString(it.protocolState)}")
             // connection is closed automatically - close is sent to peer
         }
         runBlocking {
-            CredentialExchangeHolder.connect(WsConnection, invitation = invitation) {
+            CredentialExchangeHolderContext.connect(WsConnection, invitation = invitation) {
                 assert(it.receive() is Close)
             }
         }
@@ -146,13 +146,13 @@ class ProtocolTests {
 
     @Test
     fun acceptInvitationInPath() {
-        val engine = CredentialExchangeIssuer.listen(WsConnection) {
+        val engine = CredentialExchangeIssuerContext.listen(WsConnection) {
             assert(it.receive() is Invitation)
             println("\"issuer\": ${json.encodeToString(it.protocolState)}")
             // connection is closed automatically - close is sent to peer
         }
         runBlocking {
-            CredentialExchangeHolder.connect(WsConnection, path = "ws?oob=${invitation.toBase64()}") {
+            CredentialExchangeHolderContext.connect(WsConnection, path = "ws?oob=${invitation.toBase64()}") {
                 assert(it.receive() is Close)
             }
         }
@@ -163,7 +163,7 @@ class ProtocolTests {
     fun issueCredential() {
 
         //start issuer
-        val engine = CredentialExchangeIssuer.listen(WsConnection) {
+        val engine = CredentialExchangeIssuerContext.listen(WsConnection) {
             assert(it.receive() is Invitation)
             it.sendOffer(
                 CredentialOffer(
@@ -196,7 +196,7 @@ class ProtocolTests {
 
         // start holder
         runBlocking {
-            CredentialExchangeHolder.connect(
+            CredentialExchangeHolderContext.connect(
                 WsConnection,
                 invitation = invitation,
             )

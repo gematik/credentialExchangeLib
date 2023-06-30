@@ -1,6 +1,5 @@
 package de.gematik.security.credentialExchangeLib.connection
 
-import de.gematik.security.credentialExchangeLib.connection.WsConnection.Companion.getConnection
 import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.protocols.Close
 import io.ktor.client.*
@@ -26,13 +25,13 @@ import mu.KotlinLogging
 import java.util.*
 
 internal lateinit var serverPath: String
-internal lateinit var serverConnectionHandler: suspend (Connection) -> Unit
+internal lateinit var serverConnectionHandler: suspend (WsConnection) -> Unit
 
 private val logger = KotlinLogging.logger {}
 
 class WsConnection private constructor(private val session: DefaultWebSocketSession) : Connection() {
 
-    companion object : ConnectionFactory {
+    companion object : ConnectionFactory<WsConnection> {
         private val client = HttpClient(CIO) {
             install(io.ktor.client.plugins.websocket.WebSockets) {
                 contentConverter = KotlinxWebsocketSerializationConverter(Json)
@@ -43,7 +42,7 @@ class WsConnection private constructor(private val session: DefaultWebSocketSess
             host: String,
             port: Int,
             path: String,
-            connectionHandler: suspend (Connection) -> Unit
+            connectionHandler: suspend (WsConnection) -> Unit
         ): ApplicationEngine {
             serverConnectionHandler = connectionHandler
             serverPath = path
@@ -56,16 +55,16 @@ class WsConnection private constructor(private val session: DefaultWebSocketSess
             host: String,
             port: Int,
             path: String,
-            connectionHandler: suspend (Connection) -> Unit
+            connectionHandler: suspend (WsConnection) -> Unit
         ) {
             client.webSocket(method = HttpMethod.Get, host = host, port = port, path = path) {
-                getConnection(this).use {
+                newInstance(this).use {
                     connectionHandler(it)
                 }
             }
         }
 
-        internal fun getConnection(session: Any?): Connection {
+        internal fun newInstance(session: Any?): WsConnection {
             require(session is DefaultWebSocketSession)
             val connection = WsConnection(session)
             connections[connection.id] = connection
@@ -74,16 +73,14 @@ class WsConnection private constructor(private val session: DefaultWebSocketSess
     }
 
     override fun close() {
-        connections.remove(this.id)
         runBlocking {
-            logger.info("close connection: $id")
-            send(Message(json.encodeToJsonElement(Close(message = "connection closed normally")).jsonObject, MessageType.CLOSE))
-            session.close(CloseReason(CloseReason.Codes.NORMAL, "Normal"))
+            close(CloseReason(CloseReason.Codes.NORMAL, "Normal"))
         }
     }
 
     suspend fun close(reason: CloseReason) {
-        connections.remove(this.id)
+        connections.remove(id)
+        send(Message(json.encodeToJsonElement(Close(message = "connection closed normally")).jsonObject, MessageType.CLOSE))
         logger.info("close connection: $id with reason: ${reason.message}")
         session.close(reason)
     }
@@ -149,7 +146,7 @@ fun Application.module() {
     routing {
         staticResources("/static", "files")
         webSocket(serverPath) {
-            getConnection(this).use {
+            WsConnection.newInstance(this).use {
                 serverConnectionHandler(it)
             }
         }

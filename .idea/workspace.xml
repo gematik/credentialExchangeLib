@@ -4,20 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="246e1cc3-192b-491f-8ba1-e76025f33fb5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/BbsCryptoCredentials.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/CryptoCredentials.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Close.kt" afterDir="false" />
+    <list default="true" id="246e1cc3-192b-491f-8ba1-e76025f33fb5" name="Changes" comment="feat: add protocol context management">
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Context.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/ContextFactory.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/Message.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/Message.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/ConnectionFactory.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/ConnectionFactory.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/WsConnection.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/WsConnection.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeHolder.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeHolder.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeIssuer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeIssuer.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/context/credentialexchange_v1.jsonld" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/context/credentialexchange_v1.jsonld" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/logback.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/logback.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ConnectionTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ConnectionTests.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProofTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProofTests.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeHolder.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeHolderContext.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeIssuer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeIssuerContext.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProtocolTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProtocolTests.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -105,25 +100,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "ignore.virus.scanning.warn.message": "true",
-    "ktor.last.update.timestamp": "1688046570417",
-    "last_opened_file_path": "C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources/files",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.31034482",
-    "settings.editor.selected.configurable": "AndroidSdkUpdater",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;ktor.last.update.timestamp&quot;: &quot;1688046570417&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources/files&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.31034482&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;AndroidSdkUpdater&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\rk\IntelliJIDEAProjects\credentialExchangeLib\src\main\resources\files" />
@@ -148,7 +143,7 @@
     </key>
   </component>
   <component name="RunManager" selected="Gradle.credentialExchangeLib [publishToMavenLocal]">
-    <configuration name="ProofTests" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="ProtocolTests" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -161,7 +156,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;de.gematik.security.credentialExchangeLib.ProofTests&quot;" />
+            <option value="&quot;de.gematik.security.credentialExchangeLib.ProtocolTests&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -172,7 +167,7 @@
       <ForceTestExec>true</ForceTestExec>
       <method v="2" />
     </configuration>
-    <configuration name="ProofTests.signVerifyCredential" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="ProtocolTests.issueCredential" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -185,7 +180,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;de.gematik.security.credentialExchangeLib.ProofTests.signVerifyCredential&quot;" />
+            <option value="&quot;de.gematik.security.credentialExchangeLib.ProtocolTests.issueCredential&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -267,10 +262,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.credentialExchangeLib [publishToMavenLocal]" />
-        <item itemvalue="Gradle.TestSuite" />
         <item itemvalue="Gradle.credentialExchangeLib [jar]" />
-        <item itemvalue="Gradle.ProofTests.signVerifyCredential" />
-        <item itemvalue="Gradle.ProofTests" />
+        <item itemvalue="Gradle.ProtocolTests.issueCredential" />
+        <item itemvalue="Gradle.TestSuite" />
+        <item itemvalue="Gradle.ProtocolTests" />
       </list>
     </recent_temporary>
   </component>
@@ -301,6 +296,9 @@
       <workItem from="1687959544228" duration="2149000" />
       <workItem from="1687962714915" duration="138000" />
       <workItem from="1688029533134" duration="13318000" />
+      <workItem from="1688056036383" duration="590000" />
+      <workItem from="1688056713650" duration="504000" />
+      <workItem from="1688111022879" duration="14561000" />
     </task>
     <task id="LOCAL-00001" summary="initial check in">
       <created>1683117220289</created>
@@ -448,7 +446,8 @@
     <MESSAGE value="chore: refactor wsconnection handling&#10;feat: add about info" />
     <MESSAGE value="chore: id in invitation is mandatory" />
     <MESSAGE value="chore: make logging available for jvm and android" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: make logging available for jvm and android" />
+    <MESSAGE value="feat: add protocol context management" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add protocol context management" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -467,11 +466,6 @@
           <url>file://$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/SerializerTests.kt</url>
           <line>124</line>
           <option name="timeStamp" value="41" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeIssuer.kt</url>
-          <line>104</line>
-          <option name="timeStamp" value="60" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProofTests.kt</url>

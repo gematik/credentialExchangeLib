@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "de.gematik"
-version = "0.1.0"
+version = "0.2.0-SNAPSHOT"
 
 repositories {
     mavenLocal()
@@ -28,9 +28,9 @@ dependencies {
     implementation("io.setl:rdf-urdna:1.2")
     implementation("io.github.novacrypto:Base58:2022.01.17")
 
-    implementation("io.ktor:ktor-server-core")
-    implementation("io.ktor:ktor-server-cio")
-    implementation("io.ktor:ktor-server-websockets")
+    api("io.ktor:ktor-server-core")
+    api("io.ktor:ktor-server-cio")
+    api("io.ktor:ktor-server-websockets")
     implementation("io.ktor:ktor-client-core")
     implementation("io.ktor:ktor-client-cio")
     implementation("io.ktor:ktor-client-websockets")

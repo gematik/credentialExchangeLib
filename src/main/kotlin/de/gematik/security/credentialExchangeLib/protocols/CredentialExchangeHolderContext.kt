@@ -1,9 +1,6 @@
 package de.gematik.security.credentialExchangeLib.protocols
 
-import de.gematik.security.credentialExchangeLib.connection.Connection
-import de.gematik.security.credentialExchangeLib.connection.ConnectionFactory
-import de.gematik.security.credentialExchangeLib.connection.Message
-import de.gematik.security.credentialExchangeLib.connection.MessageType
+import de.gematik.security.credentialExchangeLib.connection.*
 import de.gematik.security.credentialExchangeLib.json
 import io.ktor.server.engine.*
 import kotlinx.serialization.Serializable
@@ -12,7 +9,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import java.security.InvalidParameterException
 
-class CredentialExchangeHolder private constructor(val connection: Connection) {
+class CredentialExchangeHolderContext private constructor(val connection: Connection) : Context() {
 
     enum class State {
         INITIALIZED,
@@ -35,29 +32,32 @@ class CredentialExchangeHolder private constructor(val connection: Connection) {
 
     val protocolState = ProtocolState()
 
-    companion object Factory {
-        fun listen(
-            host: String = "0.0.0.0",
-            port: Int = 8090,
-            path: String = "ws",
-            factory: ConnectionFactory, protocolHandler: suspend (CredentialExchangeHolder) -> Unit
-        ) : ApplicationEngine {
-            return factory.listen(host, port, path) {
-                protocolHandler(CredentialExchangeHolder(it))
+    companion object : ContextFactory<CredentialExchangeHolderContext> {
+        override fun listen(
+            connectionFactory: ConnectionFactory<*>,
+            host: String,
+            port: Int,
+            path: String,
+            protocolHandler: suspend (CredentialExchangeHolderContext) -> Unit
+        ): ApplicationEngine {
+            return connectionFactory.listen(host, port, path) {
+                newInstance(it).use{
+                    protocolHandler(it)
+                }
             }
         }
 
-        suspend fun connect(
-            factory: ConnectionFactory,
-            host: String = "127.0.0.1",
-            port: Int = 8090,
-            path: String = "ws",
-            invitation: Invitation? = null,
-            protocolHandler: suspend (CredentialExchangeHolder) -> Unit
+        override suspend fun connect(
+            connectionFactory: ConnectionFactory<*>,
+            host: String,
+            port: Int,
+            path: String,
+            invitation: Invitation?,
+            protocolHandler: suspend (CredentialExchangeHolderContext) -> Unit
         ) {
             check(!(path.contains("oob=") && invitation!=null))
-            factory.connect(host, port, path + if(invitation!=null) "?oob=${invitation.toBase64()}" else "") {
-                protocolHandler(CredentialExchangeHolder(it).apply {
+            connectionFactory.connect(host, port, path + if(invitation!=null) "?oob=${invitation.toBase64()}" else "") {
+                newInstance(it).apply {
                     invitation?.let{
                         protocolState.invitation = invitation
                         protocolState.state = State.WAIT_FOR_OFFER
@@ -67,12 +67,21 @@ class CredentialExchangeHolder private constructor(val connection: Connection) {
                         protocolState.invitation = Invitation.fromBase64(oob)
                         protocolState.state = State.WAIT_FOR_OFFER
                     }
-                })
+                }.use {
+                    protocolHandler(it)
+                }
             }
         }
+
+        private fun newInstance(connection: Connection) : CredentialExchangeHolderContext {
+            val context = CredentialExchangeHolderContext(connection)
+            contexts[context.id] = context
+            return context
+        }
+
     }
 
-    suspend fun receive(): LdObject {
+    override suspend fun receive(): LdObject {
         var pm: LdObject? = null
         while (pm == null) {
             val message = connection.receive()
@@ -128,8 +137,8 @@ class CredentialExchangeHolder private constructor(val connection: Connection) {
         protocolState.state = State.WAIT_FOR_CREDENTIAL
     }
 
-    suspend fun close() {
+    override fun close() {
         protocolState.state = State.CLOSED
-        connection.close()
+        contexts.remove(id)
     }
 }

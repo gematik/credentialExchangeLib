@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import java.security.InvalidParameterException
 
-class CredentialExchangeIssuer private constructor(val connection: Connection) {
+class CredentialExchangeIssuerContext private constructor(val connection: Connection) : Context() {
 
     enum class State {
         INITIALIZED,
@@ -32,30 +32,32 @@ class CredentialExchangeIssuer private constructor(val connection: Connection) {
 
     val protocolState = ProtocolState()
 
-    companion object Factory {
-        fun listen (
-            factory: ConnectionFactory,
-            host: String = "0.0.0.0",
-            port: Int = 8090,
-            path: String = "ws",
-            protocolHandler: suspend (CredentialExchangeIssuer) -> Unit
+    companion object : ContextFactory<CredentialExchangeIssuerContext> {
+        override fun listen (
+            connectionFactory: ConnectionFactory<*>,
+            host: String,
+            port: Int,
+            path: String,
+            protocolHandler: suspend (CredentialExchangeIssuerContext) -> Unit
         ) : ApplicationEngine {
-            return factory.listen(host, port, path) {
-                protocolHandler(CredentialExchangeIssuer(it))
+            return connectionFactory.listen(host, port, path) {
+                newInstance(it).use {
+                    protocolHandler(it)
+                }
             }
         }
 
-        suspend fun connect(
-            factory: ConnectionFactory,
-            host: String = "127.0.0.1",
-            port: Int = 8090,
-            path: String = "ws",
-            invitation: Invitation? = null,
-            protocolHandler: suspend (CredentialExchangeIssuer) -> Unit
+        override suspend fun connect(
+            connectionFactory: ConnectionFactory<*>,
+            host: String,
+            port: Int,
+            path: String,
+            invitation: Invitation?,
+            protocolHandler: suspend (CredentialExchangeIssuerContext) -> Unit
         ) {
             check(!(path.contains("oob=") && invitation!=null))
-            factory.connect(host, port, path + if(invitation!=null) "?oob=${invitation.toBase64()}" else "") {
-                protocolHandler(CredentialExchangeIssuer(it).apply {
+            connectionFactory.connect(host, port, path + if(invitation!=null) "?oob=${invitation.toBase64()}" else "") {
+                newInstance(it).apply {
                     invitation?.let{
                         protocolState.invitation = invitation
                         protocolState.state = State.SEND_OFFER
@@ -65,12 +67,20 @@ class CredentialExchangeIssuer private constructor(val connection: Connection) {
                         protocolState.invitation = Invitation.fromBase64(oob)
                         protocolState.state = State.SEND_OFFER
                     }
-                })
+                }.use {
+                    protocolHandler(it)
+                }
             }
+        }
+
+        private fun newInstance(connection: Connection) : CredentialExchangeIssuerContext {
+            val context = CredentialExchangeIssuerContext(connection)
+            contexts[context.id] = context
+            return context
         }
     }
 
-    suspend fun receive(): LdObject {
+    override suspend fun receive(): LdObject {
         var pm: LdObject? = null
         while (pm == null) {
             val message = connection.receive()
@@ -113,8 +123,8 @@ class CredentialExchangeIssuer private constructor(val connection: Connection) {
         protocolState.state = State.CREDENTIAL_SUBMITTED
     }
 
-    suspend fun close() {
+    override fun close() {
         protocolState.state = State.CLOSED
-        connection.close()
+        contexts.remove(id)
     }
 }
