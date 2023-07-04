@@ -24,7 +24,7 @@ class SerializerTests {
 
     val date = Date(1684152736408)
     val presentationDefinitionId = UUID.fromString("250787ea-f892-11ed-b67e-0242ac120002")
-    val inputDescriptorId = UUID.fromString("3aa55a6e-f892-11ed-b67e-0242ac120002")
+    val inputDescriptorId = "3aa55a6e-f892-11ed-b67e-0242ac120002"
     val credential = Credential(
         atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
         type = Credential.DEFAULT_JSONLD_TYPES + listOf("VaccinationCertificate"),
@@ -118,11 +118,11 @@ class SerializerTests {
         val atId = UUID.randomUUID().toString()
         val credentialOffer = CredentialOffer(
             atId,
-            outputDescriptor = Credential()
+            outputDescriptor = Descriptor(UUID.randomUUID().toString(), Credential())
         )
         val serializedCredentialOffer = json.encodeToString(credentialOffer)
         assert(
-            json.decodeFromString<CredentialOffer>(serializedCredentialOffer).outputDescriptor.credentialSubject==null)
+            json.decodeFromString<CredentialOffer>(serializedCredentialOffer).outputDescriptor.frame.credentialSubject == null)
         println(serializedCredentialOffer)
     }
 
@@ -131,12 +131,12 @@ class SerializerTests {
         val atId = UUID.randomUUID().toString()
         val credentialRequest = CredentialRequest(
             atId,
-            outputDescriptor = Credential(),
+            outputDescriptor = Descriptor(UUID.randomUUID().toString(), Credential()),
             holderKey = "did:key:holder"
         )
         val serializedCredentialRequest = json.encodeToString(credentialRequest)
         assert(
-            json.decodeFromString<CredentialRequest>(serializedCredentialRequest).outputDescriptor.credentialSubject==null)
+            json.decodeFromString<CredentialRequest>(serializedCredentialRequest).outputDescriptor.frame.credentialSubject==null)
         println(serializedCredentialRequest)
     }
 

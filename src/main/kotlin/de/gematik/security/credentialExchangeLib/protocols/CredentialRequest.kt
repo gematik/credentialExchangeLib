@@ -12,7 +12,7 @@ class CredentialRequest(
     override val id: String? = null,
     @Required @SerialName("@context") override var atContext: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<@Serializable(with = URISerializer::class) URI> = DEFAULT_JSONLD_CONTEXTS,
     @Required override var type: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<String> = DEFAULT_JSONLD_TYPES,
-    val outputDescriptor: Credential,
+    val outputDescriptor: Descriptor,
     val holderKey: String
 ) : LdObject {
 

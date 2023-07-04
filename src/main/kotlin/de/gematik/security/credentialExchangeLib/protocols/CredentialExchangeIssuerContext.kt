@@ -14,10 +14,12 @@ class CredentialExchangeIssuerContext private constructor(val connection: Connec
 
     enum class State {
         INITIALIZED,
-        SEND_OFFER,
-        WAIT_FOR_REQUEST,
+
+        SEND_CREDENTIAL_OFFER,
+        WAIT_FOR_CREDENTIAL_REQUEST,
         SUBMIT_CREDENTIAL,
         CREDENTIAL_SUBMITTED,
+
         CLOSED
     }
 
@@ -60,12 +62,12 @@ class CredentialExchangeIssuerContext private constructor(val connection: Connec
                 newInstance(it).apply {
                     invitation?.let{
                         protocolState.invitation = invitation
-                        protocolState.state = State.SEND_OFFER
+                        protocolState.state = State.SEND_CREDENTIAL_OFFER
                     }
                     if(path.contains("oob=")){
                         val oob = path.substringAfter("oob=").substringBefore("&")
                         protocolState.invitation = Invitation.fromBase64(oob)
-                        protocolState.state = State.SEND_OFFER
+                        protocolState.state = State.SEND_CREDENTIAL_OFFER
                     }
                 }.use {
                     protocolHandler(it)
@@ -89,12 +91,12 @@ class CredentialExchangeIssuerContext private constructor(val connection: Connec
                     check(protocolState.state == State.INITIALIZED) { "invalid state: ${protocolState.state.name}" }
                     json.decodeFromJsonElement<Invitation>(message.content).also {
                         protocolState.invitation = it
-                        protocolState.state = State.SEND_OFFER
+                        protocolState.state = State.SEND_CREDENTIAL_OFFER
                     }
                 }
 
                 MessageType.CREDENTIAL_REQUEST -> {
-                    check(protocolState.state == State.WAIT_FOR_REQUEST) { "invalid state: ${protocolState.state.name}" }
+                    check(protocolState.state == State.WAIT_FOR_CREDENTIAL_REQUEST) { "invalid state: ${protocolState.state.name}" }
                     json.decodeFromJsonElement<CredentialRequest>(message.content).also {
                         protocolState.request = it
                         protocolState.state = State.SUBMIT_CREDENTIAL
@@ -110,10 +112,10 @@ class CredentialExchangeIssuerContext private constructor(val connection: Connec
     }
 
     suspend fun sendOffer(credentialOffer: CredentialOffer) {
-        check(protocolState.state == State.SEND_OFFER)
+        check(protocolState.state == State.SEND_CREDENTIAL_OFFER)
         protocolState.offer = credentialOffer
         connection.send(Message(json.encodeToJsonElement(credentialOffer).jsonObject, MessageType.CREDENTIAL_OFFER))
-        protocolState.state = State.WAIT_FOR_REQUEST
+        protocolState.state = State.WAIT_FOR_CREDENTIAL_REQUEST
     }
 
     suspend fun submitCredential(credentialSubmit: CredentialSubmit) {

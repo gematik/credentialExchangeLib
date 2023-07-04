@@ -28,5 +28,5 @@ class PresentationSubmission(
     }
 
     @Serializable
-    data class DescriptorMapEntry(val id: @Serializable(with = UUIDSerializer::class) UUID, val format: ClaimFormat, val path: String)
+    data class DescriptorMapEntry(val id: String, val format: ClaimFormat, val path: String)
 }

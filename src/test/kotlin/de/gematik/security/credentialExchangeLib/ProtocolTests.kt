@@ -1,7 +1,7 @@
 package de.gematik.security.credentialExchangeLib
 
-import de.gematik.security.credentialExchangeLib.connection.Connection
 import de.gematik.security.credentialExchangeLib.connection.WsConnection
+import de.gematik.security.credentialExchangeLib.crypto.BbsPlusSigner
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
@@ -81,6 +81,13 @@ class ProtocolTests {
         created = Date(1684152736408),
         proofPurpose = ProofPurpose.ASSERTION_METHOD,
         verificationMethod = verificationMethodIssuer
+    )
+
+    val ldProofHolder = LdProof(
+        type = listOf(ProofType.BbsBlsSignature2020.name),
+        created = Date(1684152736408),
+        proofPurpose = ProofPurpose.AUTHENTICATION,
+        verificationMethod = verificationMethodHolder
     )
 
     val credential = Credential(
@@ -168,9 +175,11 @@ class ProtocolTests {
             it.sendOffer(
                 CredentialOffer(
                     UUID.randomUUID().toString(),
-                    outputDescriptor = Credential(
-                        atContext = Credential.DEFAULT_JSONLD_CONTEXTS + URI("https://w3id.org/vaccination/v1"),
-                        type = Credential.DEFAULT_JSONLD_TYPES + "VaccinationCertificate"
+                    outputDescriptor = Descriptor(
+                        UUID.randomUUID().toString(), Credential(
+                            atContext = Credential.DEFAULT_JSONLD_CONTEXTS + URI("https://w3id.org/vaccination/v1"),
+                            type = Credential.DEFAULT_JSONLD_TYPES + "VaccinationCertificate"
+                        )
                     )
                 )
             )
@@ -214,6 +223,76 @@ class ProtocolTests {
                 println("\"holder\": ${json.encodeToString(it.protocolState)}")
             }
 
+        }
+
+        engine.stop()
+    }
+
+    @Test
+    fun exchangePresentation() {
+
+        //start holder
+        val engine = PresentationExchangeHolderContext.listen(WsConnection) {
+            assert(it.receive() is Invitation)
+            it.sendOffer(
+                PresentationOffer(
+                    UUID.randomUUID().toString(),
+                    inputDescriptor = Descriptor(
+                        UUID.randomUUID().toString(),
+                        Credential(
+                            atContext = Credential.DEFAULT_JSONLD_CONTEXTS + URI("https://w3id.org/vaccination/v1"),
+                            type = Credential.DEFAULT_JSONLD_TYPES + "VaccinationCertificate"
+                        )
+                    )
+                )
+            )
+            val presentationRequest = it.receive()
+            assert(presentationRequest is PresentationRequest)
+
+            val presentation = Presentation(
+                atContext = Presentation.DEFAULT_JSONLD_CONTEXTS + PresentationSubmission.DEFAULT_JSONLD_CONTEXTS,
+                presentationSubmission = PresentationSubmission(
+                    definitionId = UUID.randomUUID(),
+                    descriptorMap = listOf(
+                        PresentationSubmission.DescriptorMapEntry(
+                            (presentationRequest as PresentationRequest).inputDescriptor.id,
+                            ClaimFormat.LDP_VC,
+                            path = "\$.verifiableCredential[0]"
+                        )
+                    )
+                ),
+                verifiableCredential = listOf(credential.deepCopy().apply {
+                    sign(ldProofIssuer, BbsPlusSigner(keyPairIssuer))
+                }.derive((presentationRequest as PresentationRequest).inputDescriptor.frame))
+            ).apply { sign(ldProofHolder, BbsPlusSigner(keyPairHolder)) }
+
+            it.submitPresentation(
+                PresentationSubmit(
+                    UUID.randomUUID().toString(),
+                    presentation = presentation
+                )
+            )
+            println("\"issuer\": ${json.encodeToString(it.protocolState)}")
+        }
+
+        // start verifier
+        runBlocking {
+            PresentationExchangeVerifierContext.connect(
+                WsConnection,
+                invitation = invitation,
+            )
+            {
+                val presentationOffer = it.receive()
+                assert(presentationOffer is PresentationOffer)
+                it.requestPresentation(
+                    PresentationRequest(
+                        UUID.randomUUID().toString(),
+                        inputDescriptor = (presentationOffer as PresentationOffer).inputDescriptor,
+                    )
+                )
+                assert(it.receive() is PresentationSubmit)
+                println("\"holder\": ${json.encodeToString(it.protocolState)}")
+            }
         }
 
         engine.stop()

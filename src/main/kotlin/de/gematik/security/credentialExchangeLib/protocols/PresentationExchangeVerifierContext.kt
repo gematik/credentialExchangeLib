@@ -9,15 +9,15 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import java.security.InvalidParameterException
 
-class CredentialExchangeHolderContext private constructor(val connection: Connection) : Context() {
+class PresentationExchangeVerifierContext private constructor(val connection: Connection) : Context() {
 
     enum class State {
         INITIALIZED,
 
-        WAIT_FOR_CREDENTIAL_OFFER,
-        SEND_CREDENTIAL_REQUEST,
-        WAIT_FOR_CREDENTIAL,
-        CREDENTIAL_RECEIVED,
+        WAIT_FOR_PRESENTATION_OFFER,
+        SEND_PRESENTATION_REQUEST,
+        WAIT_FOR_PRESENTATION,
+        PRESENTATION_RECEIVED,
 
         CLOSED
     }
@@ -26,21 +26,21 @@ class CredentialExchangeHolderContext private constructor(val connection: Connec
     data class ProtocolState(
         var state: State = State.INITIALIZED,
         var invitation: Invitation? = null,
-        var offer: CredentialOffer? = null,
-        var request: CredentialRequest? = null,
-        var submit: CredentialSubmit? = null,
+        var offer: PresentationOffer? = null,
+        var request: PresentationRequest? = null,
+        var submit: PresentationSubmit? = null,
         var close: Close?=null
     )
 
     val protocolState = ProtocolState()
 
-    companion object : ContextFactory<CredentialExchangeHolderContext> {
+    companion object : ContextFactory<PresentationExchangeVerifierContext> {
         override fun listen(
             connectionFactory: ConnectionFactory<*>,
             host: String,
             port: Int,
             path: String,
-            protocolHandler: suspend (CredentialExchangeHolderContext) -> Unit
+            protocolHandler: suspend (PresentationExchangeVerifierContext) -> Unit
         ): ApplicationEngine {
             return connectionFactory.listen(host, port, path) {
                 newInstance(it).use{
@@ -55,19 +55,19 @@ class CredentialExchangeHolderContext private constructor(val connection: Connec
             port: Int,
             path: String,
             invitation: Invitation?,
-            protocolHandler: suspend (CredentialExchangeHolderContext) -> Unit
+            protocolHandler: suspend (PresentationExchangeVerifierContext) -> Unit
         ) {
             check(!(path.contains("oob=") && invitation!=null))
             connectionFactory.connect(host, port, path + if(invitation!=null) "?oob=${invitation.toBase64()}" else "") {
                 newInstance(it).apply {
                     invitation?.let{
                         protocolState.invitation = invitation
-                        protocolState.state = State.WAIT_FOR_CREDENTIAL_OFFER
+                        protocolState.state = State.WAIT_FOR_PRESENTATION_OFFER
                     }
                     if(path.contains("oob=")){
                         val oob = path.substringAfter("oob=").substringBefore("&")
                         protocolState.invitation = Invitation.fromBase64(oob)
-                        protocolState.state = State.WAIT_FOR_CREDENTIAL_OFFER
+                        protocolState.state = State.WAIT_FOR_PRESENTATION_OFFER
                     }
                 }.use {
                     protocolHandler(it)
@@ -75,8 +75,8 @@ class CredentialExchangeHolderContext private constructor(val connection: Connec
             }
         }
 
-        private fun newInstance(connection: Connection) : CredentialExchangeHolderContext {
-            val context = CredentialExchangeHolderContext(connection)
+        private fun newInstance(connection: Connection) : PresentationExchangeVerifierContext {
+            val context = PresentationExchangeVerifierContext(connection)
             contexts[context.id] = context
             return context
         }
@@ -92,23 +92,23 @@ class CredentialExchangeHolderContext private constructor(val connection: Connec
                     check(protocolState.state == State.INITIALIZED) { "invalid state: ${protocolState.state.name}" }
                     json.decodeFromJsonElement<Invitation>(message.content).also {
                         protocolState.invitation = it
-                        protocolState.state = State.WAIT_FOR_CREDENTIAL_OFFER
+                        protocolState.state = State.WAIT_FOR_PRESENTATION_OFFER
                     }
                 }
 
-                MessageType.CREDENTIAL_OFFER -> {
-                    check(protocolState.state == State.WAIT_FOR_CREDENTIAL_OFFER) { "invalid state: ${protocolState.state.name}" }
-                    json.decodeFromJsonElement<CredentialOffer>(message.content).also {
+                MessageType.PRESENTATION_OFFER -> {
+                    check(protocolState.state == State.WAIT_FOR_PRESENTATION_OFFER) { "invalid state: ${protocolState.state.name}" }
+                    json.decodeFromJsonElement<PresentationOffer>(message.content).also {
                         protocolState.offer = it
-                        protocolState.state = State.SEND_CREDENTIAL_REQUEST
+                        protocolState.state = State.SEND_PRESENTATION_REQUEST
                     }
                 }
 
-                MessageType.CREDENTIAL_SUBMIT -> {
-                    check(protocolState.state == State.WAIT_FOR_CREDENTIAL) { "invalid state: ${protocolState.state.name}" }
-                    json.decodeFromJsonElement<CredentialSubmit>(message.content).also {
+                MessageType.PRESENTATION_SUBMIT -> {
+                    check(protocolState.state == State.WAIT_FOR_PRESENTATION) { "invalid state: ${protocolState.state.name}" }
+                    json.decodeFromJsonElement<PresentationSubmit>(message.content).also {
                         protocolState.submit = it
-                        protocolState.state = State.CREDENTIAL_RECEIVED
+                        protocolState.state = State.PRESENTATION_RECEIVED
                     }
                 }
 
@@ -129,14 +129,14 @@ class CredentialExchangeHolderContext private constructor(val connection: Connec
         check(protocolState.state == State.INITIALIZED)
         protocolState.invitation = invitation
         connection.send(Message(json.encodeToJsonElement(invitation).jsonObject, MessageType.INVITATION_ACCEPT))
-        protocolState.state = State.WAIT_FOR_CREDENTIAL_OFFER
+        protocolState.state = State.WAIT_FOR_PRESENTATION_OFFER
     }
 
-    suspend fun requestCredential(credentialRequest: CredentialRequest) {
-        check(protocolState.state == State.SEND_CREDENTIAL_REQUEST)
-        protocolState.request = credentialRequest
-        connection.send(Message(json.encodeToJsonElement(credentialRequest).jsonObject, MessageType.CREDENTIAL_REQUEST))
-        protocolState.state = State.WAIT_FOR_CREDENTIAL
+    suspend fun requestPresentation(presentationRequest: PresentationRequest) {
+        check(protocolState.state == State.SEND_PRESENTATION_REQUEST)
+        protocolState.request = presentationRequest
+        connection.send(Message(json.encodeToJsonElement(presentationRequest).jsonObject, MessageType.PRESENTATION_REQUEST))
+        protocolState.state = State.WAIT_FOR_PRESENTATION
     }
 
     override fun close() {

@@ -31,7 +31,7 @@ class ProofTests {
 
     val date = Date(1684152736408)
     val presentationDefinitionId = UUID.fromString("250787ea-f892-11ed-b67e-0242ac120002")
-    val inputDescriptorId = UUID.fromString("3aa55a6e-f892-11ed-b67e-0242ac120002")
+    val inputDescriptorId = "3aa55a6e-f892-11ed-b67e-0242ac120002"
 
     val ldProofIssuer = LdProof(
         type = listOf(ProofType.BbsBlsSignature2020.name),
