@@ -20,7 +20,7 @@ class PresentationRequest(
             URI("https://gematik.de/credential-exchange/v1")
         )
         override val DEFAULT_JSONLD_TYPES = listOf(
-            "CredentialRequest"
+            "PresentationRequest"
         )
     }
 }

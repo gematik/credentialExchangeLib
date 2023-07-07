@@ -7,10 +7,12 @@ import de.gematik.security.credentialExchangeLib.connection.MessageType
 import de.gematik.security.credentialExchangeLib.json
 import io.ktor.server.engine.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
 import java.security.InvalidParameterException
 
-class CredentialExchangeIssuerContext private constructor(val connection: Connection) : Context() {
+class CredentialExchangeIssuerProtocol private constructor(val connection: Connection) : Protocol() {
 
     enum class State {
         INITIALIZED,
@@ -29,22 +31,25 @@ class CredentialExchangeIssuerContext private constructor(val connection: Connec
         var invitation: Invitation? = null,
         var offer: CredentialOffer? = null,
         var request: CredentialRequest? = null,
-        var submit: CredentialSubmit? = null
+        var submit: CredentialSubmit? = null,
+        var close: Close? = null
     )
 
     val protocolState = ProtocolState()
 
-    companion object : ContextFactory<CredentialExchangeIssuerContext> {
-        override fun listen (
+    companion object : ProtocolFactory<CredentialExchangeIssuerProtocol> {
+        override fun listen(
             connectionFactory: ConnectionFactory<*>,
             host: String,
             port: Int,
             path: String,
-            protocolHandler: suspend (CredentialExchangeIssuerContext) -> Unit
-        ) : ApplicationEngine {
+            handler: suspend (CredentialExchangeIssuerProtocol) -> Unit
+        ): ApplicationEngine {
             return connectionFactory.listen(host, port, path) {
-                newInstance(it).use {
-                    protocolHandler(it)
+                CredentialExchangeIssuerProtocol(it).also {
+                    protocols[it.id] = it
+                }.use {
+                    handler(it)
                 }
             }
         }
@@ -54,31 +59,18 @@ class CredentialExchangeIssuerContext private constructor(val connection: Connec
             host: String,
             port: Int,
             path: String,
-            invitation: Invitation?,
-            protocolHandler: suspend (CredentialExchangeIssuerContext) -> Unit
+            handler: suspend (CredentialExchangeIssuerProtocol) -> Unit
         ) {
-            check(!(path.contains("oob=") && invitation!=null))
-            connectionFactory.connect(host, port, path + if(invitation!=null) "?oob=${invitation.toBase64()}" else "") {
-                newInstance(it).apply {
-                    invitation?.let{
-                        protocolState.invitation = invitation
-                        protocolState.state = State.SEND_CREDENTIAL_OFFER
-                    }
-                    if(path.contains("oob=")){
-                        val oob = path.substringAfter("oob=").substringBefore("&")
-                        protocolState.invitation = Invitation.fromBase64(oob)
-                        protocolState.state = State.SEND_CREDENTIAL_OFFER
-                    }
+            connectionFactory.connect(host, port, path) {
+                val oob = path.substringAfter("oob=", "").substringBefore("&")
+                val invitation = if (oob.isEmpty()) null else Invitation.fromBase64(oob)
+                CredentialExchangeIssuerProtocol(it).also {
+                    protocols[it.id] = it
                 }.use {
-                    protocolHandler(it)
+                    invitation?.let { inv -> it.connected(inv) }
+                    handler(it)
                 }
             }
-        }
-
-        private fun newInstance(connection: Connection) : CredentialExchangeIssuerContext {
-            val context = CredentialExchangeIssuerContext(connection)
-            contexts[context.id] = context
-            return context
         }
     }
 
@@ -103,12 +95,23 @@ class CredentialExchangeIssuerContext private constructor(val connection: Connec
                     }
                 }
 
-                MessageType.CLOSE -> JsonLdObject(message.content.toMap())
+                MessageType.CLOSE -> {
+                    json.decodeFromJsonElement<Close>(message.content).also {
+                        protocolState.close = it
+                        protocolState.state = State.CLOSED
+                    }
+                }
 
                 else -> throw InvalidParameterException("wrong message type: ${message.type?.name}")
             }
         }
         return pm
+    }
+
+    override fun connected(invitation: Invitation) {
+        check(protocolState.state == State.INITIALIZED)
+        protocolState.invitation = invitation
+        protocolState.state = State.SEND_CREDENTIAL_OFFER
     }
 
     suspend fun sendOffer(credentialOffer: CredentialOffer) {
@@ -121,12 +124,17 @@ class CredentialExchangeIssuerContext private constructor(val connection: Connec
     suspend fun submitCredential(credentialSubmit: CredentialSubmit) {
         check(protocolState.state == State.SUBMIT_CREDENTIAL)
         protocolState.submit = credentialSubmit
-        connection.send(Message(json.encodeToJsonElement(credentialSubmit).jsonObject, MessageType.CREDENTIAL_SUBMIT))
+        connection.send(
+            Message(
+                json.encodeToJsonElement(credentialSubmit).jsonObject,
+                MessageType.CREDENTIAL_SUBMIT
+            )
+        )
         protocolState.state = State.CREDENTIAL_SUBMITTED
     }
 
     override fun close() {
         protocolState.state = State.CLOSED
-        contexts.remove(id)
+        protocols.remove(id)
     }
 }

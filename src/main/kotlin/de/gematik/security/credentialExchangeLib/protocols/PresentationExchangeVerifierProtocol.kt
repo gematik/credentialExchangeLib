@@ -1,6 +1,9 @@
 package de.gematik.security.credentialExchangeLib.protocols
 
-import de.gematik.security.credentialExchangeLib.connection.*
+import de.gematik.security.credentialExchangeLib.connection.Connection
+import de.gematik.security.credentialExchangeLib.connection.ConnectionFactory
+import de.gematik.security.credentialExchangeLib.connection.Message
+import de.gematik.security.credentialExchangeLib.connection.MessageType
 import de.gematik.security.credentialExchangeLib.json
 import io.ktor.server.engine.*
 import kotlinx.serialization.Serializable
@@ -9,7 +12,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import java.security.InvalidParameterException
 
-class PresentationExchangeVerifierContext private constructor(val connection: Connection) : Context() {
+class PresentationExchangeVerifierProtocol private constructor(val connection: Connection) : Protocol() {
 
     enum class State {
         INITIALIZED,
@@ -34,17 +37,19 @@ class PresentationExchangeVerifierContext private constructor(val connection: Co
 
     val protocolState = ProtocolState()
 
-    companion object : ContextFactory<PresentationExchangeVerifierContext> {
+    companion object : ProtocolFactory<PresentationExchangeVerifierProtocol> {
         override fun listen(
             connectionFactory: ConnectionFactory<*>,
             host: String,
             port: Int,
             path: String,
-            protocolHandler: suspend (PresentationExchangeVerifierContext) -> Unit
+            handler: suspend (PresentationExchangeVerifierProtocol) -> Unit
         ): ApplicationEngine {
             return connectionFactory.listen(host, port, path) {
-                newInstance(it).use{
-                    protocolHandler(it)
+                PresentationExchangeVerifierProtocol(it).also {
+                    protocols[it.id] = it
+                }.use {
+                    handler(it)
                 }
             }
         }
@@ -54,33 +59,19 @@ class PresentationExchangeVerifierContext private constructor(val connection: Co
             host: String,
             port: Int,
             path: String,
-            invitation: Invitation?,
-            protocolHandler: suspend (PresentationExchangeVerifierContext) -> Unit
+            handler: suspend (PresentationExchangeVerifierProtocol) -> Unit
         ) {
-            check(!(path.contains("oob=") && invitation!=null))
-            connectionFactory.connect(host, port, path + if(invitation!=null) "?oob=${invitation.toBase64()}" else "") {
-                newInstance(it).apply {
-                    invitation?.let{
-                        protocolState.invitation = invitation
-                        protocolState.state = State.WAIT_FOR_PRESENTATION_OFFER
-                    }
-                    if(path.contains("oob=")){
-                        val oob = path.substringAfter("oob=").substringBefore("&")
-                        protocolState.invitation = Invitation.fromBase64(oob)
-                        protocolState.state = State.WAIT_FOR_PRESENTATION_OFFER
-                    }
+            connectionFactory.connect(host, port, path) {
+                val oob = path.substringAfter("oob=", "").substringBefore("&")
+                val invitation = if (oob.isEmpty()) null else Invitation.fromBase64(oob)
+                PresentationExchangeVerifierProtocol(it).also {
+                    protocols[it.id] = it
                 }.use {
-                    protocolHandler(it)
+                    invitation?.let{inv -> it.connected(inv)}
+                    handler(it)
                 }
             }
         }
-
-        private fun newInstance(connection: Connection) : PresentationExchangeVerifierContext {
-            val context = PresentationExchangeVerifierContext(connection)
-            contexts[context.id] = context
-            return context
-        }
-
     }
 
     override suspend fun receive(): LdObject {
@@ -125,6 +116,12 @@ class PresentationExchangeVerifierContext private constructor(val connection: Co
         return pm
     }
 
+    override fun connected(invitation: Invitation) {
+        check(protocolState.state == State.INITIALIZED)
+        protocolState.invitation = invitation
+        protocolState.state = State.WAIT_FOR_PRESENTATION_OFFER
+    }
+
     suspend fun sendInvitation(invitation: Invitation) {
         check(protocolState.state == State.INITIALIZED)
         protocolState.invitation = invitation
@@ -141,6 +138,6 @@ class PresentationExchangeVerifierContext private constructor(val connection: Co
 
     override fun close() {
         protocolState.state = State.CLOSED
-        contexts.remove(id)
+        protocols.remove(id)
     }
 }

@@ -1,9 +1,5 @@
-// dummy required by 'shadowJar' task
-project.setProperty("mainClassName", "com.dummy.MainClass")
-
 plugins {
     kotlin("jvm") version "1.8.0"
-    id("io.ktor.plugin") version "2.3.1"
     kotlin("plugin.serialization") version "1.8.21"
     `maven-publish`
     `java-library`
@@ -28,13 +24,13 @@ dependencies {
     implementation("io.setl:rdf-urdna:1.2")
     implementation("io.github.novacrypto:Base58:2022.01.17")
 
-    api("io.ktor:ktor-server-core")
-    api("io.ktor:ktor-server-cio")
-    api("io.ktor:ktor-server-websockets")
-    implementation("io.ktor:ktor-client-core")
-    implementation("io.ktor:ktor-client-cio")
-    implementation("io.ktor:ktor-client-websockets")
-    implementation("io.ktor:ktor-serialization-kotlinx-json")
+    api("io.ktor:ktor-server-core:2.3.1")
+    api("io.ktor:ktor-server-cio:2.3.1")
+    api("io.ktor:ktor-server-websockets:2.3.1")
+    implementation("io.ktor:ktor-client-core:2.3.1")
+    implementation("io.ktor:ktor-client-cio:2.3.1")
+    implementation("io.ktor:ktor-client-websockets:2.3.1")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.1")
 
     testImplementation("org.junit.platform:junit-platform-suite-engine:1.9.1")
     testImplementation(kotlin("test"))
@@ -48,7 +44,7 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(11)
 }
 
 publishing {

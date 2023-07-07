@@ -7,13 +7,13 @@ interface ConnectionFactory<T : Connection> {
         host: String = "0.0.0.0",
         port: Int = 8090,
         path: String = "ws",
-        connectionHandler: suspend (T) -> Unit
+        handler: suspend (T) -> Unit
     ): ApplicationEngine
 
     suspend fun connect(
         host: String = "127.0.0.1",
         port: Int = 8090,
         path: String = "ws",
-        connectionHandler: suspend (T) -> Unit
+        handler: suspend (T) -> Unit
     )
 }

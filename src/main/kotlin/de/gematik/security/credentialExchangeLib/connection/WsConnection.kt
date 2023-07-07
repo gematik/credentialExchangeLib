@@ -42,11 +42,29 @@ class WsConnection private constructor(private val session: DefaultWebSocketSess
             host: String,
             port: Int,
             path: String,
-            connectionHandler: suspend (WsConnection) -> Unit
+            handler: suspend (WsConnection) -> Unit
         ): ApplicationEngine {
-            serverConnectionHandler = connectionHandler
+            serverConnectionHandler = handler
             serverPath = path
-            val engine = embeddedServer(io.ktor.server.cio.CIO, host = host, port = port, module = Application::module)
+            val engine = embeddedServer(io.ktor.server.cio.CIO, host = host, port = port) {
+                install(io.ktor.server.websocket.WebSockets) {
+                    contentConverter = KotlinxWebsocketSerializationConverter(Json)
+                }
+                routing {
+                    webSocket(serverPath) {
+                        WsConnection(this).also {
+                            connections[it.id] = it
+                        }.use {
+                            serverConnectionHandler(it)
+                        }
+                    }
+                    staticResources("/static", "files")
+                    get("/") {
+                        call.respondRedirect("static/about.html")
+                    }
+
+                }
+            }
             engine.start()
             return engine
         }
@@ -55,20 +73,15 @@ class WsConnection private constructor(private val session: DefaultWebSocketSess
             host: String,
             port: Int,
             path: String,
-            connectionHandler: suspend (WsConnection) -> Unit
+            handler: suspend (WsConnection) -> Unit
         ) {
             client.webSocket(method = HttpMethod.Get, host = host, port = port, path = path) {
-                newInstance(this).use {
-                    connectionHandler(it)
+                WsConnection(this).also {
+                    connections[it.id] = it
+                }.use {
+                    handler(it)
                 }
             }
-        }
-
-        internal fun newInstance(session: Any?): WsConnection {
-            require(session is DefaultWebSocketSession)
-            val connection = WsConnection(session)
-            connections[connection.id] = connection
-            return connection
         }
     }
 
@@ -80,7 +93,12 @@ class WsConnection private constructor(private val session: DefaultWebSocketSess
 
     suspend fun close(reason: CloseReason) {
         connections.remove(id)
-        send(Message(json.encodeToJsonElement(Close(message = "connection closed normally")).jsonObject, MessageType.CLOSE))
+        send(
+            Message(
+                json.encodeToJsonElement(Close(message = "connection closed normally")).jsonObject,
+                MessageType.CLOSE
+            )
+        )
         logger.info("close connection: $id with reason: ${reason.message}")
         session.close(reason)
     }
@@ -97,20 +115,11 @@ class WsConnection private constructor(private val session: DefaultWebSocketSess
 
     private var isFirstReceive = true
     override suspend fun receive(): Message {
-        while(true) {
+        while (true) {
             val message = when (session) {
                 is DefaultClientWebSocketSession -> kotlin.runCatching {
                     session.receiveDeserialized<Message>()
-                }.onFailure {
-                    when(it){
-                        is WebsocketDeserializeException -> logger.debug { it.frame.frameType.name }
-                        is ClosedReceiveChannelException -> {
-                            logger.debug { "connection closed by remote peer unexpectly" }
-                            return Message(json.encodeToJsonElement(Close(message = "connection closed by remote peer unexpectly")).jsonObject, MessageType.CLOSE)
-                        }
-                        else -> logger.debug { it.message }
-                    }
-                }.getOrNull()
+                }.onFailure { handleReceiveException(it)?.let { return it } }.getOrNull()
 
                 is DefaultWebSocketServerSession -> {
                     if (isFirstReceive && session.call.parameters.contains("oob")) {
@@ -125,33 +134,39 @@ class WsConnection private constructor(private val session: DefaultWebSocketSess
                     } else {
                         kotlin.runCatching {
                             session.receiveDeserialized<Message>()
-                        }.onFailure { logger.debug { it.message } }.getOrNull()
+                        }.onFailure { handleReceiveException(it)?.let{return it} }.getOrNull()
                     }
                 }
 
                 else -> throw IllegalStateException("wrong session type")
             }
-            message?:continue
+            message ?: continue
             isFirstReceive = false
             logger.info { "receive: ${message.type} -  ${Json.encodeToString(message)}" }
             return message
         }
     }
-}
 
-fun Application.module() {
-    install(io.ktor.server.websocket.WebSockets) {
-        contentConverter = KotlinxWebsocketSerializationConverter(Json)
-    }
-    routing {
-        staticResources("/static", "files")
-        webSocket(serverPath) {
-            WsConnection.newInstance(this).use {
-                serverConnectionHandler(it)
+    private fun handleReceiveException(throwable: Throwable): Message? {
+        return when (throwable) {
+            is WebsocketDeserializeException -> {
+                logger.debug { throwable.frame.frameType.name }
+                null
+            }
+
+            is ClosedReceiveChannelException -> {
+                logger.debug { "connection closed by remote peer unexpectly" }
+                return Message(
+                    json.encodeToJsonElement(Close(message = "connection closed by remote peer unexpectly")).jsonObject,
+                    MessageType.CLOSE
+                )
+            }
+
+            else -> {
+                logger.debug { throwable.message }
+                null
             }
         }
-        get("/") {
-            call.respondRedirect("static/about.html")
-        }
     }
 }
+

@@ -1,22 +1,21 @@
 package de.gematik.security.credentialExchangeLib.protocols
 
-import de.gematik.security.credentialExchangeLib.connection.Message
 import mu.KotlinLogging
 import java.io.Closeable
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
-sealed class Context : Closeable {
+sealed class Protocol : Closeable {
 
     companion object {
         @JvmStatic
-        protected val contexts = Collections.synchronizedMap(mutableMapOf<UUID, Context>())
-        fun getNumberOfContexts(): Int{
-            return contexts.size
+        protected val protocols = Collections.synchronizedMap(mutableMapOf<UUID, Protocol>())
+        fun getNumberOfProtocolInstances(): Int{
+            return protocols.size
         }
-        fun getContext(id: UUID) : Context? {
-            return contexts.get(id)
+        fun getProtocolInstance(id: UUID) : Protocol? {
+            return protocols.get(id)
         }
     }
 
@@ -27,4 +26,5 @@ sealed class Context : Closeable {
     }
 
     abstract suspend fun receive() : LdObject
+    abstract fun connected(invitation: Invitation)
 }

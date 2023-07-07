@@ -17,6 +17,7 @@ import kotlinx.serialization.json.jsonObject
 import org.junit.jupiter.api.Test
 import java.net.URI
 import java.util.*
+import kotlin.test.assertEquals
 
 class ProtocolTests {
 
@@ -137,14 +138,34 @@ class ProtocolTests {
     )
 
     @Test
+    fun manageProtocolInstances(){
+        val engine = CredentialExchangeIssuerProtocol.listen(WsConnection) {
+            assertEquals(1, Protocol.getNumberOfProtocolInstances())
+            assert(it.receive() is Invitation)
+            // connection is closed automatically - close is sent to peer
+        }
+        runBlocking {
+            CredentialExchangeHolderProtocol.connect(WsConnection) {
+                assertEquals(2, Protocol.getNumberOfProtocolInstances())
+                it.sendInvitation(invitation)
+                assert(it.receive() is Close)
+                assertEquals(1, Protocol.getNumberOfProtocolInstances())
+            }
+        }
+        assertEquals(0, Protocol.getNumberOfProtocolInstances())
+        engine.stop()
+    }
+
+    @Test
     fun acceptInvitation() {
-        val engine = CredentialExchangeIssuerContext.listen(WsConnection) {
+        val engine = CredentialExchangeIssuerProtocol.listen(WsConnection) {
             assert(it.receive() is Invitation)
             println("\"issuer\": ${json.encodeToString(it.protocolState)}")
             // connection is closed automatically - close is sent to peer
         }
         runBlocking {
-            CredentialExchangeHolderContext.connect(WsConnection, invitation = invitation) {
+            CredentialExchangeHolderProtocol.connect(WsConnection) {
+                it.sendInvitation(invitation)
                 assert(it.receive() is Close)
             }
         }
@@ -153,13 +174,13 @@ class ProtocolTests {
 
     @Test
     fun acceptInvitationInPath() {
-        val engine = CredentialExchangeIssuerContext.listen(WsConnection) {
+        val engine = CredentialExchangeIssuerProtocol.listen(WsConnection) {
             assert(it.receive() is Invitation)
             println("\"issuer\": ${json.encodeToString(it.protocolState)}")
             // connection is closed automatically - close is sent to peer
         }
         runBlocking {
-            CredentialExchangeHolderContext.connect(WsConnection, path = "ws?oob=${invitation.toBase64()}") {
+            CredentialExchangeHolderProtocol.connect(WsConnection, path = "ws?oob=${invitation.toBase64()}") {
                 assert(it.receive() is Close)
             }
         }
@@ -170,7 +191,7 @@ class ProtocolTests {
     fun issueCredential() {
 
         //start issuer
-        val engine = CredentialExchangeIssuerContext.listen(WsConnection) {
+        val engine = CredentialExchangeIssuerProtocol.listen(WsConnection) {
             assert(it.receive() is Invitation)
             it.sendOffer(
                 CredentialOffer(
@@ -205,11 +226,11 @@ class ProtocolTests {
 
         // start holder
         runBlocking {
-            CredentialExchangeHolderContext.connect(
+            CredentialExchangeHolderProtocol.connect(
                 WsConnection,
-                invitation = invitation,
             )
             {
+                it.sendInvitation(invitation)
                 val credentialOffer = it.receive()
                 assert(credentialOffer is CredentialOffer)
                 it.requestCredential(
@@ -232,7 +253,7 @@ class ProtocolTests {
     fun exchangePresentation() {
 
         //start holder
-        val engine = PresentationExchangeHolderContext.listen(WsConnection) {
+        val engine = PresentationExchangeHolderProtocol.listen(WsConnection) {
             assert(it.receive() is Invitation)
             it.sendOffer(
                 PresentationOffer(
@@ -277,11 +298,11 @@ class ProtocolTests {
 
         // start verifier
         runBlocking {
-            PresentationExchangeVerifierContext.connect(
-                WsConnection,
-                invitation = invitation,
+            PresentationExchangeVerifierProtocol.connect(
+                WsConnection
             )
             {
+                it.sendInvitation(invitation)
                 val presentationOffer = it.receive()
                 assert(presentationOffer is PresentationOffer)
                 it.requestPresentation(
