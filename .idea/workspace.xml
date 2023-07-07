@@ -5,18 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="246e1cc3-192b-491f-8ba1-e76025f33fb5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/ConnectionFactory.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/ConnectionFactory.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/WsConnection.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/WsConnection.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Context.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Protocol.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/ContextFactory.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/ProtocolFactory.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeHolderContext.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeHolderProtocol.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeIssuerContext.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeIssuerProtocol.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/PresentationExchangeHolderContext.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/PresentationExchangeHolderProtocol.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/PresentationExchangeVerifierContext.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/PresentationExchangeVerifierProtocol.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/PresentationRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/PresentationRequest.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProtocolTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProtocolTests.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -304,7 +293,7 @@
       <workItem from="1688111022879" duration="15817000" />
       <workItem from="1688474060771" duration="48567000" />
       <workItem from="1688658541603" duration="3419000" />
-      <workItem from="1688724711118" duration="9732000" />
+      <workItem from="1688724711118" duration="10696000" />
     </task>
     <task id="LOCAL-00001" summary="initial check in">
       <created>1683117220289</created>
@@ -432,7 +421,14 @@
       <option name="project" value="LOCAL" />
       <updated>1688486377442</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="chore: refactoring and fixing minor issues">
+      <created>1688738619203</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1688738619203</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -468,7 +464,8 @@
     <MESSAGE value="chore: make logging available for jvm and android" />
     <MESSAGE value="feat: add protocol context management" />
     <MESSAGE value="feat: add presentation exchange" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add presentation exchange" />
+    <MESSAGE value="chore: refactoring and fixing minor issues" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: refactoring and fixing minor issues" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
