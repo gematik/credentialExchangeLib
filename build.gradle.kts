@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "de.gematik"
-version = "0.2.0"
+version = "0.3.0-SNAPSHOT"
 
 repositories {
     mavenLocal()
@@ -19,10 +19,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
     implementation("com.github.mattrglobal:bbs.signatures:1.6-SNAPSHOT")
-    implementation("com.apicatalog:titanium-json-ld-jre8:1.3.2")
-    implementation("org.glassfish:jakarta.json:2.0.1")
-    implementation("io.setl:rdf-urdna:1.2")
-    implementation("io.github.novacrypto:Base58:2022.01.17")
+    api("com.apicatalog:titanium-json-ld-jre8:1.3.2")
+    api("org.glassfish:jakarta.json:2.0.1")
+    api("io.setl:rdf-urdna:1.2")
+    api("io.github.novacrypto:Base58:2022.01.17")
 
     api("io.ktor:ktor-server-core:2.3.1")
     api("io.ktor:ktor-server-cio:2.3.1")
@@ -36,7 +36,7 @@ dependencies {
     testImplementation(kotlin("test"))
 
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
-    testImplementation("ch.qos.logback:logback-classic:1.4.8")
+    implementation("ch.qos.logback:logback-classic:1.3.8")
 }
 
 tasks.test {
@@ -44,7 +44,7 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(8)
 }
 
 publishing {

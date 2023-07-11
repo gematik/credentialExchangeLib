@@ -127,18 +127,6 @@ class JsonLdTests {
     }
 
     @Test
-    fun frameCredential() {
-        val transformedRdf = credential.normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
-        val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream())).get())
-        val frameDocument = emptyVaccinationCredentialFrame.toJsonDocument()
-        val jsonObject = JsonLd.frame(inputDocument, frameDocument).options(defaultJsonLdOptions).get()
-        val framedCredential = Json.decodeFromString<Credential>(jsonObject.toString())
-        val framedRdf = framedCredential.normalize().trim().replace(Regex("<urn:bnid:(_:c14n[0-9]*)>"), "$1")
-        assertEquals(credential.normalize().trim(), framedRdf)
-        println(json.encodeToString(framedCredential))
-    }
-
-    @Test
     fun normalize() {
         val ldProof = LdProof(
             type = listOf(ProofType.BbsBlsSignature2020.name),
@@ -155,5 +143,42 @@ class JsonLdTests {
 
         """.trimIndent()
         assertEquals(expectedNormalized, normalized)
+    }
+
+    @Test
+    fun frameCredential() {
+        val transformedRdf = credential.normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
+        val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream())).get())
+        val frameDocument = emptyVaccinationCredentialFrame.toJsonDocument()
+        val jsonObject = JsonLd.frame(inputDocument, frameDocument).options(defaultJsonLdOptions).get()
+        val framedCredential = Json.decodeFromString<Credential>(jsonObject.toString())
+        val framedRdf = framedCredential.normalize().trim().replace(Regex("<urn:bnid:(_:c14n[0-9]*)>"), "$1")
+        assertEquals(credential.normalize().trim(), framedRdf)
+        println(json.encodeToString(framedCredential))
+    }
+
+    @Test
+    fun frameCredentialSelectiv() {
+        val transformedRdf = credential.normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
+        val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream())).get())
+        val frameDocument = credentialFrame.toJsonDocument()
+        val jsonObject = JsonLd.frame(inputDocument, frameDocument).options(defaultJsonLdOptions).get()
+        val framedCredential = Json.decodeFromString<Credential>(jsonObject.toString())
+        val framedRdf = framedCredential.normalize().trim().replace(Regex("<urn:bnid:(_:c14n[0-9]*)>"), "$1")
+        val expectedFramedRdf = """
+            _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/vaccination#VaccinationEvent> .
+            _:c14n0 <https://w3id.org/vaccination#administeringCentre> "Praxis Sommergarten" .
+            _:c14n0 <https://w3id.org/vaccination#batchNumber> "1626382736" .
+            _:c14n0 <https://w3id.org/vaccination#countryOfVaccination> "GE" .
+            _:c14n0 <https://w3id.org/vaccination#recipient> _:c14n1 .
+            _:c14n1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/vaccination#VaccineRecipient> .
+            _:c14n3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/vaccination#VaccinationCertificate> .
+            _:c14n3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.w3.org/2018/credentials#VerifiableCredential> .
+            _:c14n3 <https://www.w3.org/2018/credentials#credentialSubject> _:c14n0 .
+            _:c14n3 <https://www.w3.org/2018/credentials#issuanceDate> "2023-05-15T12:12:16Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+            _:c14n3 <https://www.w3.org/2018/credentials#issuer> <did:key:test> .
+        """.trimIndent()
+        assertEquals(expectedFramedRdf, framedRdf)
+        println(json.encodeToString(framedCredential))
     }
 }

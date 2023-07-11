@@ -8,6 +8,7 @@ import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.hexToByteArray
 import de.gematik.security.credentialExchangeLib.protocols.*
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import org.junit.jupiter.api.Test
@@ -92,26 +93,45 @@ class ProofTests {
         )
     )
 
-    val presentation = Presentation(
-        atContext = Presentation.DEFAULT_JSONLD_CONTEXTS + PresentationSubmission.DEFAULT_JSONLD_CONTEXTS,
-        presentationSubmission = PresentationSubmission(
-            definitionId = presentationDefinitionId,
-            descriptorMap = listOf(
-                PresentationSubmission.DescriptorMapEntry(
-                    inputDescriptorId,
-                    ClaimFormat.LDP_VC,
-                    path = "\$.verifiableCredential[0]"
+    val credentialFrame = Credential(
+        atContext = listOf(
+            URI.create("https://www.w3.org/2018/credentials/v1"),
+            URI.create("https://w3id.org/vaccination/v1")
+        ),
+        type = listOf(
+            "VerifiableCredential",
+            "VaccinationCertificate"
+        ),
+        credentialSubject = JsonObject(
+            mapOf(
+                "@explicit" to JsonPrimitive(true),
+                "type" to JsonArray(
+                    listOf(
+                        JsonPrimitive("VaccinationEvent")
+                    )
+                ),
+                "batchNumber" to JsonObject(mapOf()),
+                "administeringCentre" to JsonObject(mapOf()),
+                "countryOfVaccination" to JsonObject(mapOf()),
+                "recipient" to JsonObject(
+                    mapOf(
+                        "@explicit" to JsonPrimitive(true),
+                        "id" to JsonObject(mapOf()),
+                        "type" to JsonArray(
+                            listOf(
+                                JsonPrimitive("VaccineRecipient")
+                            )
+                        )
+                    )
                 )
             )
-        ),
-        verifiableCredential = listOf(credential.deepCopy().apply {
-            sign(ldProofIssuer, BbsPlusSigner(credentialIssuer.keyPair))
-        }.derive(emptyCredentialFrame))
+        )
     )
 
     @Test
     fun signVerifyCredential() {
-        val signedCredential = credential.deepCopy().apply { sign(ldProofIssuer, BbsPlusSigner(credentialIssuer.keyPair)) }
+        val signedCredential =
+            credential.deepCopy().apply { sign(ldProofIssuer, BbsPlusSigner(credentialIssuer.keyPair)) }
         val result = signedCredential.verify()
         assert(result)
         println(json.encodeToString(signedCredential))
@@ -119,8 +139,9 @@ class ProofTests {
 
     @Test
     fun deriveAndVerifyCredential() {
-        val signedCredential = credential.deepCopy().apply { sign(ldProofIssuer, BbsPlusSigner(credentialIssuer.keyPair)) }
-        val derivedCredential = signedCredential.derive(emptyCredentialFrame)
+        val signedCredential =
+            credential.deepCopy().apply { sign(ldProofIssuer, BbsPlusSigner(credentialIssuer.keyPair)) }
+        val derivedCredential = signedCredential.derive(credentialFrame)
         val result = derivedCredential.verify()
         assert(result)
         println(json.encodeToString(derivedCredential))
@@ -128,8 +149,24 @@ class ProofTests {
 
     @Test
     fun signVerifyPresentation() {
-        val signedPresentation = presentation.deepCopy()
-        signedPresentation.sign(ldProofHolder, BbsPlusSigner(credentialHolder.keyPair))
+        val signedPresentation = Presentation(
+            atContext = Presentation.DEFAULT_JSONLD_CONTEXTS + PresentationSubmission.DEFAULT_JSONLD_CONTEXTS,
+            presentationSubmission = PresentationSubmission(
+                definitionId = presentationDefinitionId,
+                descriptorMap = listOf(
+                    PresentationSubmission.DescriptorMapEntry(
+                        inputDescriptorId,
+                        ClaimFormat.LDP_VC,
+                        path = "\$.verifiableCredential[0]"
+                    )
+                )
+            ),
+            verifiableCredential = listOf(credential.deepCopy().apply {
+                sign(ldProofIssuer, BbsPlusSigner(credentialIssuer.keyPair))
+            }.derive(emptyCredentialFrame))
+        ).apply {
+            sign(ldProofHolder, BbsPlusSigner(credentialHolder.keyPair))
+        }
         val result = signedPresentation.verify()
         assert(result)
         println(json.encodeToString(signedPresentation))

@@ -106,7 +106,7 @@ class LdProof(
         val framedCredentialMessages = normalizedFramedCredential.split('\n')
         var j = 0
         normalizedCredential.split('\n').forEach {
-            val type = if (it == framedCredentialMessages.get(j)) {
+            val type = if (j<framedCredentialMessages.size && it == framedCredentialMessages.get(j)) {
                 j++
                 ProofMessage.PROOF_MESSAGE_TYPE_REVEALED
             } else {
