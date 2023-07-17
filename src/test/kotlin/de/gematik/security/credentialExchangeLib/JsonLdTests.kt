@@ -159,19 +159,21 @@ class JsonLdTests {
 
     @Test
     fun frameCredential() {
-        val transformedRdf = credential.normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
+        val credentialWithoutProof = credential.deepCopy().apply{proof=null}
+        val transformedRdf = credentialWithoutProof .normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
         val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream())).get())
         val frameDocument = emptyVaccinationCredentialFrame.toJsonDocument()
         val jsonObject = JsonLd.frame(inputDocument, frameDocument).options(defaultJsonLdOptions).get()
         val framedCredential = Json.decodeFromString<Credential>(jsonObject.toString())
         val framedRdf = framedCredential.normalize().trim().replace(Regex("<urn:bnid:(_:c14n[0-9]*)>"), "$1")
-        assertEquals(credential.normalize().trim(), framedRdf)
+        assertEquals(credentialWithoutProof.normalize().trim(), framedRdf)
         println(json.encodeToString(framedCredential))
     }
 
     @Test
     fun frameCredentialSelectiv() {
-        val transformedRdf = credential.normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
+        val credentialWithoutProof = credential.deepCopy().apply{proof=null}
+        val transformedRdf = credentialWithoutProof.normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
         val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream())).get())
         val frameDocument = credentialFrame.toJsonDocument()
         val jsonObject = JsonLd.frame(inputDocument, frameDocument).options(defaultJsonLdOptions).get()
@@ -188,7 +190,7 @@ class JsonLdTests {
             _:c14n2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.w3.org/2018/credentials#VerifiableCredential> .
             _:c14n2 <https://www.w3.org/2018/credentials#credentialSubject> _:c14n0 .
             _:c14n2 <https://www.w3.org/2018/credentials#issuanceDate> "2023-05-15T12:12:16Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
-            _:c14n2 <https://www.w3.org/2018/credentials#issuer> <did:key:test> .
+            _:c14n2 <https://www.w3.org/2018/credentials#issuer> <did:key:zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv> .
         """.trimIndent()
         assertEquals(expectedFramedRdf, framedRdf)
         println(json.encodeToString(framedCredential))
