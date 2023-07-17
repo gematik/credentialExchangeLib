@@ -21,6 +21,8 @@ import kotlin.test.assertEquals
 class JsonLdTests {
 
     val date = Date(1684152736408)
+    val recipientId =
+        "did:key:zUC7CgahEtPMHR2JsTnFSbhjFE6bYAm5i2vbFWRUdSUNc45zFAg3rCA6UVoYcDzU5DHAk1HuLV5tgcd6edL8mKLoDRhbz7qzav5yzkDWWgZMh8wTieyjcXtoTSmxNq96nWUgP5V"
 
     val credential = Credential(
         atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
@@ -37,6 +39,7 @@ class JsonLdTests {
                 "order" to JsonPrimitive("3/3"),
                 "recipient" to JsonObject(
                     mapOf(
+                        "id" to JsonPrimitive(recipientId),
                         "type" to JsonPrimitive("VaccineRecipient"),
                         "givenName" to JsonPrimitive("Marion"),
                         "familyName" to JsonPrimitive("Mustermann"),
@@ -55,7 +58,16 @@ class JsonLdTests {
             )
         ),
         issuanceDate = date,
-        issuer = URI.create("did:key:test")
+        issuer = URI.create("did:key:zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv"),
+        proof = listOf(
+            LdProof(
+                type = listOf(ProofType.BbsBlsSignature2020.name),
+                created = date,
+                proofPurpose = ProofPurpose.ASSERTION_METHOD,
+                verificationMethod = URI.create("did:key:zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv#zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv"),
+                proofValue = "p/YiIfAicLzDd460F516bj9jyoXImWth2RU3ULV4XAXSil91r0c0AzKk6aw+/52GCkOTp3jVKvE0GwQGTFILDVY5qD8/G2qkwELmQwmxKDsD5MNMmJtH57m460w4JcztzLbTbXozTx9ZGtuXdv3UhQ=="
+            )
+        )
     )
 
     val emptyVaccinationCredentialFrame = JsonLdObject(
@@ -166,19 +178,191 @@ class JsonLdTests {
         val framedCredential = Json.decodeFromString<Credential>(jsonObject.toString())
         val framedRdf = framedCredential.normalize().trim().replace(Regex("<urn:bnid:(_:c14n[0-9]*)>"), "$1")
         val expectedFramedRdf = """
+            <did:key:zUC7CgahEtPMHR2JsTnFSbhjFE6bYAm5i2vbFWRUdSUNc45zFAg3rCA6UVoYcDzU5DHAk1HuLV5tgcd6edL8mKLoDRhbz7qzav5yzkDWWgZMh8wTieyjcXtoTSmxNq96nWUgP5V> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/vaccination#VaccineRecipient> .
             _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/vaccination#VaccinationEvent> .
             _:c14n0 <https://w3id.org/vaccination#administeringCentre> "Praxis Sommergarten" .
             _:c14n0 <https://w3id.org/vaccination#batchNumber> "1626382736" .
             _:c14n0 <https://w3id.org/vaccination#countryOfVaccination> "GE" .
-            _:c14n0 <https://w3id.org/vaccination#recipient> _:c14n1 .
-            _:c14n1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/vaccination#VaccineRecipient> .
-            _:c14n3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/vaccination#VaccinationCertificate> .
-            _:c14n3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.w3.org/2018/credentials#VerifiableCredential> .
-            _:c14n3 <https://www.w3.org/2018/credentials#credentialSubject> _:c14n0 .
-            _:c14n3 <https://www.w3.org/2018/credentials#issuanceDate> "2023-05-15T12:12:16Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
-            _:c14n3 <https://www.w3.org/2018/credentials#issuer> <did:key:test> .
+            _:c14n0 <https://w3id.org/vaccination#recipient> <did:key:zUC7CgahEtPMHR2JsTnFSbhjFE6bYAm5i2vbFWRUdSUNc45zFAg3rCA6UVoYcDzU5DHAk1HuLV5tgcd6edL8mKLoDRhbz7qzav5yzkDWWgZMh8wTieyjcXtoTSmxNq96nWUgP5V> .
+            _:c14n2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/vaccination#VaccinationCertificate> .
+            _:c14n2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.w3.org/2018/credentials#VerifiableCredential> .
+            _:c14n2 <https://www.w3.org/2018/credentials#credentialSubject> _:c14n0 .
+            _:c14n2 <https://www.w3.org/2018/credentials#issuanceDate> "2023-05-15T12:12:16Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+            _:c14n2 <https://www.w3.org/2018/credentials#issuer> <did:key:test> .
         """.trimIndent()
         assertEquals(expectedFramedRdf, framedRdf)
         println(json.encodeToString(framedCredential))
     }
+
+    @Test
+    fun expandCredential() {
+        val expandedCredential = JsonLd.expand(credential.toJsonDocument()).get()
+        println(json.encodeToString(json.parseToJsonElement(expandedCredential.toString())))
+    }
+
+    @Test
+    fun compactCredential() {
+        val inputDocument = credential.toJsonDocument()
+        val context = Credential(
+            atContext = credential.atContext + credential.proof!!.get(0).atContext,
+            type = credential.type + credential.proof!!.get(0).type!!
+        ).toJsonDocument()
+        val compactedCredential = JsonLd.compact(inputDocument, context).options(defaultJsonLdOptions).get()
+        println(json.encodeToString(json.parseToJsonElement(compactedCredential.toString())))
+    }
+
+    @Test
+    fun frameCredentialSelectiveWithProof() {
+        val inputDocument = credential.toJsonDocument()
+        val frame = JsonLdObject(
+            content = mapOf(
+                "@context" to JsonArray(
+                    listOf(
+                        JsonPrimitive("https://www.w3.org/2018/credentials/v1"),
+                        JsonPrimitive("https://w3id.org/vaccination/v1"),
+                        JsonPrimitive("https://w3id.org/security/bbs/v1")
+                    )
+                ),
+                "type" to JsonArray(
+                    listOf(
+                        JsonPrimitive("VerifiableCredential"),
+                        JsonPrimitive("VaccinationCertificate")
+                    )
+                ),
+                "credentialSubject" to JsonObject(
+                    mapOf(
+                        "@explicit" to JsonPrimitive(true),
+                        "@requireAll" to JsonPrimitive(true),
+                        "type" to JsonArray(
+                            listOf(
+                                JsonPrimitive("VaccinationEvent")
+                            )
+                        ),
+                        "order" to JsonObject(mapOf()),
+                        "recipient" to JsonObject(
+                            mapOf(
+                                "@explicit" to JsonPrimitive(true),
+                                "id" to JsonObject(mapOf()),
+                                "type" to JsonArray(
+                                    listOf(
+                                        JsonPrimitive("VaccineRecipient")
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+                "proof" to JsonObject(
+                    mapOf(
+                        "@explicit" to JsonPrimitive(true),
+                        "type" to JsonArray(
+                            listOf(
+                                JsonPrimitive("BbsBlsSignature2020")
+                            )
+                        ),
+                        "proofValue" to JsonObject(mapOf())
+                    )
+                )
+            )
+        ).toJsonDocument()
+        val framedCredential = JsonLd.frame(inputDocument, frame).options(defaultJsonLdOptions).get()
+        println(json.encodeToString(json.parseToJsonElement(framedCredential.toString())))
+    }
+
+    @Test
+    fun frameCredentialValueNoMatch() {
+        val inputDocument = credential.toJsonDocument()
+        val frame = JsonLdObject(
+            content = mapOf(
+                "@context" to JsonArray(
+                    listOf(
+                        JsonPrimitive("https://www.w3.org/2018/credentials/v1"),
+                        JsonPrimitive("https://w3id.org/vaccination/v1"),
+                        JsonPrimitive("https://w3id.org/security/bbs/v1")
+                    )
+                ),
+                "type" to JsonArray(
+                    listOf(
+                        JsonPrimitive("VerifiableCredential"),
+                        JsonPrimitive("VaccinationCertificate")
+                    )
+                ),
+                "credentialSubject" to JsonObject(
+                    mapOf(
+                        "@explicit" to JsonPrimitive(true),
+                        "@requireAll" to JsonPrimitive(true),
+                        "type" to JsonArray(
+                            listOf(
+                                JsonPrimitive("VaccinationEvent")
+                            )
+                        ),
+                        "order" to JsonArray(listOf(JsonPrimitive("2/3"))),
+                        "recipient" to JsonObject(
+                            mapOf(
+                                "@explicit" to JsonPrimitive(true),
+                                "id" to JsonObject(mapOf()),
+                                "type" to JsonArray(
+                                    listOf(
+                                        JsonPrimitive("VaccineRecipient")
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+                "proof" to JsonObject(mapOf())
+            )
+        ).toJsonDocument()
+        val framedCredential = JsonLd.frame(inputDocument, frame).options(defaultJsonLdOptions).get()
+        println(json.encodeToString(json.parseToJsonElement(framedCredential.toString())))
+    }
+
+    @Test
+    fun frameCredentialValueMatch() {
+        val inputDocument = credential.toJsonDocument()
+        val frame = JsonLdObject(
+            content = mapOf(
+                "@context" to JsonArray(
+                    listOf(
+                        JsonPrimitive("https://www.w3.org/2018/credentials/v1"),
+                        JsonPrimitive("https://w3id.org/vaccination/v1"),
+                        JsonPrimitive("https://w3id.org/security/bbs/v1")
+                    )
+                ),
+                "type" to JsonArray(
+                    listOf(
+                        JsonPrimitive("VerifiableCredential"),
+                        JsonPrimitive("VaccinationCertificate")
+                    )
+                ),
+                "credentialSubject" to JsonObject(
+                    mapOf(
+                        "@explicit" to JsonPrimitive(true),
+                        "@requireAll" to JsonPrimitive(true),
+                        "type" to JsonArray(
+                            listOf(
+                                JsonPrimitive("VaccinationEvent")
+                            )
+                        ),
+                        "order" to JsonArray(listOf(JsonPrimitive("3/3"))),
+                        "recipient" to JsonObject(
+                            mapOf(
+                                "@explicit" to JsonPrimitive(true),
+                                "id" to JsonObject(mapOf()),
+                                "type" to JsonArray(
+                                    listOf(
+                                        JsonPrimitive("VaccineRecipient")
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+                "proof" to JsonObject(mapOf())
+            )
+        ).toJsonDocument()
+        val framedCredential = JsonLd.frame(inputDocument, frame).options(defaultJsonLdOptions).get()
+        println(json.encodeToString(json.parseToJsonElement(framedCredential.toString())))
+    }
+
 }
