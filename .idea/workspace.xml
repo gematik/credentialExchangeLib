@@ -5,13 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="246e1cc3-192b-491f-8ba1-e76025f33fb5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/credentialSubjects/JsonLdValue.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/credentialSubjects/VaccinationEvent.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/context/vsd_v1.jsonld" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/credentialSubjects/Vsd.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/HttpLoaderWithCache.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/HttpLoaderWithCache.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/extensions/Utils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/extensions/Utils.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/context/vaccination_v1_modified.jsonld" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/context/vaccination_v1_modified.jsonld" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/context/vsd_v1.jsonld" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/context/vsd_v1.jsonld" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/JsonLdTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/JsonLdTests.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -99,26 +95,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;ktor.last.update.timestamp&quot;: &quot;1689608455106&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources/context/vaccination_v1_modified.jsonld&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.31034482&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;AndroidSdkUpdater&quot;,
-    &quot;two.files.diff.last.used.file&quot;: &quot;C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources/context/vaccination_v1_modified.jsonld&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "ignore.virus.scanning.warn.message": "true",
+    "ktor.last.update.timestamp": "1689839586830",
+    "last_opened_file_path": "C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources/context/vaccination_v1_modified.jsonld",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.31034482",
+    "settings.editor.selected.configurable": "AndroidSdkUpdater",
+    "two.files.diff.last.used.file": "C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources/context/vaccination_v1_modified.jsonld",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\rk\IntelliJIDEAProjects\credentialExchangeLib\src\main\resources\files" />
@@ -143,7 +139,7 @@
       <recent name="de.gematik.security.credentialExchangeLib.types" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.JsonLdTests.frameCredential">
+  <component name="RunManager" selected="Gradle.JsonLdTests.expandAndCompactVsdCredential">
     <configuration name="JsonLdTests.compactVsdCredential" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -158,6 +154,30 @@
             <option value=":test" />
             <option value="--tests" />
             <option value="&quot;de.gematik.security.credentialExchangeLib.JsonLdTests.compactVsdCredential&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>true</ForceTestExec>
+      <method v="2" />
+    </configuration>
+    <configuration name="JsonLdTests.expandAndCompactVsdCredential" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+            <option value="--tests" />
+            <option value="&quot;de.gematik.security.credentialExchangeLib.JsonLdTests.expandAndCompactVsdCredential&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -216,57 +236,37 @@
       <ForceTestExec>true</ForceTestExec>
       <method v="2" />
     </configuration>
-    <configuration name="credentialExchangeLib [jar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="JsonLdTests.vsdCredential" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
+        <option name="scriptParameters" value="" />
         <option name="taskDescriptions">
           <list />
         </option>
         <option name="taskNames">
           <list>
-            <option value="jar" />
+            <option value=":test" />
+            <option value="--tests" />
+            <option value="&quot;de.gematik.security.credentialExchangeLib.JsonLdTests.vsdCredential&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
       </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
       <DebugAllEnabled>false</DebugAllEnabled>
-      <ForceTestExec>false</ForceTestExec>
-      <method v="2" />
-    </configuration>
-    <configuration name="credentialExchangeLib [publishToMavenLocal]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="publishToMavenLocal" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <ForceTestExec>false</ForceTestExec>
+      <ForceTestExec>true</ForceTestExec>
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Gradle.JsonLdTests.frameCredential" />
-        <item itemvalue="Gradle.credentialExchangeLib [publishToMavenLocal]" />
-        <item itemvalue="Gradle.credentialExchangeLib [jar]" />
+        <item itemvalue="Gradle.JsonLdTests.expandAndCompactVsdCredential" />
+        <item itemvalue="Gradle.JsonLdTests.vsdCredential" />
         <item itemvalue="Gradle.JsonLdTests.compactVsdCredential" />
         <item itemvalue="Gradle.JsonLdTests.expandVsdCredential" />
+        <item itemvalue="Gradle.JsonLdTests.frameCredential" />
       </list>
     </recent_temporary>
   </component>
@@ -314,7 +314,7 @@
       <workItem from="1689348341451" duration="25000" />
       <workItem from="1689582453393" duration="20669000" />
       <workItem from="1689667077444" duration="21441000" />
-      <workItem from="1689751172834" duration="7556000" />
+      <workItem from="1689751172834" duration="11044000" />
     </task>
     <task id="LOCAL-00001" summary="initial check in">
       <created>1683117220289</created>
@@ -477,7 +477,14 @@
       <option name="project" value="LOCAL" />
       <updated>1689610149853</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="feat: vsd">
+      <created>1689839695954</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1689839695954</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -518,7 +525,8 @@
     <MESSAGE value="chore: minor corrections and improved unit tests" />
     <MESSAGE value="chore: jsonld test add recepient id in credential" />
     <MESSAGE value="fix: jsonld test" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: jsonld test" />
+    <MESSAGE value="feat: vsd" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: vsd" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

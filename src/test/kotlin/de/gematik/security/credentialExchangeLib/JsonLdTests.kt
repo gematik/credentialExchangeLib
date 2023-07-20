@@ -397,8 +397,8 @@ class JsonLdTests {
                         countryCode = "GER",
                         "Test GKV-SV"
                     ),
-                    insuranceType = InsuranceType.Member.code,
-                    residencyPrinciple = ResidencyPrinciple.Berlin.code
+                    insuranceType = InsuranceType.Member,
+                    residencyPrinciple = ResidencyPrinciple.Berlin
                 )
             )
         ).jsonObject,
@@ -411,17 +411,18 @@ class JsonLdTests {
         val credentialSerialized = json.encodeToString(vsdCredential)
         val credentialDeserialzed = json.decodeFromString<Credential>(credentialSerialized)
         assertEquals(vsdCredential.credentialSubject, credentialDeserialzed.credentialSubject)
+        println(json.encodeToString(vsdCredential))
     }
 
     @Test
-    fun expandVsdCredential() {
+    fun expandAndCompactVsdCredential() {
         val expandedCredential = JsonLd.expand(vsdCredential.toJsonDocument()).options(defaultJsonLdOptions).get()
         println(json.encodeToString(json.parseToJsonElement(expandedCredential.toString())))
-    }
-
-    @Test
-    fun compactVsdCredential() {
-        val inputDocument = vsdCredential.toJsonDocument()
+        val inputDocument = json.encodeToString(json.parseToJsonElement(expandedCredential.toString()))
+            .byteInputStream()
+            .use{
+            JsonDocument.of(it)
+        }
         val context = Credential(
             atContext = vsdCredential.atContext,
             type = vsdCredential.type
