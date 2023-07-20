@@ -47,7 +47,7 @@
         },
         "vaccine": {
           "@id": "https://w3id.org/vaccination#VaccineEventVaccine",
-          "@type": "@id"
+          "@type": "https://w3id.org/vaccination#Vaccine"
         }
       }
     },
@@ -76,10 +76,6 @@
         "type": "@type",
         "atcCode": "https://w3id.org/vaccination#atc-code",
         "disease": "https://w3id.org/vaccination#disease",
-        "event": {
-          "@id": "https://w3id.org/vaccination#VaccineRecipientVaccineEvent",
-          "@type": "https://w3id.org/vaccination#VaccineEvent"
-        },
         "marketingAuthorizationHolder": "https://w3id.org/vaccination#marketingAuthorizationHolder",
         "medicinalProductName": "https://w3id.org/vaccination#medicinalProductName"
       }

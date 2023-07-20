@@ -1,0 +1,293 @@
+{
+  "@context": {
+    "id": "@id",
+    "type": "@type",
+    "@version": 1.1,
+    "@protected": true,
+    "description": "http://schema.org/description",
+    "identifier": "http://schema.org/identifier",
+    "name": "http://schema.org/name",
+    "image": "http://schema.org/image",
+    "InsuranceCertificate": {
+      "@id": "https://gematik.de/vsd#InsuranceCertificate",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "description": "http://schema.org/description",
+        "identifier": "http://schema.org/identifier",
+        "name": "http://schema.org/name",
+        "image": "http://schema.org/image"
+      }
+    },
+    "Insurance": {
+      "@id": "https://gematik.de/vsd#Insurance",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "insurant": {
+          "@id": "https://gematik.de/vsd#insuranceInsurant",
+          "@type": "@id"
+        },
+        "coverage": {
+          "@id": "https://gematik.de/vsd#insuranceCoverage",
+          "@type": "@id"
+        }
+      }
+    },
+    "Insurant": {
+      "@id": "https://gematik.de/vsd#Insurant",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "insurantId": {
+          "@id": "https://gematik.de/vsd#insuranceInsurantID",
+          "@type": "https://gematik.de/vsd#InsurantId"
+        },
+        "familyName": {
+          "@id": "https://gematik.de/vsd#insurantFamilyName",
+          "@type": "http://schema.org/FamilyName"
+        },
+        "givenName": {
+          "@id": "https://gematik.de/vsd#insurantGivenName",
+          "@type": "http://schema.org/GivenName"
+        },
+        "nameExtension": {
+          "@id": "https://gematik.de/vsd#insurantNameExtension",
+          "@type": "http://schema.org/NameExtension"
+        },
+        "birthdate": {
+          "@id": "https://gematik.de/vsd#insurantBirthdate",
+          "@type": "http://schema.org/Date"
+        },
+        "gender": {
+          "@id": "https://gematik.de/vsd#insurantGender",
+          "@type": "https://gematik.de/vsd#Gender"
+        },
+        "academicTitle": {
+          "@id": "https://gematik.de/vsd#insurantAcademicTitle",
+          "@type": "https://gematik.de/vsd#AcademicTitle"
+        },
+        "streetAddress": {
+          "@id": "https://gematik.de/vsd#insurantStreetAddress",
+          "@type": "@id"
+        },
+        "postBoxAddress": {
+          "@id": "https://gematik.de/vsd#insurantPostBoxAddress",
+          "@type": "@id"
+        }
+      }
+    },
+    "StreetAddress": {
+      "@id": "https://gematik.de/vsd#StreetAddress",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "country": {
+          "@id": "https://gematik.de/vsd#streetAddressCountry",
+          "@type": "https://gematik.de/vsd#Country"
+        },
+        "location": {
+          "@id": "https://gematik.de/vsd#streetAddressLocation",
+          "@type": "https://gematik.de/vsd#Location"
+        },
+        "addressExtension": {
+          "@id": "https://gematik.de/vsd#streetAddressAddressExtension",
+          "@type": "https://gematik.de/vsd#AddressExtension"
+        },
+        "streetNumber": {
+          "@id": "https://gematik.de/vsd#streetAddressStreetNumber",
+          "@type": "https://gematik.de/vsd#StreetNumber"
+        },
+        "postalCode": {
+          "@id": "https://gematik.de/vsd#streetAddressPostalCode",
+          "@type": "https://gematik.de/vsd#PostalCode"
+        },
+        "street": {
+          "@id": "https://gematik.de/vsd#streetAddressStreet",
+          "@type": "https://gematik.de/vsd#Street"
+        }
+      }
+    },
+    "PostBoxAddress": {
+      "@id": "https://gematik.de/vsd#PostBoxAddress",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "country": {
+          "@id": "https://gematik.de/vsd#postBoxAddressCountry",
+          "@type": "https://gematik.de/vsd#Country"
+        },
+        "location": {
+          "@id": "https://gematik.de/vsd#postalAddress/postBoxAddressLocation",
+          "@type": "https://gematik.de/vsd#Location"
+        },
+        "postBoxNumber": {
+          "@id": "https://gematik.de/vsd#postalAddress/postBoxAddressPostBoxNumber",
+          "@type": "https://gematik.de/vsd#streetNumber"
+        },
+        "postalCode": {
+          "@id": "https://gematik.de/vsd#postalAddress/postBoxAddressPostalCode",
+          "@type": "https://gematik.de/vsd#postalCode"
+        }
+      }
+    },
+    "Coverage": {
+      "@id": "https://gematik.de/vsd#Coverage",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "start": {
+          "@id": "https://gematik.de/vsd#coverageStart",
+          "@type": "http://schema.org/Date"
+        },
+        "end": {
+          "@id": "https://gematik.de/vsd#coverageEnd",
+          "@type": "http://schema.org/Date"
+        },
+        "costCenter": {
+          "@id": "https://gematik.de/vsd#coverageCostCenter",
+          "@type": "@id"
+        },
+        "insuranceType": {
+          "@id": "https://gematik.de/vsd#coverageInsuranceType",
+          "@type": "https://gematik.de/vsd#InsuranceType"
+        },
+        "reimbursment": {
+          "@id": "https://gematik.de/vsd#coverageReimbursement",
+          "@type": "@id"
+        },
+        "residencyPrinciple": {
+          "@id": "https://gematik.de/vsd#coverageResidencyPrinciple",
+          "@type": "https://gematik.de/vsd#ResidencyPrinciple"
+        },
+        "specialGroupOfPersons": {
+          "@id": "https://gematik.de/vsd#coverageSpecialGroupOfPersons",
+          "@type": "https://gematik.de/vsd/#SpecialGroupOfPersons"
+        },
+        "dmpMark": {
+          "@id": "https://gematik.de/vsd#coverageDmpMark",
+          "@type": "https://gematik.de/vsd#DmpMark"
+        },
+        "selectiveContracts": {
+          "@id": "https://gematik.de/vsd#CoverageSelectiveContracts",
+          "@type": "@id"
+        },
+        "coPayment": {
+          "@id": "https://gematik.de/vsd#coverageCoPayment",
+          "@type": "@id"
+        },
+        "dormantBenefitsEntitlement": {
+          "@id": "https://gematik.de/vsd#coverageDormantBenefitsEntitlement",
+          "@type": "@id"
+        }
+      }
+    },
+    "CostCenter": {
+      "@id": "https://gematik.de/vsd#CostCenter",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "identification": "https://gematik.de/vsd#costCenterIdentification",
+        "countryCode": {
+          "@id": "https://gematik.de/vsd#costCenterCountryCode",
+          "@type": "https://gematik.de/vsd#CountryCode"
+        },
+        "fullName": "https://gematik.de/vsd#costCenter/name"
+      }
+    },
+    "Reimbursement": {
+      "@id": "https://gematik.de/vsd#Reimbursement",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "medicalCare": {
+          "@id": "https://gematik.de/vsd#reimbursementMedicalCare",
+          "@type": "https://gematik.de/vsd#MedicalCare"
+        },
+        "inpatientSector": {
+          "@id": "https://gematik.de/vsd#reimbursementInpatientSector",
+          "@type": "https://gematik.de/vsd#InpatientSector"
+        },
+        "initiatedServices": {
+          "@id": "https://gematik.de/vsd#reimbursementInitiatedServices",
+          "@type": "https://gematik.de/vsd/#InitiatedServices"
+        },
+        "dentalCare": {
+          "@id": "https://gematik.de/vsd#reimbursementDentalCare",
+          "@type": "https://gematik.de/vsd/#dentalCare"
+        }
+      }
+    },
+    "SelectiveContracts": {
+      "@id": "https://gematik.de/vsd#SelectiveContracts",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "medical": {
+          "@id": "https://gematik.de/vsd#selectiveContractsMedical",
+          "@type": "https://gematik.de/vsd#Medical"
+        },
+        "dental": {
+          "@id": "https://gematik.de/vsd#selectiveContractsDental",
+          "@type": "https://gematik.de/vsd#Dental"
+        }
+      }
+    },
+    "CoPayment": {
+      "@id": "https://gematik.de/vsd#CoPayment",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "status": {
+          "@id": "https://gematik.de/vsd#coPaymentStatus",
+          "@type": "https://gematik.de/vsd#Status"
+        },
+        "validUntil": {
+          "@id": "https://gematik.de/vsd#coPaymentValidUntil",
+          "@type": "http://schema.org/Date"
+        }
+      }
+    },
+    "DormantBenefitsEntitlement": {
+      "@id": "https://gematik.de/vsd#insurant/DormantBenefitsEntitlement",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "start": {
+          "@id": "https://gematik.de/vsd#dormantBenefitsEntitlementStart",
+          "@type": "http://schema.org/Date"
+        },
+        "end": {
+          "@id": "https://gematik.de/vsd#dormantBenefitsEntitlementStart",
+          "@type": "http://schema.org/Date"
+        },
+        "dormancyType": {
+          "@id": "https://gematik.de/vsd#dormantBenefitsEntitlementDormanceType",
+          "@type": "https://gematik.de/vsd/#DormancyType"
+        }
+      }
+    }
+  }
+}

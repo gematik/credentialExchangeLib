@@ -3,14 +3,14 @@ package de.gematik.security.credentialExchangeLib
 import com.apicatalog.jsonld.JsonLd
 import com.apicatalog.jsonld.document.JsonDocument
 import com.apicatalog.jsonld.document.RdfDocument
+import de.gematik.security.credentialExchangeLib.credentialSubjects.*
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
-import de.gematik.security.credentialExchangeLib.extensions.deepCopy
-import de.gematik.security.credentialExchangeLib.extensions.normalize
-import de.gematik.security.credentialExchangeLib.extensions.toJsonDocument
+import de.gematik.security.credentialExchangeLib.extensions.*
 import de.gematik.security.credentialExchangeLib.protocols.Credential
 import de.gematik.security.credentialExchangeLib.protocols.JsonLdObject
 import de.gematik.security.credentialExchangeLib.protocols.LdProof
 import de.gematik.security.credentialExchangeLib.protocols.ProofPurpose
+import io.ktor.util.reflect.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import org.junit.jupiter.api.Test
@@ -23,6 +23,9 @@ class JsonLdTests {
     val date = Date(1684152736408)
     val recipientId =
         "did:key:zUC7CgahEtPMHR2JsTnFSbhjFE6bYAm5i2vbFWRUdSUNc45zFAg3rCA6UVoYcDzU5DHAk1HuLV5tgcd6edL8mKLoDRhbz7qzav5yzkDWWgZMh8wTieyjcXtoTSmxNq96nWUgP5V"
+
+    val issuer =
+        "did:key:zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv"
 
     val credential = Credential(
         atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
@@ -58,13 +61,13 @@ class JsonLdTests {
             )
         ),
         issuanceDate = date,
-        issuer = URI.create("did:key:zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv"),
+        issuer = URI.create(issuer),
         proof = listOf(
             LdProof(
                 type = listOf(ProofType.BbsBlsSignature2020.name),
                 created = date,
                 proofPurpose = ProofPurpose.ASSERTION_METHOD,
-                verificationMethod = URI.create("did:key:zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv#zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv"),
+                verificationMethod = URI.create("$issuer#${issuer.drop(8)}"),
                 proofValue = "p/YiIfAicLzDd460F516bj9jyoXImWth2RU3ULV4XAXSil91r0c0AzKk6aw+/52GCkOTp3jVKvE0GwQGTFILDVY5qD8/G2qkwELmQwmxKDsD5MNMmJtH57m460w4JcztzLbTbXozTx9ZGtuXdv3UhQ=="
             )
         )
@@ -159,8 +162,8 @@ class JsonLdTests {
 
     @Test
     fun frameCredential() {
-        val credentialWithoutProof = credential.deepCopy().apply{proof=null}
-        val transformedRdf = credentialWithoutProof .normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
+        val credentialWithoutProof = credential.deepCopy().apply { proof = null }
+        val transformedRdf = credentialWithoutProof.normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
         val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream())).get())
         val frameDocument = emptyVaccinationCredentialFrame.toJsonDocument()
         val jsonObject = JsonLd.frame(inputDocument, frameDocument).options(defaultJsonLdOptions).get()
@@ -172,7 +175,7 @@ class JsonLdTests {
 
     @Test
     fun frameCredentialSelectiv() {
-        val credentialWithoutProof = credential.deepCopy().apply{proof=null}
+        val credentialWithoutProof = credential.deepCopy().apply { proof = null }
         val transformedRdf = credentialWithoutProof.normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
         val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream())).get())
         val frameDocument = credentialFrame.toJsonDocument()
@@ -198,7 +201,7 @@ class JsonLdTests {
 
     @Test
     fun expandCredential() {
-        val expandedCredential = JsonLd.expand(credential.toJsonDocument()).get()
+        val expandedCredential = JsonLd.expand(credential.toJsonDocument()).options(defaultJsonLdOptions) .get()
         println(json.encodeToString(json.parseToJsonElement(expandedCredential.toString())))
     }
 
@@ -365,6 +368,66 @@ class JsonLdTests {
         ).toJsonDocument()
         val framedCredential = JsonLd.frame(inputDocument, frame).options(defaultJsonLdOptions).get()
         println(json.encodeToString(json.parseToJsonElement(framedCredential.toString())))
+    }
+
+    val vsdCredential = Credential(
+        atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://gematik.de/vsd/v1")),
+        type = Credential.DEFAULT_JSONLD_TYPES + listOf("InsuranceCertificate"),
+        credentialSubject = json.encodeToJsonElement(
+            Insurance(
+                insurant = Insurant(
+                    insurantId = "X110403565",
+                    familyName = "Schühmann",
+                    nameExtension = "Gräfin",
+                    givenName = "Adele Maude Veronika Mimi M.",
+                    birthdate = Utils.getDate(1953, 10, 1),
+                    gender = Gender.Female,
+                    streetAddress = StreetAddress(
+                        postalCode = 10176,
+                        location = "Berlin",
+                        street = "Dorfstrasse",
+                        streetNumber = "1",
+                        country = "GER"
+                    )
+                ),
+                coverage = Coverage(
+                    start = Utils.getDate(1993, 10, 7),
+                    costCenter = CostCenter(
+                        identification = 109500969,
+                        countryCode = "GER",
+                        "Test GKV-SV"
+                    ),
+                    insuranceType = InsuranceType.Member.code,
+                    residencyPrinciple = ResidencyPrinciple.Berlin.code
+                )
+            )
+        ).jsonObject,
+        issuanceDate = date,
+        issuer = URI.create(issuer)
+    )
+
+    @Test
+    fun vsdCredential() {
+        val credentialSerialized = json.encodeToString(vsdCredential)
+        val credentialDeserialzed = json.decodeFromString<Credential>(credentialSerialized)
+        assertEquals(vsdCredential.credentialSubject, credentialDeserialzed.credentialSubject)
+    }
+
+    @Test
+    fun expandVsdCredential() {
+        val expandedCredential = JsonLd.expand(vsdCredential.toJsonDocument()).options(defaultJsonLdOptions).get()
+        println(json.encodeToString(json.parseToJsonElement(expandedCredential.toString())))
+    }
+
+    @Test
+    fun compactVsdCredential() {
+        val inputDocument = vsdCredential.toJsonDocument()
+        val context = Credential(
+            atContext = vsdCredential.atContext,
+            type = vsdCredential.type
+        ).toJsonDocument()
+        val compactedCredential = JsonLd.compact(inputDocument, context).options(defaultJsonLdOptions).get()
+        println(json.encodeToString(json.parseToJsonElement(compactedCredential.toString())))
     }
 
 }

@@ -7,6 +7,7 @@ import java.net.URI
 
 object HttpLoaderWithCache : HttpLoader(DefaultHttpClient.defaultInstance()) {
     private val staticCache = mapOf(
+        "https://gematik.de/vsd/v1" to getContext("/context/vsd_v1.jsonld"),
         "https://w3id.org/security/v2" to getContext("/context/security_v2.jsonld"),
         "https://www.w3.org/2018/credentials/v1" to getContext("/context/2018_credentials_v1.jsonld"),
         "https://w3id.org/vaccination/v1" to getContext("/context/vaccination_v1_modified.jsonld"),
