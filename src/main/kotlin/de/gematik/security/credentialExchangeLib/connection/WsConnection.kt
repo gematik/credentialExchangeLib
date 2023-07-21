@@ -24,9 +24,6 @@ import kotlinx.serialization.json.jsonObject
 import mu.KotlinLogging
 import java.util.*
 
-internal lateinit var serverPath: String
-internal lateinit var serverConnectionHandler: suspend (WsConnection) -> Unit
-
 private val logger = KotlinLogging.logger {}
 
 class WsConnection private constructor(private val session: DefaultWebSocketSession) : Connection() {
@@ -44,18 +41,16 @@ class WsConnection private constructor(private val session: DefaultWebSocketSess
             path: String,
             handler: suspend (WsConnection) -> Unit
         ): ApplicationEngine {
-            serverConnectionHandler = handler
-            serverPath = path
             val engine = embeddedServer(io.ktor.server.cio.CIO, host = host, port = port) {
                 install(io.ktor.server.websocket.WebSockets) {
                     contentConverter = KotlinxWebsocketSerializationConverter(Json)
                 }
                 routing {
-                    webSocket(serverPath) {
+                    webSocket(path) {
                         WsConnection(this).also {
                             connections[it.id] = it
                         }.use {
-                            serverConnectionHandler(it)
+                            handler(it)
                         }
                     }
                     staticResources("/static", "files")
