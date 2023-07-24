@@ -14,7 +14,7 @@ import kotlin.test.assertEquals
 class ConnectionTests {
     @Test
     fun pingPong() {
-        val engine = WsConnection.listen {
+        WsConnection.listen {
             it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive("pong" )))))
         }
         runBlocking {
@@ -23,12 +23,12 @@ class ConnectionTests {
                 assertEquals("pong", it.receive().content.get("shot")?.jsonPrimitive?.content)
             }
         }
-        engine.stop()
+        WsConnection.stopListening()
     }
 
     @Test
     fun pingPong2() {
-        val engine = WsConnection.listen {
+        WsConnection.listen {
             val response = it.receive().content.get("shot")?.jsonPrimitive?.content?.replace("ping", "pong")
             delay(100)
             it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive(response)))))
@@ -45,17 +45,17 @@ class ConnectionTests {
                 assertEquals("pong2", it.receive().content.get("shot")?.jsonPrimitive?.content)
             }
         }
-        engine.stop()
+        WsConnection.stopListening()
     }
 
     @Test
     fun pingPong2TwoListener() {
-        val engine1 = WsConnection.listen(port = 1200) {
+        WsConnection.listen(port = 1200) {
             val response = it.receive().content.get("shot")?.jsonPrimitive?.content?.replace("ping", "pong")
             delay(100)
             it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive(response)))))
         }
-        val engine2 = WsConnection.listen(port = 1201) {
+        WsConnection.listen(port = 1201) {
             val response = it.receive().content.get("shot")?.jsonPrimitive?.content?.replace("ping", "peng")
             delay(100)
             it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive(response)))))
@@ -72,8 +72,7 @@ class ConnectionTests {
                 assertEquals("peng2", it.receive().content.get("shot")?.jsonPrimitive?.content)
             }
         }
-        engine1.stop()
-        engine2.stop()
+        WsConnection.stopListening()
     }
 
 }

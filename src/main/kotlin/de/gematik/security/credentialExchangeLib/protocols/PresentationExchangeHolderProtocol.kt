@@ -5,7 +5,6 @@ import de.gematik.security.credentialExchangeLib.connection.ConnectionFactory
 import de.gematik.security.credentialExchangeLib.connection.Message
 import de.gematik.security.credentialExchangeLib.connection.MessageType
 import de.gematik.security.credentialExchangeLib.json
-import io.ktor.server.engine.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
@@ -37,14 +36,14 @@ class PresentationExchangeHolderProtocol private constructor(val connection: Con
 
     val protocolState = ProtocolState()
 
-    companion object : ProtocolFactory<PresentationExchangeHolderProtocol> {
+    companion object : ProtocolFactory<PresentationExchangeHolderProtocol>() {
         override fun listen(
             connectionFactory: ConnectionFactory<*>,
             host: String,
             port: Int,
             path: String,
             handler: suspend (PresentationExchangeHolderProtocol) -> Unit
-        ): ApplicationEngine {
+        ) {
             return connectionFactory.listen(host, port, path) {
                 PresentationExchangeHolderProtocol(it).also {
                     protocols[it.id] = it

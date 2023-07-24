@@ -178,7 +178,7 @@
                 },
                 "dentalCare": {
                   "@id": "https://gematik.de/vsd#reimbursementDentalCare",
-                  "@type": "https://gematik.de/vsd/#dentalCare"
+                  "@type": "https://gematik.de/vsd/#DentalCare"
                 }
               }
             },

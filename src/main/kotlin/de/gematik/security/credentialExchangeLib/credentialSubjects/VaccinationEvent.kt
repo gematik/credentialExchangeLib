@@ -2,8 +2,6 @@ package de.gematik.security.credentialExchangeLib.credentialSubjects
 
 import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
 import de.gematik.security.credentialExchangeLib.serializer.URISerializer
-import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
-import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
 import java.net.URI
 import java.util.*

@@ -6,8 +6,18 @@
   <component name="ChangeListManager">
     <list default="true" id="246e1cc3-192b-491f-8ba1-e76025f33fb5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/ConnectionFactory.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/ConnectionFactory.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/WsConnection.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/WsConnection.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/credentialSubjects/VaccinationEvent.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/credentialSubjects/VaccinationEvent.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeHolderProtocol.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeHolderProtocol.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeIssuerProtocol.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeIssuerProtocol.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/PresentationExchangeHolderProtocol.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/PresentationExchangeHolderProtocol.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/PresentationExchangeVerifierProtocol.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/PresentationExchangeVerifierProtocol.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Protocol.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Protocol.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/ProtocolFactory.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/ProtocolFactory.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/context/vsd_v1.jsonld" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/context/vsd_v1.jsonld" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ConnectionTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ConnectionTests.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProtocolTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProtocolTests.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -99,7 +109,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "ignore.virus.scanning.warn.message": "true",
-    "ktor.last.update.timestamp": "1689926719151",
+    "ktor.last.update.timestamp": "1690185194386",
     "last_opened_file_path": "C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources/context/vaccination_v1_modified.jsonld",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -139,7 +149,7 @@
     </key>
   </component>
   <component name="RunManager" selected="Gradle.TestSuite">
-    <configuration name="ConnectionTests.pingPong2TwoListener" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="ConnectionTests" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -152,7 +162,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;de.gematik.security.credentialExchangeLib.ConnectionTests.pingPong2TwoListener&quot;" />
+            <option value="&quot;de.gematik.security.credentialExchangeLib.ConnectionTests&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -163,7 +173,7 @@
       <ForceTestExec>true</ForceTestExec>
       <method v="2" />
     </configuration>
-    <configuration name="JsonLdTests.expandAndCompactVsdCredential" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="ProtocolTests" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -176,7 +186,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;de.gematik.security.credentialExchangeLib.JsonLdTests.expandAndCompactVsdCredential&quot;" />
+            <option value="&quot;de.gematik.security.credentialExchangeLib.ProtocolTests&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -258,10 +268,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.TestSuite" />
-        <item itemvalue="Gradle.ConnectionTests.pingPong2TwoListener" />
+        <item itemvalue="Gradle.ProtocolTests" />
+        <item itemvalue="Gradle.ConnectionTests" />
         <item itemvalue="Gradle.credentialExchangeLib [publishToMavenLocal]" />
         <item itemvalue="Gradle.credentialExchangeLib [jar]" />
-        <item itemvalue="Gradle.JsonLdTests.expandAndCompactVsdCredential" />
       </list>
     </recent_temporary>
   </component>
@@ -310,7 +320,9 @@
       <workItem from="1689582453393" duration="20669000" />
       <workItem from="1689667077444" duration="21441000" />
       <workItem from="1689751172834" duration="11879000" />
-      <workItem from="1689851851680" duration="3120000" />
+      <workItem from="1689851851680" duration="6520000" />
+      <workItem from="1689945875403" duration="620000" />
+      <workItem from="1690184655157" duration="10854000" />
     </task>
     <task id="LOCAL-00001" summary="initial check in">
       <created>1683117220289</created>
@@ -487,7 +499,14 @@
       <option name="project" value="LOCAL" />
       <updated>1689843105683</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="fix: multiple ws connection listener">
+      <created>1689926871003</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1689926871003</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -505,7 +524,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="initial check in" />
     <MESSAGE value="add Prooftest" />
     <MESSAGE value="feat: sign and verify JsonLdObject&#10;mod: removed ldsignature-java and jsonld-common-java dependencies" />
     <MESSAGE value="feat: presentation&#10;feat: JsonLdObject&#10;feat: linked data framing" />
@@ -530,19 +548,20 @@
     <MESSAGE value="fix: jsonld test" />
     <MESSAGE value="feat: vsd" />
     <MESSAGE value="chore: refinement vsd" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: refinement vsd" />
+    <MESSAGE value="fix: multiple ws connection listener" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: multiple ws connection listener" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeIssuerProtocol.kt</url>
-          <line>98</line>
+          <line>97</line>
           <option name="timeStamp" value="87" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/PresentationExchangeHolderProtocol.kt</url>
-          <line>98</line>
+          <line>97</line>
           <properties>
             <option name="lambda-ordinal" value="-1" />
           </properties>
@@ -550,7 +569,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/PresentationExchangeVerifierProtocol.kt</url>
-          <line>106</line>
+          <line>105</line>
           <properties>
             <option name="lambda-ordinal" value="-1" />
           </properties>
@@ -558,7 +577,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/CredentialExchangeHolderProtocol.kt</url>
-          <line>64</line>
+          <line>63</line>
           <option name="timeStamp" value="91" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">

@@ -27,8 +27,10 @@ import java.util.*
 private val logger = KotlinLogging.logger {}
 
 class WsConnection private constructor(private val session: DefaultWebSocketSession) : Connection() {
-
     companion object : ConnectionFactory<WsConnection> {
+
+        private val engines = mutableMapOf<String, ApplicationEngine>()
+
         private val client = HttpClient(CIO) {
             install(io.ktor.client.plugins.websocket.WebSockets) {
                 contentConverter = KotlinxWebsocketSerializationConverter(Json)
@@ -40,7 +42,7 @@ class WsConnection private constructor(private val session: DefaultWebSocketSess
             port: Int,
             path: String,
             handler: suspend (WsConnection) -> Unit
-        ): ApplicationEngine {
+        ) {
             val engine = embeddedServer(io.ktor.server.cio.CIO, host = host, port = port) {
                 install(io.ktor.server.websocket.WebSockets) {
                     contentConverter = KotlinxWebsocketSerializationConverter(Json)
@@ -61,7 +63,7 @@ class WsConnection private constructor(private val session: DefaultWebSocketSess
                 }
             }
             engine.start()
-            return engine
+            engines.put("$host:$port", engine)
         }
 
         override suspend fun connect(
@@ -78,6 +80,17 @@ class WsConnection private constructor(private val session: DefaultWebSocketSess
                 }
             }
         }
+
+        override fun stopListening(host: String?, port: Int?) {
+            engines.filter {
+                "${host ?: ""}:${port ?: ""}" == "${
+                    if (host != null) it.key.substringBefore(":") else ""
+                }:${
+                    if (host != null) it.key.substringAfter(":") else ""
+                }"
+            }.values.forEach { it.stop() }
+        }
+
     }
 
     override fun close() {
@@ -129,7 +142,7 @@ class WsConnection private constructor(private val session: DefaultWebSocketSess
                     } else {
                         kotlin.runCatching {
                             session.receiveDeserialized<Message>()
-                        }.onFailure { handleReceiveException(it)?.let{return it} }.getOrNull()
+                        }.onFailure { handleReceiveException(it)?.let { return it } }.getOrNull()
                     }
                 }
 

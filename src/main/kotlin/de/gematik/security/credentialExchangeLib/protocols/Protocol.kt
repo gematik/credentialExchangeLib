@@ -26,5 +26,5 @@ sealed class Protocol : Closeable {
     }
 
     abstract suspend fun receive() : LdObject
-    abstract fun connected(invitation: Invitation)
+    protected abstract fun connected(invitation: Invitation)
 }
