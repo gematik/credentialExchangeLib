@@ -1,5 +1,6 @@
 package de.gematik.security.credentialExchangeLib.protocols
 
+import de.gematik.security.credentialExchangeLib.connection.Connection
 import de.gematik.security.credentialExchangeLib.connection.ConnectionFactory
 import de.gematik.security.credentialExchangeLib.connection.WsConnection
 
@@ -18,6 +19,12 @@ abstract class ProtocolFactory<T : Protocol> {
     ){
         WsConnection.stopListening(host, port)
     }
+
+    abstract suspend fun bind(
+        connection: Connection,
+        invitation: Invitation,
+        handler: suspend (T) -> Unit
+    )
 
     abstract suspend fun connect(
         connectionFactory: ConnectionFactory<*>,

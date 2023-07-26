@@ -26,7 +26,7 @@ import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
-class WsConnection private constructor(private val session: DefaultWebSocketSession) : Connection() {
+class WsConnection private constructor(val session: DefaultWebSocketSession) : Connection() {
     companion object : ConnectionFactory<WsConnection> {
 
         private val engines = mutableMapOf<String, ApplicationEngine>()

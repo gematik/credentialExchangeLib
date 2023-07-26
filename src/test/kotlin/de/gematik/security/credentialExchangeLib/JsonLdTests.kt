@@ -10,7 +10,6 @@ import de.gematik.security.credentialExchangeLib.protocols.Credential
 import de.gematik.security.credentialExchangeLib.protocols.JsonLdObject
 import de.gematik.security.credentialExchangeLib.protocols.LdProof
 import de.gematik.security.credentialExchangeLib.protocols.ProofPurpose
-import io.ktor.util.reflect.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import org.junit.jupiter.api.Test
@@ -395,7 +394,7 @@ class JsonLdTests {
                     costCenter = CostCenter(
                         identification = 109500969,
                         countryCode = "GER",
-                        "Test GKV-SV"
+                        name = "Test GKV-SV"
                     ),
                     insuranceType = InsuranceType.Member,
                     residencyPrinciple = ResidencyPrinciple.Berlin
@@ -412,6 +411,12 @@ class JsonLdTests {
         val credentialDeserialzed = json.decodeFromString<Credential>(credentialSerialized)
         assertEquals(vsdCredential.credentialSubject, credentialDeserialzed.credentialSubject)
         println(json.encodeToString(vsdCredential))
+    }
+
+    @Test
+    fun vsdCredentialToNquads() {
+        val nQuads = vsdCredential.toNQuads()
+        println(nQuads)
     }
 
     @Test

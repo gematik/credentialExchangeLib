@@ -1,16 +1,16 @@
 package de.gematik.security.credentialExchangeLib
 
+import de.gematik.security.credentialExchangeLib.credentialSubjects.*
 import de.gematik.security.credentialExchangeLib.crypto.BbsCryptoCredentials
 import de.gematik.security.credentialExchangeLib.crypto.BbsPlusSigner
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
+import de.gematik.security.credentialExchangeLib.extensions.Utils
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.hexToByteArray
 import de.gematik.security.credentialExchangeLib.protocols.*
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.*
 import org.junit.jupiter.api.Test
 import java.net.URI
 import java.util.*
@@ -142,6 +142,66 @@ class ProofTests {
         val signedCredential =
             credential.deepCopy().apply { sign(ldProofIssuer, BbsPlusSigner(credentialIssuer.keyPair)) }
         val derivedCredential = signedCredential.derive(credentialFrame)
+        val result = derivedCredential.verify()
+        assert(result)
+        println(json.encodeToString(derivedCredential))
+    }
+
+    @Test
+    fun deriveAndVerifyVsdCredential() {
+
+        val vsdCredential = Credential(
+            atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://gematik.de/vsd/v1")),
+            type = Credential.DEFAULT_JSONLD_TYPES + listOf("InsuranceCertificate"),
+            credentialSubject = json.encodeToJsonElement(
+                Insurance(
+                    insurant = Insurant(
+                        insurantId = "X110403565",
+                        familyName = "Schühmann",
+                        nameExtension = "Gräfin",
+                        givenName = "Adele Maude Veronika Mimi M.",
+                        birthdate = Utils.getDate(1953, 10, 1),
+                        gender = Gender.Female,
+                        streetAddress = StreetAddress(
+                            postalCode = 10176,
+                            location = "Berlin",
+                            street = "Dorfstrasse",
+                            streetNumber = "1",
+                            country = "GER"
+                        )
+                    ),
+                    coverage = Coverage(
+                        start = Utils.getDate(1993, 10, 7),
+                        costCenter = CostCenter(
+                            identification = 109500969,
+                            countryCode = "GER",
+                            name = "Test GKV-SV"
+                        ),
+                        insuranceType = InsuranceType.Member,
+                        residencyPrinciple = ResidencyPrinciple.Berlin
+                    )
+                )
+            ).jsonObject,
+            issuanceDate = date,
+            issuer = credentialIssuer.didKey
+        )
+
+        val signedCredential = vsdCredential.apply { sign(ldProofIssuer, BbsPlusSigner(credentialIssuer.keyPair)) }
+
+        val frameString = """
+            {
+                "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://gematik.de/vsd/v1"
+                ],
+                "type": [
+                    "VerifiableCredential",
+                    "InsuranceCertificate"
+                ]
+            }
+            """.trimIndent()
+        val frame = json.decodeFromString<Credential>(frameString)
+        val derivedCredential = signedCredential.derive(frame)
         val result = derivedCredential.verify()
         assert(result)
         println(json.encodeToString(derivedCredential))

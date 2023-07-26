@@ -11,7 +11,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import java.security.InvalidParameterException
 
-class CredentialExchangeIssuerProtocol private constructor(val connection: Connection) : Protocol() {
+class CredentialExchangeIssuerProtocol private constructor(connection: Connection) : Protocol(connection) {
 
     enum class State {
         INITIALIZED,
@@ -50,6 +50,19 @@ class CredentialExchangeIssuerProtocol private constructor(val connection: Conne
                 }.use {
                     handler(it)
                 }
+            }
+        }
+
+        override suspend fun bind(
+            connection: Connection,
+            invitation: Invitation,
+            handler: suspend (CredentialExchangeIssuerProtocol) -> Unit
+        ) {
+            CredentialExchangeIssuerProtocol(connection).also {
+                protocols[it.id] = it
+                it.connected(invitation)
+            }.use {
+                handler(it)
             }
         }
 

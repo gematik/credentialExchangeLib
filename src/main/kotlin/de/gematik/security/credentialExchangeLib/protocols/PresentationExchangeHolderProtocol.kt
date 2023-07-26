@@ -11,7 +11,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import java.security.InvalidParameterException
 
-class PresentationExchangeHolderProtocol private constructor(val connection: Connection) : Protocol() {
+class PresentationExchangeHolderProtocol private constructor(connection: Connection) : Protocol(connection) {
 
     enum class State {
         INITIALIZED,
@@ -53,6 +53,19 @@ class PresentationExchangeHolderProtocol private constructor(val connection: Con
             }
         }
 
+        override suspend fun bind(
+            connection: Connection,
+            invitation: Invitation,
+            handler: suspend (PresentationExchangeHolderProtocol) -> Unit
+        ) {
+            PresentationExchangeHolderProtocol(connection).also {
+                protocols[it.id] = it
+                it.connected(invitation)
+            }.use {
+                handler(it)
+            }
+        }
+
         override suspend fun connect(
             connectionFactory: ConnectionFactory<*>,
             host: String,
@@ -87,7 +100,7 @@ class PresentationExchangeHolderProtocol private constructor(val connection: Con
                 }
 
                 MessageType.PRESENTATION_REQUEST -> {
-                    check(protocolState.state == State.WAIT_FOR_PRESENTATION_REQUEST) { "invalid state: ${protocolState.state.name}" }
+                    check(protocolState.state == State.WAIT_FOR_PRESENTATION_REQUEST || protocolState.state == State.SEND_PRESENTATION_OFFER) { "invalid state: ${protocolState.state.name}" }
                     json.decodeFromJsonElement<PresentationRequest>(message.content).also {
                         protocolState.request = it
                         protocolState.state = State.SUBMIT_PRESENTATION

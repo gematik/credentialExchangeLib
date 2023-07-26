@@ -1,9 +1,7 @@
 package de.gematik.security.credentialExchangeLib.credentialSubjects
 
 import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
-import de.gematik.security.credentialExchangeLib.serializer.URISerializer
 import kotlinx.serialization.Serializable
-import java.net.URI
 import java.util.*
 
 @Serializable
@@ -21,7 +19,6 @@ data class VaccinationEvent(
 
 @Serializable
 data class Recipient(
-    val id: @Serializable(with = URISerializer::class) URI? = null,
     val birthDate: @Serializable(with = DateSerializer::class) Date? = null,
     val familyName: String? = null,
     val givenName: String? = null,

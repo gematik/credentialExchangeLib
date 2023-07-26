@@ -1,12 +1,13 @@
 package de.gematik.security.credentialExchangeLib.protocols
 
+import de.gematik.security.credentialExchangeLib.connection.Connection
 import mu.KotlinLogging
 import java.io.Closeable
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
-sealed class Protocol : Closeable {
+sealed class Protocol(val connection: Connection) : Closeable {
 
     companion object {
         @JvmStatic
