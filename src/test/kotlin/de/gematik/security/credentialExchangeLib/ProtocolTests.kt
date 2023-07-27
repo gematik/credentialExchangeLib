@@ -129,7 +129,9 @@ class ProtocolTests {
 
     val invitation = Invitation(
         UUID.randomUUID().toString(),
-        label = "credential issuer",
+        label = "Test Insurance Company",
+        goal = "Issue Insurance Certificate",
+        goalCode = GoalCode.OFFER_CREDENDIAL,
         service = listOf(
             Service(
                 serviceEndpoint = URI("ws://127.0.0.1:8090/ws")

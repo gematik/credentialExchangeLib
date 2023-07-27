@@ -18,6 +18,8 @@ class Invitation(
     ) URI> = DEFAULT_JSONLD_CONTEXTS,
     @Required override var type: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<String>? = DEFAULT_JSONLD_TYPES,
     val label: String,
+    val goal: String,
+    val goalCode: GoalCode,
     val service: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<Service>,
 ) : LdObject {
     companion object : LdObject.Defaults() {
@@ -35,4 +37,11 @@ class Invitation(
         return Base64.getEncoder().encodeToString(json.encodeToString(this).toByteArray())
     }
 
+}
+
+enum class GoalCode{
+    OFFER_CREDENDIAL,
+    REQUEST_CREDENTIAL,
+    REQUEST_PRESENTATION,
+    OFFER_PRESENTATION
 }

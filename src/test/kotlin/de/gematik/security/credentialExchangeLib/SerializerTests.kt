@@ -103,7 +103,10 @@ class SerializerTests {
         val atId = UUID.randomUUID().toString()
         val invitation = Invitation(
             atId,
-            label = "Issuer of vaccination certificates",
+            label = "Test Medical Office",
+            goal = "Issue Vaccination Certificate",
+            goalCode = GoalCode.OFFER_CREDENDIAL,
+
             service = listOf(Service(serviceEndpoint = URI.create("http://example.com")))
         )
         val serializedInvitation = json.encodeToString(invitation)
