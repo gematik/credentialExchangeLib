@@ -1,7 +1,74 @@
 = Credential Exchange Library for kotlin
 
-== Overview
-=== Layers
+== Components
+
+[plantuml]
+.component diagram
+----
+@startuml
+
+skinparam component {
+  backgroundColor<<implemented>> LightGreen
+}
+
+[Applications kotlin/Android]  <<implemented>> as Applications
+[credential exchange] <<implemented>> as CredentialExchange
+[credential exchange protocols] <<implemented>> as Protocols
+[connections] <<implemented>> as Connections
+[WsConnection] <<implemented>> as WsConnection
+[DIDCommConnection] as DIDComm
+[didcomm-jvm SICPA] <<implemented>> as SICPA
+[kotlin serialization] <<implemented>> as Serialization
+[ktor] <<implemented>> as ktor
+[Rdf-Urdna] <<implemented>> as RdfUrdna
+[JsonLd-Signatures] <<implemented>> as JsonLdSignatures
+[jsonld titanium] <<implemented>> as JsonLd
+[bbs-signatures (java wrapper)] <<implemented>> as BbsSignature
+[bbs_plus (rust)] <<implemented>> as BbsPlus
+[google Tink] <<implemented>>  as Tink
+[ECDSA] as Ecdsa
+[EdDSA] as Eddsa
+Applications -down- CredentialExchange
+CredentialExchange -down- Protocols
+CredentialExchange -down- Serialization
+CredentialExchange -down- JsonLdSignatures
+CredentialExchange -down- JsonLd
+RdfUrdna -left- JsonLd
+Protocols -down- Connections
+Connections -down- WsConnection
+WsConnection -down- ktor
+Connections -down- DIDComm
+DIDComm -down- SICPA
+JsonLdSignatures -left- Serialization
+Protocols -right- Serialization
+Protocols -down- JsonLd
+JsonLdSignatures -down- JsonLd
+JsonLdSignatures -down- BbsSignature
+JsonLdSignatures -down- RdfUrdna
+JsonLdSignatures -down- Ecdsa
+JsonLdSignatures -down- Eddsa
+BbsSignature -down- BbsPlus
+Ecdsa -down- Tink
+Eddsa -down- Tink
+Ecdsa -left[hidden]- RdfUrdna
+Eddsa -left[hidden]- RdfUrdna
+
+note right of Applications
+  Demo applications:
+  Insurance (Web), Medical Office (Web),
+  Wallet (App) and Admission Control (App)
+end note
+
+note right of CredentialExchange
+  artifact: de.gematik:credentialExchangeLib:0.3.0-SNAPSHOT
+  available for kotlin, java, Android
+end note
+
+
+@enduml
+----
+
+== Layers
 The credential exchange library consists of three layers:
 
 . Connection layer
