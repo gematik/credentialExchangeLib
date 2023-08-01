@@ -6,9 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="246e1cc3-192b-491f-8ba1-e76025f33fb5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Invitation.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Invitation.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProtocolTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/ProtocolTests.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/SerializerTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/SerializerTests.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.adoc" beforeDir="false" afterPath="$PROJECT_DIR$/README.adoc" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,23 +30,6 @@
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="credentialExchangeLib" type="f1a62948:ProjectNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="credentialExchangeLib" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="credentialExchangeLib" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-                <item name="build" type="c8890929:TasksNode$1" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="credentialExchangeLib" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-                <item name="publishing" type="c8890929:TasksNode$1" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
@@ -95,26 +76,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;ktor.last.update.timestamp&quot;: &quot;1690379784059&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources/context/vaccination_v1_modified.jsonld&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.31034482&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;AndroidSdkUpdater&quot;,
-    &quot;two.files.diff.last.used.file&quot;: &quot;C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources/context/vaccination_v1_modified.jsonld&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "ignore.virus.scanning.warn.message": "true",
+    "ktor.last.update.timestamp": "1690887552734",
+    "last_opened_file_path": "C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources/context/vaccination_v1_modified.jsonld",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.31034482",
+    "settings.editor.selected.configurable": "AndroidSdkUpdater",
+    "two.files.diff.last.used.file": "C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources/context/vaccination_v1_modified.jsonld",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\rk\IntelliJIDEAProjects\credentialExchangeLib\src\main\resources\files" />
@@ -323,6 +304,11 @@
       <workItem from="1690451281700" duration="180000" />
       <workItem from="1690451507062" duration="124000" />
       <workItem from="1690452103226" duration="124000" />
+      <workItem from="1690457164510" duration="122000" />
+      <workItem from="1690462250791" duration="1632000" />
+      <workItem from="1690787307048" duration="3909000" />
+      <workItem from="1690813412026" duration="43000" />
+      <workItem from="1690876524816" duration="11961000" />
     </task>
     <task id="LOCAL-00001" summary="initial check in">
       <created>1683117220289</created>
@@ -520,7 +506,14 @@
       <option name="project" value="LOCAL" />
       <updated>1690392353832</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="feat: invitation extended by goal and goalCode">
+      <created>1690457276072</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1690457276072</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -538,7 +531,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: presentation&#10;feat: JsonLdObject&#10;feat: linked data framing" />
     <MESSAGE value="feat: derive proof" />
     <MESSAGE value="feat: HttpLoader with static cached contexts" />
     <MESSAGE value="chore: proof tests" />
@@ -563,7 +555,8 @@
     <MESSAGE value="fix: multiple ws connection listener" />
     <MESSAGE value="chore: encapsulation of ApplicationEngine to make ConnectionFactory and ProtocolFactory interfaces generic" />
     <MESSAGE value="feat: allow late binding of existing connections to protocols&#10;chore: refactor vsd" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: allow late binding of existing connections to protocols&#10;chore: refactor vsd" />
+    <MESSAGE value="feat: invitation extended by goal and goalCode" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: invitation extended by goal and goalCode" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

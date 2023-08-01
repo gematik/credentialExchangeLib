@@ -1,52 +1,137 @@
 = Credential Exchange Library for kotlin
 
-== Issuer
-Please note that the issuer acts as verifier if he needs additional data from the holder to issue the credential.
+== Overview
+=== Layers
+The credential exchange library consists of three layers:
+
+. Connection layer
+. Protocol layer
+. Application layer
+
+=== Connection layer
+The connection layer manages connections over their entire lifetime. It allows to establish new connections by listing for incoming connection requests and by connecting to remote peers. Connection are uniquely identified by an UUID. After the connection is established messages can be sent and received using the connection. Closed connections are destroyed or reused for future connection depending on their type:
+
+* WebSockets connections are destroyed when closed
+* DidComm connections are persistant connections and can be reused after closed
+
+Further the connection layer provides the generic serialization and deserialization of the payload represented by JSON objects. So the connection layer provides an abstract interface to establish and close connections as well as send and receive messages. The protocol layer is independent of the different connection types implemented by the connection layer.
+
+=== Protocol layer
+
+The protocol layer implements two protocols:
+
+. Credential Issueing Protocol (Issuer and Holder)
+. Presentation Exchange Protocol (Holder and Verifier)
+
+Please note that the trustworthiness of the peer should always be verified before disclosing sensitive personal information. The peer verification can be done on different levels (e.g. in person, client/server authentication using TLS, exchanging credentials, ...). The protocol layer only specifies how to use credentials. Even this step is optional, because the verification may be provided somewhere else as explained above.
+
+==== Credential Issueing Protocol
+
+The holder receives the invitation of the issuer out of band (e.g. qr-code, nfc, BlueTooth, ...). The holder (invitee) accepts the invitation by sending it back to the issuer (inviter).
+
+===== Holder
 
 [plantuml]
-.state diagram issuer
+.state diagram: credential issueing - holder
 ----
 @startuml
 
 [*] --> Initialized
-Initialized --> SendOffer : receive invitation
+Initialized --> WaitForCredentialOffer : send invitation
 Initialized --> Closed : close
-SendOffer --> WaitForRequest : send offer
-SendOffer --> Closed : close
-WaitForRequest --> SubmitCredential : receive request
-WaitForRequest --> Closed : close
+WaitForCredentialOffer --> SendCredentialRequest : receive offer
+WaitForCredentialOffer --> SendPresentation : receive presenation request
+SendPresentation --> WaitForCredentialOffer : send presentation
+SendPresentation --> Closed : close
+WaitForCredentialOffer --> Closed : close
+SendCredentialRequest --> WaitForCredential : send credential request
+SendCredentialRequest --> Closed : close
+WaitForCredential --> CredentialReceived : receive credential
+WaitForCredential --> Closed : close
+CredentialReceived --> Closed : close
+Closed --> [*]
+
+@enduml
+----
+===== Issuer
+Please note that the issuer acts as verifier if he needs additional data from the holder to issue the credential.
+
+[plantuml]
+.state diagram: credential issueing - issuer
+----
+@startuml
+
+[*] --> Initialized
+Initialized --> SendCredentialOffer : receive invitation
+Initialized --> Closed : close
+SendCredentialOffer --> WaitForCredentialRequest : send offer
+SendCredentialOffer --> WaitForPresentation : send presentation request
+WaitForPresentation --> SendCredentialOffer : receive presenation
+WaitForPresentation --> Closed : close
+SendCredentialOffer --> Closed : close
+WaitForCredentialRequest --> SubmitCredential : receive request
+WaitForCredentialRequest --> Closed : close
 SubmitCredential --> CredentialSubmitted : send credential
-SubmitCredential --> HolderVerification : send presentation request
 SubmitCredential --> Closed : close
-HolderVerification --> SubmitCredential : receive credential
-HolderVerification --> Closed : close
 CredentialSubmitted --> Closed : close
 Closed --> [*]
 
 @enduml
 ----
 
-== Holder
-Please note that the holder should always verify the trustworthiness of the issuer before present credentials. Nevertheless, the step is optional in the credential exchange protocol, because the verification may be provided somewhere else (e.g. client/server authentication on transport layer).
+==== Presentation Exchange Protocol
+The protocol can either be started by the holder or the verifier by receiving an invitation out of band (e.g. qr-code, nfc, BlueTooth, ...) and sending it back to the invitee.
+
+===== Holder
+Please note that the holder acts as verifier if he needs additional data from the verifier before disclosing sensitive personal data.
+
 
 [plantuml]
-.state diagram holder
+.state diagram: presentation exchange - holder
 ----
 @startuml
 
 [*] --> Initialized
-Initialized --> WaitForOffer : send invitation
+Initialized --> SendPresentationOffer : receive or send invitation
 Initialized --> Closed : close
-WaitForOffer --> SendRequest : receive offer
-WaitForOffer --> Closed : close
-SendRequest --> WaitForCredential : send request
-SendRequest --> Closed : close
-WaitForCredential --> CredentialReceived : receive credential
-WaitForCredential --> HolderVerification : receive presentation request
-WaitForCredential --> Closed : close
-HolderVerification --> WaitForCredential : send presentation
-HolderVerification --> Closed : close
-CredentialReceived --> Closed : close
+SendPresentationOffer --> WaitForPresentationRequest : send presentation offer
+SendPresentationOffer --> SubmitPresentation : receive presentation request
+SendPresentationOffer --> WaitForPresentation : send presentation request
+SendPresentationOffer --> Closed : close
+WaitForPresentation --> SendPresentationOffer : send presentation
+WaitForPresentation --> Closed : close
+WaitForPresentationRequest --> SubmitPresentation : receive presentation request
+WaitForPresentationRequest --> Closed : close
+SubmitPresentation --> PresentationSubmitted : send presentation
+SubmitPresentation --> Closed : close
+PresentationSubmitted --> Closed : close
+Closed --> [*]
 
 @enduml
 ----
+===== Verifier
+
+[plantuml]
+.state diagram: presentation exchange - verifier
+----
+@startuml
+
+[*] --> Initialized
+Initialized --> WaitForPresentationOffer : receive or send invitation
+Initialized --> Closed : close
+WaitForPresentationOffer --> SendPresentationRequest : receive presentation offer
+WaitForPresentationOffer --> SendPresentation : receive presentation request
+WaitForPresentationOffer --> WaitForPresentation : send presentation request
+WaitForPresentationOffer --> Closed : close
+SendPresentation --> WaitForPresentationOffer : send presentation
+SendPresentation --> Closed : close
+SendPresentationRequest --> WaitForPresentation : send presentation request
+SendPresentationRequest --> Closed : close
+WaitForPresentation --> PresentationReceived : receive presentation
+WaitForPresentation --> Closed : close
+PresentationReceived --> Closed : close
+Closed --> [*]
+
+@enduml
+----
+
