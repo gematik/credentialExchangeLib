@@ -1,8 +1,8 @@
 package de.gematik.security.credentialExchangeLib
 
 import de.gematik.security.credentialExchangeLib.credentialSubjects.*
-import de.gematik.security.credentialExchangeLib.crypto.BbsCryptoCredentials
-import de.gematik.security.credentialExchangeLib.crypto.BbsPlusSigner
+import de.gematik.security.credentialExchangeLib.crypto.bbs.BbsCryptoCredentials
+import de.gematik.security.credentialExchangeLib.crypto.bbs.BbsPlusSigner
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.extensions.Utils
@@ -14,8 +14,9 @@ import kotlinx.serialization.json.*
 import org.junit.jupiter.api.Test
 import java.net.URI
 import java.util.*
+import kotlin.test.assertEquals
 
-class ProofTests {
+class BbsProofTests {
 
     val credentialIssuer = BbsCryptoCredentials(
         KeyPair(
@@ -129,9 +130,20 @@ class ProofTests {
     )
 
     @Test
+    fun testBbsCryptoCredentials() {
+        val cryptoCredentials = BbsCryptoCredentials(BbsCryptoCredentials.createKeyPair())
+        assertEquals(cryptoCredentials.didKey.toString().length, credentialIssuer.didKey.toString().length)
+        println(cryptoCredentials.didKey)
+        assertEquals(cryptoCredentials.verKey.length, credentialIssuer.verKey.length)
+        println(cryptoCredentials.verKey)
+        assertEquals(cryptoCredentials.verificationMethod.toString().length, credentialIssuer.verificationMethod.toString().length)
+        println(cryptoCredentials.verificationMethod)
+    }
+
+    @Test
     fun signVerifyCredential() {
         val signedCredential =
-            credential.deepCopy().apply { sign(ldProofIssuer, BbsPlusSigner(credentialIssuer.keyPair)) }
+            credential.deepCopy().apply { sign(ldProofIssuer, credentialIssuer.keyPair.privateKey!!) }
         val result = signedCredential.verify()
         assert(result)
         println(json.encodeToString(signedCredential))
@@ -140,7 +152,7 @@ class ProofTests {
     @Test
     fun deriveAndVerifyCredential() {
         val signedCredential =
-            credential.deepCopy().apply { sign(ldProofIssuer, BbsPlusSigner(credentialIssuer.keyPair)) }
+            credential.deepCopy().apply { sign(ldProofIssuer, credentialIssuer.keyPair.privateKey!!) }
         val derivedCredential = signedCredential.derive(credentialFrame)
         val result = derivedCredential.verify()
         assert(result)
@@ -186,7 +198,7 @@ class ProofTests {
             issuer = credentialIssuer.didKey
         )
 
-        val signedCredential = vsdCredential.apply { sign(ldProofIssuer, BbsPlusSigner(credentialIssuer.keyPair)) }
+        val signedCredential = vsdCredential.apply { sign(ldProofIssuer, credentialIssuer.keyPair.privateKey!!) }
 
         val frameString = """
             {
@@ -222,10 +234,10 @@ class ProofTests {
                 )
             ),
             verifiableCredential = listOf(credential.deepCopy().apply {
-                sign(ldProofIssuer, BbsPlusSigner(credentialIssuer.keyPair))
+                sign(ldProofIssuer, credentialIssuer.keyPair.privateKey!!)
             }.derive(emptyCredentialFrame))
         ).apply {
-            sign(ldProofHolder, BbsPlusSigner(credentialHolder.keyPair))
+            sign(ldProofHolder, credentialHolder.keyPair.privateKey!!)
         }
         val result = signedPresentation.verify()
         assert(result)

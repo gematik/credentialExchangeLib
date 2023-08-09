@@ -12,6 +12,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import okhttp3.internal.toImmutableList
 import java.net.URI
+import java.security.PrivateKey
 import java.util.*
 
 @Serializable
@@ -34,8 +35,8 @@ class Credential(
         )
     }
 
-    override fun sign(ldProof: LdProof, signer: Signer) {
-        val signedProof = ldProof.deepCopy().apply { sign(this@Credential, signer)}
+    override fun sign(ldProof: LdProof, privateKey: ByteArray) {
+        val signedProof = ldProof.deepCopy().apply { sign(this@Credential, privateKey)}
         proof = (proof?:emptyList()).toMutableList().apply {
             add(signedProof)
             toImmutableList()
@@ -43,21 +44,17 @@ class Credential(
     }
 
     override fun verify() : Boolean {
-        val pr = proof?.get(0)
-        check(pr!=null){"credential doesn't contain a proof for verification"}
+        val singleProof = proof?.firstOrNull()
+        check(singleProof!=null){"credential doesn't contain a proof for verification"}
         check(proof?.size == 1){"verification of multi signature not supported yet"}
-        return when(pr.type?.get(0)){
-            ProofType.BbsBlsSignature2020.name -> pr.verify(this)
-            ProofType.BbsBlsSignatureProof2020.name -> pr.verifyProof(this)
-            else -> false
-        }
+        return singleProof.verify(this)
     }
 
     fun derive(frame: Credential) : Credential {
-        val pr = proof?.get(0)
-        check(pr!=null){"credential doesn't contain a proof for derivation"}
+        val singleProof = proof?.firstOrNull()
+        check(singleProof!=null){"credential doesn't contain a proof for derivation"}
         check(proof?.size == 1){"derive credential with multiple proofs is not supported yet"}
-        return pr.deriveProof(this, frame)
+        return singleProof.deriveProof(this, frame)
     }
 
 }

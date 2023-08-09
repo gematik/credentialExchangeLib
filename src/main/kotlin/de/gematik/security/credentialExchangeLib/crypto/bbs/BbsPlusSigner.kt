@@ -1,10 +1,13 @@
-package de.gematik.security.credentialExchangeLib.crypto
+package de.gematik.security.credentialExchangeLib.crypto.bbs
 
 import bbs.signatures.Bbs
 import bbs.signatures.ProofMessage
+import de.gematik.security.credentialExchangeLib.crypto.KeyPair
+import de.gematik.security.credentialExchangeLib.crypto.Proofer
+import de.gematik.security.credentialExchangeLib.crypto.Signer
 import java.security.GeneralSecurityException
 
-class BbsPlusSigner(override val keyPair: KeyPair) : Signer {
+class BbsPlusSigner(override val keyPair: KeyPair) : Signer, Proofer {
     init {
         keyPair.privateKey?.let {
             require(it.size == Bbs.getSecretKeySize()) {
@@ -25,7 +28,7 @@ class BbsPlusSigner(override val keyPair: KeyPair) : Signer {
         }.onFailure { throw GeneralSecurityException(it.message) }.getOrThrow()
     }
 
-    fun deriveProof(signature: ByteArray, nonce: ByteArray, content: List<ProofMessage>): ByteArray {
+    override fun deriveProof(signature: ByteArray, nonce: ByteArray, content: List<ProofMessage>): ByteArray {
         return runCatching {
             check(keyPair.publicKey!=null){"public key required to derive proof"}
             Bbs.blsCreateProof(keyPair.publicKey, nonce, signature, content.toTypedArray());

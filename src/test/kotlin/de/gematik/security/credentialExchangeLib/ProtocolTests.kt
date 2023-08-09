@@ -1,7 +1,7 @@
 package de.gematik.security.credentialExchangeLib
 
 import de.gematik.security.credentialExchangeLib.connection.WsConnection
-import de.gematik.security.credentialExchangeLib.crypto.BbsPlusSigner
+import de.gematik.security.credentialExchangeLib.crypto.bbs.BbsPlusSigner
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
@@ -285,9 +285,9 @@ class ProtocolTests {
                     )
                 ),
                 verifiableCredential = listOf(credential.deepCopy().apply {
-                    sign(ldProofIssuer, BbsPlusSigner(keyPairIssuer))
+                    sign(ldProofIssuer, keyPairIssuer.privateKey!!)
                 }.derive((presentationRequest as PresentationRequest).inputDescriptor.frame))
-            ).apply { sign(ldProofHolder, BbsPlusSigner(keyPairHolder)) }
+            ).apply { sign(ldProofHolder, keyPairHolder.privateKey!!) }
 
             it.submitPresentation(
                 PresentationSubmit(

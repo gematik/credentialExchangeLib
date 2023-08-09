@@ -1,11 +1,14 @@
 package de.gematik.security.credentialExchangeLib.extensions
 
 import bbs.signatures.Bbs
+import de.gematik.security.credentialExchangeLib.crypto.bbs.BbsCryptoCredentials
+import de.gematik.security.credentialExchangeLib.crypto.ecdsa.P256CryptoCredentials
 import io.github.novacrypto.base58.Base58
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toJavaInstant
+import java.math.BigInteger
 import java.net.URI
 import java.util.*
 
@@ -14,14 +17,15 @@ fun String.hexToByteArray(): ByteArray {
     return chunked(2).map { it.toInt(16).toByte() }.toByteArray()
 }
 
-fun URI.toBls12381G2PublicKey(): ByteArray {
+fun URI.toPublicKey(): ByteArray {
     require(scheme.lowercase() == "did")
-    require(schemeSpecificPart.lowercase().startsWith("key:zuc"))
-    require(schemeSpecificPart.drop(4) == this.fragment)
-    val byteArray = Base58.base58Decode(fragment.drop(1))
-    require(byteArray.size == Bbs.getBls12381G2PublicKeySize() + 2)
-    require(byteArray.copyOfRange(0, 2).contentEquals(byteArrayOf(0xeb.toByte(), 0x01)))
-    return byteArray.copyOfRange(2, byteArray.size)
+    require(schemeSpecificPart.substring(0,3) == "key")
+    val byteArray = Base58.base58Decode(fragment.drop(1)).let {it.copyOfRange(2, it.size)}
+    return when(schemeSpecificPart.substring(4,7)){
+        "zUC" -> if(byteArray.size == Bbs.getBls12381G2PublicKeySize()) byteArray else throw IllegalArgumentException()
+        "zDn" -> if(byteArray.size == P256CryptoCredentials.publicKeySize) byteArray else throw IllegalArgumentException()
+        else -> throw IllegalArgumentException()
+    }
 }
 
 class Utils{
@@ -31,3 +35,17 @@ class Utils{
         }
     }
 }
+
+/**
+ * Returns a byteArray of length size containing the unsigned representation of this BigInteger
+ * @param size of destination array
+ * @return byteArray of length size containing the unsigned representation of this BigInteger
+ * @throws [IllegalStateException] if the BigInteger doesn't fit into defined size
+ */
+
+fun BigInteger.toByteArray(size: Int): ByteArray {
+    val byteList = toByteArray().dropWhile { it == 0.toByte() }
+    check(byteList.size <= size){"BigInteger to big"}
+    return byteList.toByteArray().copyInto(ByteArray(size),size - byteList.size, 0, size)
+}
+

@@ -6,14 +6,12 @@ import com.apicatalog.jsonld.document.JsonDocument
 import com.apicatalog.jsonld.document.RdfDocument
 import de.gematik.security.credentialExchangeLib.crypto.*
 import de.gematik.security.credentialExchangeLib.defaultJsonLdOptions
-import de.gematik.security.credentialExchangeLib.extensions.deepCopy
-import de.gematik.security.credentialExchangeLib.extensions.normalize
-import de.gematik.security.credentialExchangeLib.extensions.toBls12381G2PublicKey
-import de.gematik.security.credentialExchangeLib.extensions.toJsonDocument
+import de.gematik.security.credentialExchangeLib.extensions.*
 import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
 import de.gematik.security.credentialExchangeLib.serializer.URISerializer
 import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
+import io.ktor.util.reflect.*
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -45,9 +43,23 @@ class LdProof(
         override val DEFAULT_JSONLD_TYPES = listOf<String>()
     }
 
-    inline fun <reified T> sign(jsonLdObject: T, signer: Signer) where T : LdObject, T : Verifiable {
+    inline fun <reified T> sign(jsonLdObject: T, privateKey: ByteArray) where T : LdObject, T : Verifiable {
         check(proofValue == null) { "proof already contains proof value" }
         check(jsonLdObject.proof == null) { "jsonLdObject already signed" }
+        val signer = type?.firstOrNull()?.let {
+            runCatching {
+                CryptoRegistry.getSigner(
+                    ProofType.valueOf(it),
+                    KeyPair(
+                        privateKey,
+                        verificationMethod.toPublicKey()
+                    )
+                )
+            }.getOrNull()
+        }
+        check(
+            signer != null
+        ) { "no signer registered for proof type: ${type?.firstOrNull()}" }
         val statements = listOf(
             normalize().trim().split('\n'),
             jsonLdObject.normalize<T>().trim().split('\n')
@@ -58,21 +70,40 @@ class LdProof(
     inline fun <reified T> verify(
         jsonLdObject: T
     ): Boolean where T : LdObject, T : Verifiable {
-        val ldProofWithoutProofValue = deepCopy().apply { proofValue = null }
-        val jsonLdObjectWithoutProof = jsonLdObject.deepCopy<T>().apply { proof = null }
-        val statements = listOf(
-            ldProofWithoutProofValue.normalize().trim().split('\n'),
-            jsonLdObjectWithoutProof.normalize<T>().trim().split('\n')
-        ).flatMap { it.map { it.toByteArray() } }
-        val verifier = type?.let{getVerifier(it, verificationMethod.toBls12381G2PublicKey())}
-        return verifier?.verify(statements, Base64.getDecoder().decode(proofValue))?:false
+        val singleType = type?.firstOrNull() ?: return false
+        val verifier =
+            runCatching {
+                CryptoRegistry.getVerifier(
+                    ProofType.valueOf(singleType),
+                    verificationMethod.toPublicKey()
+                )
+            }.getOrNull()
+        return when (verifier) {
+            is ProofVerifier -> {
+                if(ProofType.valueOf(singleType).isProof) {
+                    (jsonLdObject as? Credential)?.let { verifyProof(it, verifier) } ?: false
+                }else{
+                    verify(jsonLdObject, verifier)
+                }
+            }
+            is Verifier -> verify(jsonLdObject, verifier)
+            else -> false
+        }
     }
 
     fun deriveProof(credential: Credential, frame: Credential): Credential {
 
         // 0. check if signature is suitable for deriving proof
+        val signer = type?.firstOrNull()?.let {
+            runCatching {
+                CryptoRegistry.getSigner(
+                    ProofType.valueOf(it),
+                    KeyPair(publicKey = verificationMethod.toPublicKey())
+                )
+            }.getOrNull()
+        } as? Proofer
         check(
-            type?.firstOrNull { it.endsWith(ProofType.BbsBlsSignature2020.name) } != null
+            signer != null
         ) { "proof type doesn't support proof derivation" }
 
         // 1. frame input document
@@ -106,7 +137,7 @@ class LdProof(
         val framedCredentialMessages = normalizedFramedCredential.split('\n')
         var j = 0
         normalizedCredential.split('\n').forEach {
-            val type = if (j<framedCredentialMessages.size && it == framedCredentialMessages.get(j)) {
+            val type = if (j < framedCredentialMessages.size && it == framedCredentialMessages.get(j)) {
                 j++
                 ProofMessage.PROOF_MESSAGE_TYPE_REVEALED
             } else {
@@ -115,9 +146,8 @@ class LdProof(
             proofMessages.add(ProofMessage(type, it.toByteArray(), null))
         }
         // 3. calculate signature
-        val signer = type?.let{getSigner(it, KeyPair(publicKey = verificationMethod.toBls12381G2PublicKey()))}
         val nonce = Random.nextBytes(32)
-        val signature = signer?.deriveProof(Base64.getDecoder().decode(proofValue), nonce, proofMessages)
+        val signature = signer.deriveProof(Base64.getDecoder().decode(proofValue), nonce, proofMessages)
         // 4. complete new proof, add to new credential and return
         return framedCredential.apply {
             proof = listOf(newLdProof.apply {
@@ -128,8 +158,20 @@ class LdProof(
         }
     }
 
-    fun verifyProof(credential: Credential) : Boolean {
-        check(type?.size == 1 && type?.get(0) == ProofType.BbsBlsSignatureProof2020.name){"invalid proof type"}
+    inline fun <reified T> verify(
+        jsonLdObject: T, verifier: Verifier
+    ): Boolean where T : LdObject, T : Verifiable {
+        val ldProofWithoutProofValue = deepCopy().apply { proofValue = null }
+        val jsonLdObjectWithoutProof = jsonLdObject.deepCopy<T>().apply { proof = null }
+        val statements = listOf(
+            ldProofWithoutProofValue.normalize().trim().split('\n'),
+            jsonLdObjectWithoutProof.normalize<T>().trim().split('\n')
+        ).flatMap { it.map { it.toByteArray() } }
+        return verifier.verify(statements, Base64.getDecoder().decode(proofValue)) ?: false
+    }
+
+    fun verifyProof(credential: Credential, verifier: ProofVerifier): Boolean {
+
         // 1 prepare original proof
         val ldProofWithoutProofValue = deepCopy().apply {
             // 1.1 remove proof value
@@ -147,12 +189,12 @@ class LdProof(
             credentialWithoutProof.normalize().trim().replace(Regex("<urn:bnid:(_:c14n[0-9]*)>"), "$1").split('\n')
         ).flatMap { it.map { it.toByteArray() } }
         // 4 get verifier and verify revealed messages
-        val verifier = type?.let{getVerifier(it, verificationMethod.toBls12381G2PublicKey())}
-        return verifier?.verifyProof(
+        return verifier.verifyProof(
             statements,
             Base64.getDecoder().decode(proofValue),
             Base64.getDecoder().decode(nonce)
-        )?:false
+        )
     }
+
 
 }

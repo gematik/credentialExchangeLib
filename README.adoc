@@ -24,10 +24,11 @@ skinparam component {
 [JsonLd-Signatures] <<implemented>> as JsonLdSignatures
 [jsonld titanium] <<implemented>> as JsonLd
 [bbs-signatures (java wrapper)] <<implemented>> as BbsSignature
-[bbs_plus (rust)] <<implemented>> as BbsPlus
-[google Tink] <<implemented>>  as Tink
-[ECDSA] as Ecdsa
+[ECDSA] <<implemented>> as Ecdsa
 [EdDSA] as Eddsa
+[CL-Signatures] as ClSignatures
+[bbs_plus (rust)] <<implemented>> as BbsPlus
+[bouncycastle] <<implemented>>  as Tink
 Applications -down- CredentialExchange
 CredentialExchange -down- Protocols
 CredentialExchange -down- Serialization
@@ -47,11 +48,14 @@ JsonLdSignatures -down- BbsSignature
 JsonLdSignatures -down- RdfUrdna
 JsonLdSignatures -down- Ecdsa
 JsonLdSignatures -down- Eddsa
+JsonLdSignatures -down- ClSignatures
 BbsSignature -down- BbsPlus
 Ecdsa -down- Tink
 Eddsa -down- Tink
-Ecdsa -left[hidden]- RdfUrdna
-Eddsa -left[hidden]- RdfUrdna
+BbsSignature -left[hidden]- RdfUrdna
+Ecdsa -left[hidden]- BbsSignature
+Eddsa -left[hidden]- Ecdsa
+ClSignatures -left[hidden]- Eddsa
 
 note right of Applications
   Demo applications:
@@ -68,8 +72,8 @@ end note
 @enduml
 ----
 
-== Layers
-The credential exchange library consists of three layers:
+== Communication Stack
+The communication stack of the credential exchange library consists of three layers:
 
 . Connection layer
 . Protocol layer

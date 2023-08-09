@@ -1,9 +1,11 @@
-package de.gematik.security.credentialExchangeLib.crypto
+package de.gematik.security.credentialExchangeLib.crypto.bbs
 
 import bbs.signatures.Bbs
+import de.gematik.security.credentialExchangeLib.crypto.ProofVerifier
+import de.gematik.security.credentialExchangeLib.crypto.Verifier
 import java.security.GeneralSecurityException
 
-class BbsPlusVerifier(override val publicKey : ByteArray) : Verifier {
+class BbsPlusVerifier(override val publicKey : ByteArray) : Verifier, ProofVerifier {
     init {
         require(publicKey.size == Bbs.getBls12381G2PublicKeySize()) {
             "wrong keysize - expected ${Bbs.getBls12381G2PublicKeySize()} was ${publicKey.size}"
@@ -16,11 +18,9 @@ class BbsPlusVerifier(override val publicKey : ByteArray) : Verifier {
         }.onFailure{throw GeneralSecurityException(it.message) }.getOrThrow()
     }
 
-    fun verifyProof(content : List<ByteArray>, proof: ByteArray, nonce: ByteArray) : Boolean {
+    override fun verifyProof(content : List<ByteArray>, proof: ByteArray, nonce: ByteArray) : Boolean {
         return runCatching {
             Bbs.blsVerifyProof(publicKey, proof, nonce, content.toTypedArray());
         }.onFailure{throw GeneralSecurityException(it.message) }.getOrThrow()
     }
-
-
 }

@@ -1,6 +1,5 @@
 package de.gematik.security.credentialExchangeLib.protocols
 
-import de.gematik.security.credentialExchangeLib.crypto.Signer
 import de.gematik.security.credentialExchangeLib.serializer.URISerializer
 import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
 import kotlinx.serialization.Required
@@ -27,16 +26,16 @@ class Presentation(
         )
     }
 
-    override fun sign(ldProof: LdProof, signer: Signer){
-        ldProof.sign(this, signer)
+    override fun sign(ldProof: LdProof, privateKey: ByteArray){
+        ldProof.sign(this, privateKey)
         proof = listOf(ldProof)
     }
 
     override fun verify() : Boolean {
-        val pr = proof?.get(0)
-        check(pr!=null){"presenation doesn't contain a proof for verification"}
+        val singleProof = proof?.firstOrNull()
+        check(singleProof!=null){"presentation doesn't contain a proof for verification"}
         check(proof?.size == 1){"verfication of multi signature not supported yet"}
-        return pr.verify(this)
+        return singleProof.verify(this)
     }
 
 }

@@ -37,6 +37,8 @@ dependencies {
 
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation("ch.qos.logback:logback-classic:1.3.8")
+
+    implementation ("org.bouncycastle:bcprov-jdk18on:1.76")
 }
 
 tasks.test {
