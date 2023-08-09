@@ -1,7 +1,7 @@
 package de.gematik.security.credentialExchangeLib.extensions
 
 import bbs.signatures.Bbs
-import de.gematik.security.credentialExchangeLib.crypto.bbs.BbsCryptoCredentials
+import de.gematik.security.credentialExchangeLib.crypto.ecdsa.Ed25519CryptoCredentials
 import de.gematik.security.credentialExchangeLib.crypto.ecdsa.P256CryptoCredentials
 import io.github.novacrypto.base58.Base58
 import kotlinx.datetime.LocalDate
@@ -17,14 +17,20 @@ fun String.hexToByteArray(): ByteArray {
     return chunked(2).map { it.toInt(16).toByte() }.toByteArray()
 }
 
+fun ByteArray.toHex(discardLeadingZeros: Boolean = false): String {
+    val string = joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
+    return "0x${if (discardLeadingZeros) string.trimStart('0') else string}"
+}
+
 fun URI.toPublicKey(): ByteArray {
     require(scheme.lowercase() == "did")
     require(schemeSpecificPart.substring(0,3) == "key")
     val byteArray = Base58.base58Decode(fragment.drop(1)).let {it.copyOfRange(2, it.size)}
     return when(schemeSpecificPart.substring(4,7)){
-        "zUC" -> if(byteArray.size == Bbs.getBls12381G2PublicKeySize()) byteArray else throw IllegalArgumentException()
-        "zDn" -> if(byteArray.size == P256CryptoCredentials.publicKeySize) byteArray else throw IllegalArgumentException()
-        else -> throw IllegalArgumentException()
+        "zUC" -> if(byteArray.size == Bbs.getBls12381G2PublicKeySize()) byteArray else throw IllegalArgumentException("zUC : wrong key size")
+        "zDn" -> if(byteArray.size == P256CryptoCredentials.publicKeySize) byteArray else throw IllegalArgumentException("zDn : wrong key size")
+        "z6M" -> if(byteArray.size == Ed25519CryptoCredentials.publicKeySize) byteArray else throw IllegalArgumentException("z6M : wrong key size")
+        else -> throw IllegalArgumentException("unsupported multiformat prefix: ${schemeSpecificPart.substring(4,7)}")
     }
 }
 
