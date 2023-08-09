@@ -1,22 +1,11 @@
 package de.gematik.security.credentialExchangeLib.crypto.ecdsa
 
-import bbs.signatures.Bbs
-import bbs.signatures.ProofMessage
-import de.gematik.security.credentialExchangeLib.crypto.KeyPair
-import de.gematik.security.credentialExchangeLib.crypto.Signer
 import de.gematik.security.credentialExchangeLib.crypto.Verifier
-import org.bouncycastle.asn1.sec.SECNamedCurves
 import org.bouncycastle.crypto.digests.SHA256Digest
-import org.bouncycastle.crypto.params.ECDomainParameters
-import org.bouncycastle.crypto.params.ECPrivateKeyParameters
 import org.bouncycastle.crypto.params.ECPublicKeyParameters
 import org.bouncycastle.crypto.signers.ECDSASigner
 import org.bouncycastle.crypto.signers.HMacDSAKCalculator
-import org.bouncycastle.math.ec.ECPoint
-import org.bouncycastle.math.ec.custom.sec.SecP256K1Curve
-import org.bouncycastle.math.ec.custom.sec.SecP256R1Curve
 import java.math.BigInteger
-import java.security.GeneralSecurityException
 import java.security.MessageDigest
 
 class P256Verifier(override val publicKey: ByteArray) : Verifier {

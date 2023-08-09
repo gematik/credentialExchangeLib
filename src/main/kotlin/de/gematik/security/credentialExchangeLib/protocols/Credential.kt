@@ -1,7 +1,5 @@
 package de.gematik.security.credentialExchangeLib.protocols
 
-import de.gematik.security.credentialExchangeLib.crypto.ProofType
-import de.gematik.security.credentialExchangeLib.crypto.Signer
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
 import de.gematik.security.credentialExchangeLib.serializer.URISerializer
@@ -12,7 +10,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import okhttp3.internal.toImmutableList
 import java.net.URI
-import java.security.PrivateKey
 import java.util.*
 
 @Serializable

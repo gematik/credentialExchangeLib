@@ -1,7 +1,6 @@
 package de.gematik.security.credentialExchangeLib
 
 import de.gematik.security.credentialExchangeLib.connection.WsConnection
-import de.gematik.security.credentialExchangeLib.crypto.bbs.BbsPlusSigner
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy

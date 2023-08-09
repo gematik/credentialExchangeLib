@@ -1,10 +1,9 @@
 package de.gematik.security.credentialExchangeLib
 
 import de.gematik.security.credentialExchangeLib.credentialSubjects.*
-import de.gematik.security.credentialExchangeLib.crypto.bbs.BbsCryptoCredentials
-import de.gematik.security.credentialExchangeLib.crypto.bbs.BbsPlusSigner
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
+import de.gematik.security.credentialExchangeLib.crypto.bbs.BbsCryptoCredentials
 import de.gematik.security.credentialExchangeLib.extensions.Utils
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.hexToByteArray

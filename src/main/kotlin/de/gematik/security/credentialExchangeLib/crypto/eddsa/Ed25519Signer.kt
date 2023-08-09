@@ -2,16 +2,9 @@ package de.gematik.security.credentialExchangeLib.crypto.ecdsa
 
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
 import de.gematik.security.credentialExchangeLib.crypto.Signer
-import de.gematik.security.credentialExchangeLib.extensions.toByteArray
-import org.bouncycastle.crypto.digests.SHA256Digest
-import org.bouncycastle.crypto.params.ECPrivateKeyParameters
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
-import org.bouncycastle.crypto.signers.ECDSASigner
 import org.bouncycastle.crypto.signers.Ed25519Signer
-import org.bouncycastle.crypto.signers.HMacDSAKCalculator
-import java.math.BigInteger
 import java.security.GeneralSecurityException
-import java.security.MessageDigest
 
 class Ed25519Signer(override val keyPair: KeyPair) : Signer {
     init {
