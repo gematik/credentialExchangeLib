@@ -7,7 +7,7 @@ import org.junit.platform.suite.api.Suite
 @SelectClasses(
     JsonLdTests::class,
     BbsProofTests::class,
-    P256ProofTest::class,
+    EcdsaProofTest::class,
     SerializerTests::class,
     ConnectionTests::class,
     ProtocolTests::class

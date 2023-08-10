@@ -1,6 +1,7 @@
 package de.gematik.security.credentialExchangeLib.extensions
 
 import bbs.signatures.Bbs
+import de.gematik.security.credentialExchangeLib.crypto.ecdsa.EcdsaCryptoCredentials
 import de.gematik.security.credentialExchangeLib.crypto.ecdsa.Ed25519CryptoCredentials
 import de.gematik.security.credentialExchangeLib.crypto.ecdsa.P256CryptoCredentials
 import io.github.novacrypto.base58.Base58
@@ -28,8 +29,9 @@ fun URI.toPublicKey(): ByteArray {
     val byteArray = Base58.base58Decode(fragment.drop(1)).let {it.copyOfRange(2, it.size)}
     return when(schemeSpecificPart.substring(4,7)){
         "zUC" -> if(byteArray.size == Bbs.getBls12381G2PublicKeySize()) byteArray else throw IllegalArgumentException("zUC : wrong key size")
-        "zDn" -> if(byteArray.size == P256CryptoCredentials.publicKeySize) byteArray else throw IllegalArgumentException("zDn : wrong key size")
+        "zDn" -> if(byteArray.size == EcdsaCryptoCredentials.publicKeySize) byteArray else throw IllegalArgumentException("zDn : wrong key size")
         "z6M" -> if(byteArray.size == Ed25519CryptoCredentials.publicKeySize) byteArray else throw IllegalArgumentException("z6M : wrong key size")
+        "zQ3" -> if(byteArray.size == EcdsaCryptoCredentials.publicKeySize) byteArray else throw IllegalArgumentException("zQ3 : wrong key size")
         else -> throw IllegalArgumentException("unsupported multiformat prefix: ${schemeSpecificPart.substring(4,7)}")
     }
 }

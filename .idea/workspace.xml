@@ -5,16 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="246e1cc3-192b-491f-8ba1-e76025f33fb5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/eddsa/Ed25519CryptoCredentials.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/eddsa/Ed25519Signer.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/eddsa/Ed25519Verifier.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/Ed25519ProofTest.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/EcdsaCryptoCredentials.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/EcdsaSigner.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/EcdsaVerifier.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256K1CryptoCredentials.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256K1Signer.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256K1Verifier.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.adoc" beforeDir="false" afterPath="$PROJECT_DIR$/README.adoc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/CryptoRegistry.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/CryptoRegistry.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ProofType.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ProofType.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/Common.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256CryptoCredentials.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256CryptoCredentials.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256Signer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256Signer.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256Verifier.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256Verifier.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/extensions/Utils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/extensions/Utils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/BbsProofTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/BbsProofTests.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/P256ProofTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/EcdsaProofTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/TestSuite.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/TestSuite.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,8 +84,8 @@
         <option value="Kotlin Data Class" />
         <option value="Kotlin Object" />
         <option value="Kotlin File" />
-        <option value="Kotlin Class" />
         <option value="Kotlin Interface" />
+        <option value="Kotlin Class" />
       </list>
     </option>
   </component>
@@ -106,7 +114,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "ignore.virus.scanning.warn.message": "true",
-    "ktor.last.update.timestamp": "1691570092183",
+    "ktor.last.update.timestamp": "1691657731241",
     "last_opened_file_path": "C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -143,15 +151,15 @@
       <recent name="de.gematik.security.credentialExchangeLib.bbs" />
     </key>
     <key name="CopyKotlinDeclarationDialog.RECENTS_KEY">
-      <recent name="de.gematik.security.credentialExchangeLib" />
       <recent name="de.gematik.security.credentialExchangeLib.crypto.ecdsa" />
+      <recent name="de.gematik.security.credentialExchangeLib" />
       <recent name="de.gematik.security.credentialExchangeLib.serializer" />
       <recent name="de.gematik.security.credentialExchangeLib.protocols" />
       <recent name="de.gematik.security.credentialExchangeLib.types" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.Ed25519ProofTest.testEd25519CryptoCredentials">
-    <configuration name="Ed25519ProofTest.signVerifyCredential" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+  <component name="RunManager" selected="Gradle.TestSuite">
+    <configuration name="BbsProofTests.testBbsCryptoCredentials" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -164,7 +172,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;de.gematik.security.credentialExchangeLib.Ed25519ProofTest.signVerifyCredential&quot;" />
+            <option value="&quot;de.gematik.security.credentialExchangeLib.BbsProofTests.testBbsCryptoCredentials&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -175,7 +183,7 @@
       <ForceTestExec>true</ForceTestExec>
       <method v="2" />
     </configuration>
-    <configuration name="Ed25519ProofTest.testEd25519CryptoCredentials" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="EcdsaProofTest.signVerifyCredentialP256" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -188,7 +196,55 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;de.gematik.security.credentialExchangeLib.Ed25519ProofTest.testEd25519CryptoCredentials&quot;" />
+            <option value="&quot;de.gematik.security.credentialExchangeLib.EcdsaProofTest.signVerifyCredentialP256&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>true</ForceTestExec>
+      <method v="2" />
+    </configuration>
+    <configuration name="EcdsaProofTest.signVerifyCredentialP256K1" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+            <option value="--tests" />
+            <option value="&quot;de.gematik.security.credentialExchangeLib.EcdsaProofTest.signVerifyCredentialP256K1&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>true</ForceTestExec>
+      <method v="2" />
+    </configuration>
+    <configuration name="P256ProofTest.testP256K1CryptoCredentials" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+            <option value="--tests" />
+            <option value="&quot;de.gematik.security.credentialExchangeLib.P256ProofTest.testP256K1CryptoCredentials&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -223,57 +279,13 @@
       <ForceTestExec>true</ForceTestExec>
       <method v="2" />
     </configuration>
-    <configuration name="credentialExchangeLib [jar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="jar" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <ForceTestExec>false</ForceTestExec>
-      <method v="2" />
-    </configuration>
-    <configuration name="credentialExchangeLib [publishToMavenLocal]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="publishToMavenLocal" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <ForceTestExec>false</ForceTestExec>
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Gradle.Ed25519ProofTest.testEd25519CryptoCredentials" />
         <item itemvalue="Gradle.TestSuite" />
-        <item itemvalue="Gradle.Ed25519ProofTest.signVerifyCredential" />
-        <item itemvalue="Gradle.credentialExchangeLib [publishToMavenLocal]" />
-        <item itemvalue="Gradle.credentialExchangeLib [jar]" />
+        <item itemvalue="Gradle.BbsProofTests.testBbsCryptoCredentials" />
+        <item itemvalue="Gradle.EcdsaProofTest.signVerifyCredentialP256K1" />
+        <item itemvalue="Gradle.EcdsaProofTest.signVerifyCredentialP256" />
+        <item itemvalue="Gradle.P256ProofTest.testP256K1CryptoCredentials" />
       </list>
     </recent_temporary>
   </component>
@@ -350,7 +362,7 @@
       <workItem from="1691135808794" duration="4086000" />
       <workItem from="1691396506450" duration="17429000" />
       <workItem from="1691480803783" duration="36079000" />
-      <workItem from="1691590280451" duration="9186000" />
+      <workItem from="1691590280451" duration="21805000" />
     </task>
     <task id="LOCAL-00001" summary="initial check in">
       <created>1683117220289</created>
@@ -576,7 +588,21 @@
       <option name="project" value="LOCAL" />
       <updated>1691588928327</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="feat: support of EdDSA Ed25519">
+      <created>1691600013765</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1691600013765</updated>
+    </task>
+    <task id="LOCAL-00034" summary="chore: optimize imports">
+      <created>1691600099474</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1691600099474</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -594,8 +620,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: verify derived proof" />
-    <MESSAGE value="chore: add state diagrams for issuer and holder" />
     <MESSAGE value="feat: add credential exchange types" />
     <MESSAGE value="feat: add web socket connections" />
     <MESSAGE value="feat: add credential exchange state machine" />
@@ -619,49 +643,11 @@
     <MESSAGE value="chore: update README.adoc state diagrams and layer description" />
     <MESSAGE value="chore: add component diagramto README.adoc" />
     <MESSAGE value="feat: support of ECDSA SecP256R1 including necessary refactory" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: support of ECDSA SecP256R1 including necessary refactory" />
+    <MESSAGE value="feat: support of EdDSA Ed25519" />
+    <MESSAGE value="chore: optimize imports" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: optimize imports" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/eddsa/Ed25519Signer.kt</url>
-          <line>30</line>
-          <properties>
-            <option name="lambda-ordinal" value="-1" />
-          </properties>
-          <option name="timeStamp" value="150" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/eddsa/Ed25519Verifier.kt</url>
-          <line>18</line>
-          <properties>
-            <option name="lambda-ordinal" value="-1" />
-          </properties>
-          <option name="timeStamp" value="151" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/Ed25519ProofTest.kt</url>
-          <line>90</line>
-          <option name="timeStamp" value="153" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt</url>
-          <line>72</line>
-          <option name="timeStamp" value="154" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt</url>
-          <line>80</line>
-          <option name="timeStamp" value="155" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/eddsa/Ed25519Verifier.kt</url>
-          <line>7</line>
-          <option name="timeStamp" value="156" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
         <PinnedItemInfo parentTag="com.apicatalog.jsonld.document.JsonDocument" memberName="contentType" />

@@ -11,8 +11,8 @@ import java.math.BigInteger
 import java.security.GeneralSecurityException
 import java.security.MessageDigest
 
-class P256Signer(keyPair: KeyPair) : EcdsaSigner(keyPair) {
+class P256K1Signer(keyPair: KeyPair) : EcdsaSigner(keyPair) {
     override val signer = ECDSASigner(HMacDSAKCalculator(SHA256Digest())).apply {
-        init(true, ECPrivateKeyParameters(BigInteger(1, keyPair.privateKey), P256CryptoCredentials.ecDomainParameters))
+        init(true, ECPrivateKeyParameters(BigInteger(1, keyPair.privateKey), P256K1CryptoCredentials.ecDomainParameters))
     }
 }

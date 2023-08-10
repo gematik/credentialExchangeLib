@@ -24,8 +24,8 @@ skinparam component {
 [JsonLd-Signatures] <<implemented>> as JsonLdSignatures
 [jsonld titanium] <<implemented>> as JsonLd
 [bbs-signatures (java wrapper)] <<implemented>> as BbsSignature
-[ECDSA] <<implemented>> as Ecdsa
-[EdDSA] as Eddsa
+[ECDSA (secp256r1/k1)] <<implemented>> as Ecdsa
+[EdDSA (ed25519)]  <<implemented>> as Eddsa
 [CL-Signatures] as ClSignatures
 [bbs_plus (rust)] <<implemented>> as BbsPlus
 [bouncycastle] <<implemented>>  as Tink
@@ -64,8 +64,8 @@ note right of Applications
 end note
 
 note right of CredentialExchange
-  artifact: de.gematik:credentialExchangeLib:0.3.0-SNAPSHOT
-  available for kotlin, java, Android
+  artifact: de.gematik:credentialExchangeLib
+  one lib for kotlin, java, Android
 end note
 
 

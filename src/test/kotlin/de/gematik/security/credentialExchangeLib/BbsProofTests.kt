@@ -8,6 +8,7 @@ import de.gematik.security.credentialExchangeLib.extensions.Utils
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.hexToByteArray
 import de.gematik.security.credentialExchangeLib.protocols.*
+import io.github.novacrypto.base58.Base58
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import org.junit.jupiter.api.Test
@@ -131,11 +132,13 @@ class BbsProofTests {
     @Test
     fun testBbsCryptoCredentials() {
         val cryptoCredentials = BbsCryptoCredentials(BbsCryptoCredentials.createKeyPair())
-        assertEquals(cryptoCredentials.didKey.toString().length, credentialIssuer.didKey.toString().length)
+        assert(cryptoCredentials.didKey.toString().startsWith("did:key:zUC"))
         println(cryptoCredentials.didKey)
-        assertEquals(cryptoCredentials.verKey.length, credentialIssuer.verKey.length)
+        assertEquals(96, Base58.base58Decode(cryptoCredentials.verKey).size)
         println(cryptoCredentials.verKey)
-        assertEquals(cryptoCredentials.verificationMethod.toString().length, credentialIssuer.verificationMethod.toString().length)
+        assertEquals(
+            cryptoCredentials.verificationMethod.toString(),
+            cryptoCredentials.didKey.toString()+"#"+cryptoCredentials.didKey.toString().drop(8))
         println(cryptoCredentials.verificationMethod)
     }
 
