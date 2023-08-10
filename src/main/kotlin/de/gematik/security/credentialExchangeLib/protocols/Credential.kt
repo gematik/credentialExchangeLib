@@ -40,6 +40,14 @@ class Credential(
         }
     }
 
+    suspend fun asyncSign(ldProof: LdProof, privateKey: ByteArray, context: Any) {
+        val signedProof = ldProof.deepCopy().apply { asyncSign(this@Credential, privateKey, context)}
+        proof = (proof?:emptyList()).toMutableList().apply {
+            add(signedProof)
+            toImmutableList()
+        }
+    }
+
     override fun verify() : Boolean {
         val singleProof = proof?.firstOrNull()
         check(singleProof!=null){"credential doesn't contain a proof for verification"}

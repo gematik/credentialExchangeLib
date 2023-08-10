@@ -31,6 +31,11 @@ class Presentation(
         proof = listOf(ldProof)
     }
 
+    suspend fun asyncSign(ldProof: LdProof, privateKey: ByteArray, context : Any){
+        ldProof.asyncSign(this, privateKey, context)
+        proof = listOf(ldProof)
+    }
+
     override fun verify() : Boolean {
         val singleProof = proof?.firstOrNull()
         check(singleProof!=null){"presentation doesn't contain a proof for verification"}

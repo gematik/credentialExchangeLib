@@ -5,24 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="246e1cc3-192b-491f-8ba1-e76025f33fb5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/EcdsaCryptoCredentials.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/EcdsaSigner.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/EcdsaVerifier.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256K1CryptoCredentials.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256K1Signer.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256K1Verifier.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/AsyncSigner.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.adoc" beforeDir="false" afterPath="$PROJECT_DIR$/README.adoc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/credentialSubjects/JsonLdValue.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/credentialSubjects/JsonLdValue.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/CryptoRegistry.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/CryptoRegistry.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ProofType.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ProofType.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/Common.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/EcdsaCryptoCredentials.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/EcdsaCryptoCredentials.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256CryptoCredentials.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256CryptoCredentials.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256Signer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256Signer.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256Verifier.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256Verifier.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/extensions/Utils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/extensions/Utils.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/BbsProofTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/BbsProofTests.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/P256ProofTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/EcdsaProofTest.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/TestSuite.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/TestSuite.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256K1CryptoCredentials.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ecdsa/P256K1CryptoCredentials.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Credential.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Credential.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Presentation.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Presentation.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,26 +101,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "ignore.virus.scanning.warn.message": "true",
-    "ktor.last.update.timestamp": "1691657731241",
-    "last_opened_file_path": "C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.31034482",
-    "settings.editor.selected.configurable": "AndroidSdkUpdater",
-    "two.files.diff.last.used.file": "C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources/context/vaccination_v1_modified.jsonld",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;ktor.last.update.timestamp&quot;: &quot;1691657731241&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.31034482&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;AndroidSdkUpdater&quot;,
+    &quot;two.files.diff.last.used.file&quot;: &quot;C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources/context/vaccination_v1_modified.jsonld&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\rk\IntelliJIDEAProjects\credentialExchangeLib\src\main\kotlin\de\gematik\security\credentialExchangeLib\crypto" />
@@ -145,6 +137,7 @@
       <recent name="C:\Users\rk\IntelliJIDEAProjects\credentialExchangeLib\src\test\resources" />
     </key>
     <key name="MoveKotlinTopLevelDeclarationsDialog.RECENTS_KEY">
+      <recent name="de.gematik.security.credentialExchangeLib.crypto" />
       <recent name="de.gematik.security.credentialExchangeLib.crypto.Bbs" />
       <recent name="de.gematik.security.credentialExchangeLib" />
       <recent name="" />
@@ -158,7 +151,7 @@
       <recent name="de.gematik.security.credentialExchangeLib.types" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.TestSuite">
+  <component name="RunManager" selected="Gradle.credentialExchangeLib [publishToMavenLocal]">
     <configuration name="BbsProofTests.testBbsCryptoCredentials" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -173,30 +166,6 @@
             <option value=":test" />
             <option value="--tests" />
             <option value="&quot;de.gematik.security.credentialExchangeLib.BbsProofTests.testBbsCryptoCredentials&quot;" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <ForceTestExec>true</ForceTestExec>
-      <method v="2" />
-    </configuration>
-    <configuration name="EcdsaProofTest.signVerifyCredentialP256" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":test" />
-            <option value="--tests" />
-            <option value="&quot;de.gematik.security.credentialExchangeLib.EcdsaProofTest.signVerifyCredentialP256&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -231,30 +200,6 @@
       <ForceTestExec>true</ForceTestExec>
       <method v="2" />
     </configuration>
-    <configuration name="P256ProofTest.testP256K1CryptoCredentials" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":test" />
-            <option value="--tests" />
-            <option value="&quot;de.gematik.security.credentialExchangeLib.P256ProofTest.testP256K1CryptoCredentials&quot;" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <ForceTestExec>true</ForceTestExec>
-      <method v="2" />
-    </configuration>
     <configuration name="TestSuite" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -279,13 +224,57 @@
       <ForceTestExec>true</ForceTestExec>
       <method v="2" />
     </configuration>
+    <configuration name="credentialExchangeLib [jar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="jar" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>false</ForceTestExec>
+      <method v="2" />
+    </configuration>
+    <configuration name="credentialExchangeLib [publishToMavenLocal]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="publishToMavenLocal" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>false</ForceTestExec>
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.credentialExchangeLib [publishToMavenLocal]" />
+        <item itemvalue="Gradle.credentialExchangeLib [jar]" />
         <item itemvalue="Gradle.TestSuite" />
         <item itemvalue="Gradle.BbsProofTests.testBbsCryptoCredentials" />
         <item itemvalue="Gradle.EcdsaProofTest.signVerifyCredentialP256K1" />
-        <item itemvalue="Gradle.EcdsaProofTest.signVerifyCredentialP256" />
-        <item itemvalue="Gradle.P256ProofTest.testP256K1CryptoCredentials" />
       </list>
     </recent_temporary>
   </component>
@@ -362,7 +351,9 @@
       <workItem from="1691135808794" duration="4086000" />
       <workItem from="1691396506450" duration="17429000" />
       <workItem from="1691480803783" duration="36079000" />
-      <workItem from="1691590280451" duration="21805000" />
+      <workItem from="1691590280451" duration="21884000" />
+      <workItem from="1691669751020" duration="9673000" />
+      <workItem from="1691688580203" duration="1217000" />
     </task>
     <task id="LOCAL-00001" summary="initial check in">
       <created>1683117220289</created>
@@ -602,7 +593,14 @@
       <option name="project" value="LOCAL" />
       <updated>1691600099474</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="feat: support of secp256k1">
+      <created>1691667218423</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1691667218423</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -620,7 +618,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: add credential exchange types" />
     <MESSAGE value="feat: add web socket connections" />
     <MESSAGE value="feat: add credential exchange state machine" />
     <MESSAGE value="chore: change required to produced and publish artifact as library" />
@@ -645,7 +642,8 @@
     <MESSAGE value="feat: support of ECDSA SecP256R1 including necessary refactory" />
     <MESSAGE value="feat: support of EdDSA Ed25519" />
     <MESSAGE value="chore: optimize imports" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: optimize imports" />
+    <MESSAGE value="feat: support of secp256k1" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: support of secp256k1" />
   </component>
   <component name="XDebuggerManager">
     <pin-to-top-manager>

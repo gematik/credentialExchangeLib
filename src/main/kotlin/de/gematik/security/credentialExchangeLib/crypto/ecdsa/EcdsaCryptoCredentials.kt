@@ -32,7 +32,6 @@ abstract class EcdsaCryptoCredentials(keyPair: KeyPair) : CryptoCredentials {
     final override val verKey: String
 
     init {
-        require(keyPair.privateKey == null || privateKeySize == keyPair.privateKey.size)
         require(keyPair.publicKey != null && publicKeySize == keyPair.publicKey.size)
         this.keyPair = keyPair
         verKey = Base58.base58Encode(keyPair.publicKey)

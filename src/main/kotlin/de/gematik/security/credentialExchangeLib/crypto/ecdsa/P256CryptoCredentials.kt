@@ -19,6 +19,7 @@ class P256CryptoCredentials(keyPair: KeyPair) : EcdsaCryptoCredentials(keyPair) 
     override val verificationMethod: URI
 
     init {
+        require(keyPair.privateKey == null || privateKeySize == keyPair.privateKey.size)
         didKey = URI.create("did:key:z${Base58.base58Encode(multiCodecId + keyPair.publicKey!!)}")
         verificationMethod = URI.create("${didKey}#${didKey.toString().drop(8)}")
     }

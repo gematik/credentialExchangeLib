@@ -21,7 +21,7 @@ object CryptoRegistry {
     )
 
     fun registerSigner(type: ProofType, initializer: (KeyPair) -> Signer) {
-        signers.put(type, initializer)
+        signers[type] = initializer
     }
 
     fun unRegisterSigner(type: ProofType) {
@@ -33,7 +33,7 @@ object CryptoRegistry {
     }
 
     fun registerVerifier(type: ProofType, initializer: (ByteArray) -> Verifier) {
-        verifiers.put(type, initializer)
+        verifiers[type] = initializer
     }
 
     fun unRegisterVerifier(type: ProofType) {

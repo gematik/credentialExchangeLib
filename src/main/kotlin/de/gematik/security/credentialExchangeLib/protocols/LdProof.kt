@@ -69,6 +69,30 @@ class LdProof(
         proofValue = String(Base64.getEncoder().encode(signer.sign(statements)))
     }
 
+    inline suspend fun <reified T> asyncSign(jsonLdObject: T, privateKey: ByteArray, context: Any) where T : LdObject, T : Verifiable {
+        check(proofValue == null) { "proof already contains proof value" }
+        check(jsonLdObject.proof == null) { "jsonLdObject already signed" }
+        val signer = type?.firstOrNull()?.let {
+            runCatching {
+                CryptoRegistry.getSigner(
+                    ProofType.valueOf(it),
+                    KeyPair(
+                        privateKey,
+                        verificationMethod.toPublicKey()
+                    )
+                )
+            }.getOrNull()
+        } as? AsyncSigner
+        check(
+            signer != null
+        ) { "no async signer registered for proof type: ${type?.firstOrNull()}" }
+        val statements = listOf(
+            normalize().trim().split('\n'),
+            jsonLdObject.normalize<T>().trim().split('\n')
+        ).flatMap { it.map { it.toByteArray() } }
+        proofValue = String(Base64.getEncoder().encode(signer.asyncSign(statements, context)))
+    }
+
     inline fun <reified T> verify(
         jsonLdObject: T
     ): Boolean where T : LdObject, T : Verifiable {
@@ -169,7 +193,7 @@ class LdProof(
             ldProofWithoutProofValue.normalize().trim().split('\n'),
             jsonLdObjectWithoutProof.normalize<T>().trim().split('\n')
         ).flatMap { it.map { it.toByteArray() } }
-        return verifier.verify(statements, Base64.getDecoder().decode(proofValue)) ?: false
+        return verifier.verify(statements, Base64.getDecoder().decode(proofValue))
     }
 
     fun verifyProof(credential: Credential, verifier: ProofVerifier): Boolean {
