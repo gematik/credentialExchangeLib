@@ -24,11 +24,13 @@ skinparam component {
 [JsonLd-Signatures] <<implemented>> as JsonLdSignatures
 [jsonld titanium] <<implemented>> as JsonLd
 [bbs-signatures (java wrapper)] <<implemented>> as BbsSignature
-[ECDSA (secp256r1/k1)] <<implemented>> as Ecdsa
-[EdDSA (ed25519)]  <<implemented>> as Eddsa
+[ECDSA (secp256r1)] <<implemented>> as secp256r1
+[ECDSA (secp256k1)] <<implemented>> as secp256k1
+[EdDSA (ed25519)]  <<implemented>> as ed25519
+[HW AndroidKeystore] <<implemented>> as AndroidKeystore
 [CL-Signatures] as ClSignatures
 [bbs_plus (rust)] <<implemented>> as BbsPlus
-[bouncycastle] <<implemented>>  as Tink
+[bouncycastle] <<implemented>>  as Bouncy
 Applications -down- CredentialExchange
 CredentialExchange -down- Protocols
 CredentialExchange -down- Serialization
@@ -46,16 +48,20 @@ Protocols -down- JsonLd
 JsonLdSignatures -down- JsonLd
 JsonLdSignatures -down- BbsSignature
 JsonLdSignatures -down- RdfUrdna
-JsonLdSignatures -down- Ecdsa
-JsonLdSignatures -down- Eddsa
+JsonLdSignatures -down- secp256r1
+JsonLdSignatures -down- secp256k1
+JsonLdSignatures -down- ed25519
 JsonLdSignatures -down- ClSignatures
 BbsSignature -down- BbsPlus
-Ecdsa -down- Tink
-Eddsa -down- Tink
+secp256r1 -down- AndroidKeystore
+secp256r1 -down- Bouncy
+secp256k1 -down- Bouncy
+ed25519 -down- Bouncy
 BbsSignature -left[hidden]- RdfUrdna
-Ecdsa -left[hidden]- BbsSignature
-Eddsa -left[hidden]- Ecdsa
-ClSignatures -left[hidden]- Eddsa
+secp256r1 -left[hidden]- BbsSignature
+secp256k1 -left[hidden]- secp256r1
+ed25519 -left[hidden]- secp256k1
+ClSignatures -left[hidden]- ed25519
 
 note right of Applications
   Demo applications:
