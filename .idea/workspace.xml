@@ -6,7 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="246e1cc3-192b-491f-8ba1-e76025f33fb5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.adoc" beforeDir="false" afterPath="$PROJECT_DIR$/README.adoc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/credentialSubjects/Vsd.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/credentialSubjects/Vsd.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/extensions/JsonLd.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/extensions/JsonLd.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/context/vsd_v1.jsonld" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/context/vsd_v1.jsonld" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/JsonLdTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/JsonLdTests.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,7 +102,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "ignore.virus.scanning.warn.message": "true",
-    "ktor.last.update.timestamp": "1692021007806",
+    "ktor.last.update.timestamp": "1692367079555",
     "last_opened_file_path": "C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -144,7 +148,7 @@
     </key>
   </component>
   <component name="RunManager" selected="Gradle.credentialExchangeLib [publishToMavenLocal]">
-    <configuration name="BbsProofTests.testBbsCryptoCredentials" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="BbsProofTests.deriveAndVerifyVsdCredential" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -157,7 +161,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;de.gematik.security.credentialExchangeLib.BbsProofTests.testBbsCryptoCredentials&quot;" />
+            <option value="&quot;de.gematik.security.credentialExchangeLib.BbsProofTests.deriveAndVerifyVsdCredential&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -168,7 +172,7 @@
       <ForceTestExec>true</ForceTestExec>
       <method v="2" />
     </configuration>
-    <configuration name="EcdsaProofTest.signVerifyCredentialP256K1" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="JsonLdTests.frameVsdCredential" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -181,7 +185,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;de.gematik.security.credentialExchangeLib.EcdsaProofTest.signVerifyCredentialP256K1&quot;" />
+            <option value="&quot;de.gematik.security.credentialExchangeLib.JsonLdTests.frameVsdCredential&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -265,8 +269,8 @@
         <item itemvalue="Gradle.credentialExchangeLib [publishToMavenLocal]" />
         <item itemvalue="Gradle.credentialExchangeLib [jar]" />
         <item itemvalue="Gradle.TestSuite" />
-        <item itemvalue="Gradle.BbsProofTests.testBbsCryptoCredentials" />
-        <item itemvalue="Gradle.EcdsaProofTest.signVerifyCredentialP256K1" />
+        <item itemvalue="Gradle.BbsProofTests.deriveAndVerifyVsdCredential" />
+        <item itemvalue="Gradle.JsonLdTests.frameVsdCredential" />
       </list>
     </recent_temporary>
   </component>
@@ -346,7 +350,15 @@
       <workItem from="1691590280451" duration="21884000" />
       <workItem from="1691669751020" duration="9673000" />
       <workItem from="1691688580203" duration="1273000" />
-      <workItem from="1691758938786" duration="2905000" />
+      <workItem from="1691758938786" duration="3543000" />
+      <workItem from="1692096099650" duration="594000" />
+      <workItem from="1692113645544" duration="82000" />
+      <workItem from="1692113748278" duration="24000" />
+      <workItem from="1692120027445" duration="2200000" />
+      <workItem from="1692186554791" duration="626000" />
+      <workItem from="1692190043610" duration="1494000" />
+      <workItem from="1692266961324" duration="1489000" />
+      <workItem from="1692279733063" duration="32709000" />
     </task>
     <task id="LOCAL-00001" summary="initial check in">
       <created>1683117220289</created>
@@ -600,7 +612,14 @@
       <option name="project" value="LOCAL" />
       <updated>1691691112856</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="chore: update component diagram in README.adoc">
+      <created>1692023361515</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1692023361515</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -618,7 +637,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: add credential exchange state machine" />
     <MESSAGE value="chore: change required to produced and publish artifact as library" />
     <MESSAGE value="chore: refactor wsconnection handling&#10;feat: add about info" />
     <MESSAGE value="chore: id in invitation is mandatory" />
@@ -643,9 +661,24 @@
     <MESSAGE value="chore: optimize imports" />
     <MESSAGE value="feat: support of secp256k1" />
     <MESSAGE value="feat: support of biometric/async authentication" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: support of biometric/async authentication" />
+    <MESSAGE value="chore: update component diagram in README.adoc" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: update component diagram in README.adoc" />
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt</url>
+          <line>151</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt</url>
+          <line>145</line>
+          <option name="timeStamp" value="20" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
         <PinnedItemInfo parentTag="com.apicatalog.jsonld.document.JsonDocument" memberName="contentType" />

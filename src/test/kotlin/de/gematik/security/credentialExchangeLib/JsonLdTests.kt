@@ -163,7 +163,7 @@ class JsonLdTests {
     fun frameCredential() {
         val credentialWithoutProof = credential.deepCopy().apply { proof = null }
         val transformedRdf = credentialWithoutProof.normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
-        val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream())).get())
+        val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream(Charsets.ISO_8859_1))).get())
         val frameDocument = emptyVaccinationCredentialFrame.toJsonDocument()
         val jsonObject = JsonLd.frame(inputDocument, frameDocument).options(defaultJsonLdOptions).get()
         val framedCredential = Json.decodeFromString<Credential>(jsonObject.toString())
@@ -176,7 +176,7 @@ class JsonLdTests {
     fun frameCredentialSelectiv() {
         val credentialWithoutProof = credential.deepCopy().apply { proof = null }
         val transformedRdf = credentialWithoutProof.normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
-        val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream())).get())
+        val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream(Charsets.ISO_8859_1))).get())
         val frameDocument = credentialFrame.toJsonDocument()
         val jsonObject = JsonLd.frame(inputDocument, frameDocument).options(defaultJsonLdOptions).get()
         val framedCredential = Json.decodeFromString<Credential>(jsonObject.toString())
@@ -200,7 +200,7 @@ class JsonLdTests {
 
     @Test
     fun expandCredential() {
-        val expandedCredential = JsonLd.expand(credential.toJsonDocument()).options(defaultJsonLdOptions) .get()
+        val expandedCredential = JsonLd.expand(credential.toJsonDocument()).options(defaultJsonLdOptions).get()
         println(json.encodeToString(json.parseToJsonElement(expandedCredential.toString())))
     }
 
@@ -397,7 +397,11 @@ class JsonLdTests {
                         name = "Test GKV-SV"
                     ),
                     insuranceType = InsuranceType.Member,
-                    residencyPrinciple = ResidencyPrinciple.Berlin
+                    residencyPrinciple = ResidencyPrinciple.Berlin,
+                    coPayment = CoPayment(
+                        status = true,
+                        validUntil = date
+                    )
                 )
             )
         ).jsonObject,
@@ -424,16 +428,71 @@ class JsonLdTests {
         val expandedCredential = JsonLd.expand(vsdCredential.toJsonDocument()).options(defaultJsonLdOptions).get()
         println(json.encodeToString(json.parseToJsonElement(expandedCredential.toString())))
         val inputDocument = json.encodeToString(json.parseToJsonElement(expandedCredential.toString()))
-            .byteInputStream()
-            .use{
-            JsonDocument.of(it)
-        }
+            .byteInputStream(Charsets.ISO_8859_1)
+            .use {
+                JsonDocument.of(it)
+            }
         val context = Credential(
             atContext = vsdCredential.atContext,
             type = vsdCredential.type
         ).toJsonDocument()
         val compactedCredential = JsonLd.compact(inputDocument, context).options(defaultJsonLdOptions).get()
         println(json.encodeToString(json.parseToJsonElement(compactedCredential.toString())))
+    }
+
+    val emptyVsdCredentialFrame = JsonLdObject(
+        content = mapOf(
+            "@context" to JsonArray(
+                listOf(
+                    JsonPrimitive("https://www.w3.org/2018/credentials/v1"),
+                    JsonPrimitive("https://gematik.de/vsd/v1")
+                )
+            ),
+            "type" to JsonArray(
+                listOf(
+                    JsonPrimitive("VerifiableCredential"),
+                    JsonPrimitive("InsuranceCertificate")
+                )
+            )
+        )
+    )
+
+    @Test
+    fun frameVsdCredential() {
+        val transformedRdf = vsdCredential.normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
+        val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream(Charsets.ISO_8859_1))).get())
+        val frameDocument = emptyVsdCredentialFrame.toJsonDocument()
+        val jsonObject = JsonLd.frame(inputDocument, frameDocument).options(defaultJsonLdOptions).get()
+        val framedCredential = Json.decodeFromString<Credential>(jsonObject.toString())
+        val framedRdf = framedCredential.normalize().trim().replace(Regex("<urn:bnid:(_:c14n[0-9]*)>"), "$1")
+        assertEquals(vsdCredential.normalize().trim(), framedRdf)
+        println(json.encodeToString(framedCredential))
+    }
+
+    @Test
+    fun testFixBooleans() {
+        val cred = """
+        {
+            "@context": {
+                "jsonBoolean": {
+                  "@id": "http://example.org/test#jsonBoolean",  
+                  "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+                }
+            },
+            "jsonBoolean" : true
+        }
+        """.trimIndent()
+        val inputDocument = cred.byteInputStream(Charsets.ISO_8859_1).use {
+            JsonDocument.of(it)
+        }
+        val rdfDocumentOfInputDocument = RdfDocument.of(JsonLd.toRdf(inputDocument).get())
+        val inputDocumentFromRdfDocument = JsonDocument.of(JsonLd.fromRdf(rdfDocumentOfInputDocument).get())
+        val inputDocumentFromRdfFixed = inputDocumentFromRdfDocument.fixBooleans()
+        assert(inputDocument.jsonContent.get().toString().contains("\"jsonBoolean\":true"))
+        println(inputDocument.jsonContent.get())
+        assert(inputDocumentFromRdfDocument.jsonContent.get().toString().contains("\"@value\":\"true\""))
+        assert(inputDocumentFromRdfFixed.jsonContent.get().toString().contains("\"@value\":true"))
+        println(inputDocumentFromRdfFixed.jsonContent.get())
     }
 
 }

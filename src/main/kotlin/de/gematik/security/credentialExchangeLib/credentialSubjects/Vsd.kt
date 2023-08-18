@@ -47,31 +47,31 @@ data class CostCenter(
 ) : JsonLdValue(listOf("CostCenter"))
 
 @Serializable
-enum class InsuranceType {
-    @SerialName("1")  Member,
-    @SerialName("3")  Family,
-    @SerialName("5")  PensionerAndFamily
+enum class InsuranceType(code: Int) {
+    Member(1),
+    Family(3),
+    PensionerAndFamily(5)
 }
 
 @Serializable
-enum class ResidencyPrinciple {
-    @SerialName("01")  SchleswigHolstein,
-    @SerialName("02")  Hamburg,
-    @SerialName("03")  Bremen,
-    @SerialName("17")  Niedersachsen,
-    @SerialName("20")  WestfalenLippe,
-    @SerialName("38")  Nordrhein,
-    @SerialName("46")  Hessen,
-    @SerialName("51")  RheinlandPfalz,
-    @SerialName("52")  BadenWuerttemberg,
-    @SerialName("71")  Bayerns,
-    @SerialName("72")  Berlin,
-    @SerialName("73")  Saarland,
-    @SerialName("78")  MecklenburgVorpommern,
-    @SerialName("83")  Brandenburg,
-    @SerialName("88")  SachsenAnhalt,
-    @SerialName("93")  Thueringen,
-    @SerialName("98")  Sachsen
+enum class ResidencyPrinciple(twoDigitCode: String) {
+    SchleswigHolstein ("01"),
+    Hamburg("02"),
+    Bremen("03"),
+    Niedersachsen("17"),
+    WestfalenLippe("20"),
+    Nordrhein("38"),
+    Hessen("46"),
+    RheinlandPfalz("51"),
+    BadenWuerttemberg("52"),
+    Bayern("71"),
+    Berlin("72"),
+    Saarland("73"),
+    MecklenburgVorpommern("78"),
+    Brandenburg("83"),
+    SachsenAnhalt("88"),
+    Thueringen("93"),
+    Sachsen("98")
 }
 
 @Serializable
@@ -100,10 +100,10 @@ data class StreetAddress(
 ) : JsonLdValue(listOf("StreetAddress"))
 
 @Serializable
-enum class Gender {
-    @SerialName("M") Male,
-    @SerialName("W") Female,
-    @SerialName("X") Undefined
+enum class Gender(code: Char) {
+    Male('M'),
+    Female('W'),
+    Undefined('X')
 }
 
 @Serializable
@@ -113,25 +113,25 @@ data class CoPayment(
 ) : JsonLdValue(listOf("CoPayment"))
 
 @Serializable
-enum class SpecialGroupOfPersons {
-    @SerialName("4") BSHG,
-    @SerialName("6") BVG,
-    @SerialName("7") SVA,
-    @SerialName("8") SVA_pauschal,
-    @SerialName("9") Asyl
+enum class SpecialGroupOfPersons(code:Int) {
+    BSHG(4),
+    BVG(6),
+    SVA(7),
+    SVA_pauschal(8),
+    Asyl(9)
 }
 
 @Serializable
-enum class DmpMark {
-    @SerialName("1") DiabetesMellitusTyp2,
-    @SerialName("2") Brustkrebs,
-    @SerialName("3") KoronareHerzkrankheit,
-    @SerialName("4") DiabetesMellitusTyp1,
-    @SerialName("5") AsthmaBronchiale,
-    @SerialName("6") COPD_ChronicObstructivePulmonaryDisease,
-    @SerialName("7") ChronischeHerzinsuffizienz,
-    @SerialName("8") Depression,
-    @SerialName("9") Rueckenschmerz
+enum class DmpMark(code: Int) {
+    DiabetesMellitusType2(1),
+    BreastCancer(2),
+    CHD_CoronaryHeartDisease(3),
+    DiabetesMellitusType1(4),
+    AsthmaBronchiale(5),
+    COPD_ChronicObstructivePulmonaryDisease(6),
+    ChronicCardiacInsufficiency(7),
+    Depression(8),
+    SevereBackPain(9)
 }
 
 @Serializable
@@ -142,10 +142,10 @@ data class SelectiveContracts(
 ) : JsonLdValue(listOf("SelectivContract"))
 
 @Serializable
-enum class SelectiveContractStatus {
-    @SerialName("1") selectivContractAvailable,
-    @SerialName("0") selectivContractNotAvailable,
-    @SerialName("9") selectivContractMarkNotUsed
+enum class SelectiveContractStatus(code: Int) {
+    selectivContractAvailable(1),
+    selectivContractNotAvailable(0),
+    selectivContractMarkNotUsed(9)
 }
 
 @Serializable
@@ -163,7 +163,7 @@ data class DormantBenefitsEntitlement(
 ) : JsonLdValue(listOf("DormantBenefitsEntitlement"))
 
 @Serializable
-enum class DormancyType {
-    @SerialName("1") complete,
-    @SerialName("2") limited
+enum class DormancyType(code: Int) {
+    complete(1),
+    limited(2)
 }

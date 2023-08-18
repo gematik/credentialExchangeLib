@@ -263,7 +263,7 @@
         "type": "@type",
         "status": {
           "@id": "https://gematik.de/vsd#coPaymentStatus",
-          "@type": "https://gematik.de/vsd#Status"
+          "@type": "http://www.w3.org/2001/XMLSchema#boolean"
         },
         "validUntil": {
           "@id": "https://gematik.de/vsd#coPaymentValidUntil",

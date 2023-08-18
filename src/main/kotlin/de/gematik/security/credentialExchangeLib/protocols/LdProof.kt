@@ -6,10 +6,7 @@ import com.apicatalog.jsonld.document.JsonDocument
 import com.apicatalog.jsonld.document.RdfDocument
 import de.gematik.security.credentialExchangeLib.crypto.*
 import de.gematik.security.credentialExchangeLib.defaultJsonLdOptions
-import de.gematik.security.credentialExchangeLib.extensions.deepCopy
-import de.gematik.security.credentialExchangeLib.extensions.normalize
-import de.gematik.security.credentialExchangeLib.extensions.toJsonDocument
-import de.gematik.security.credentialExchangeLib.extensions.toPublicKey
+import de.gematik.security.credentialExchangeLib.extensions.*
 import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
 import de.gematik.security.credentialExchangeLib.serializer.URISerializer
@@ -139,13 +136,14 @@ class LdProof(
         // 1.2. convert internal blank node identifiers to uniform black node identifiers (urn:bnid)
         val normalizeTransformedCredential = normalizedCredential.replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
         // 1.3. create expanded input document from rdf string
-        val expandedInputDocument = normalizeTransformedCredential.byteInputStream(Charsets.ISO_8859_1).use {
+        val expandedInputDocumentWrongBoolean = normalizeTransformedCredential.byteInputStream(Charsets.ISO_8859_1).use {
             JsonDocument.of(
                 JsonLd.fromRdf(
                     RdfDocument.of(it)
                 ).options(defaultJsonLdOptions).get()
             )
         }
+        val expandedInputDocument = expandedInputDocumentWrongBoolean.fixBooleans()
         // 1.4. frame
         val framedCredential = json.decodeFromString<Credential>(
             JsonLd.frame(expandedInputDocument, frame.toJsonDocument()).options(defaultJsonLdOptions).get().toString()
