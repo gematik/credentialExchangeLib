@@ -174,7 +174,7 @@ class BbsProofTests {
                         familyName = "Schühmann",
                         nameExtension = "Gräfin",
                         givenName = "Adele Maude Veronika Mimi M.",
-                        birthdate = Utils.getDate(1953, 10, 1),
+                        birthDate = Utils.getDate(1953, 10, 1),
                         gender = Gender.Female,
                         streetAddress = StreetAddress(
                             postalCode = 10176,

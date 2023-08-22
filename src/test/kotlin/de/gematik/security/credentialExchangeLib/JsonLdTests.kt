@@ -163,7 +163,8 @@ class JsonLdTests {
     fun frameCredential() {
         val credentialWithoutProof = credential.deepCopy().apply { proof = null }
         val transformedRdf = credentialWithoutProof.normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
-        val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream(Charsets.ISO_8859_1))).get())
+        val inputDocument =
+            JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream(Charsets.ISO_8859_1))).get())
         val frameDocument = emptyVaccinationCredentialFrame.toJsonDocument()
         val jsonObject = JsonLd.frame(inputDocument, frameDocument).options(defaultJsonLdOptions).get()
         val framedCredential = Json.decodeFromString<Credential>(jsonObject.toString())
@@ -176,7 +177,8 @@ class JsonLdTests {
     fun frameCredentialSelectiv() {
         val credentialWithoutProof = credential.deepCopy().apply { proof = null }
         val transformedRdf = credentialWithoutProof.normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
-        val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream(Charsets.ISO_8859_1))).get())
+        val inputDocument =
+            JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream(Charsets.ISO_8859_1))).get())
         val frameDocument = credentialFrame.toJsonDocument()
         val jsonObject = JsonLd.frame(inputDocument, frameDocument).options(defaultJsonLdOptions).get()
         val framedCredential = Json.decodeFromString<Credential>(jsonObject.toString())
@@ -379,13 +381,19 @@ class JsonLdTests {
                     familyName = "Schühmann",
                     nameExtension = "Gräfin",
                     givenName = "Adele Maude Veronika Mimi M.",
-                    birthdate = Utils.getDate(1953, 10, 1),
+                    birthDate = Utils.getDate(1953, 10, 1),
                     gender = Gender.Female,
                     streetAddress = StreetAddress(
                         postalCode = 10176,
                         location = "Berlin",
                         street = "Dorfstrasse",
                         streetNumber = "1",
+                        country = "GER"
+                    ),
+                    postBoxAddress = PostBoxAddress(
+                        postalCode = 10176,
+                        location = "Berlin",
+                        postBoxNumber = "123456",
                         country = "GER"
                     )
                 ),
@@ -396,11 +404,32 @@ class JsonLdTests {
                         countryCode = "GER",
                         name = "Test GKV-SV"
                     ),
+                    dmpMark = DmpMark.CHD_CoronaryHeartDisease,
                     insuranceType = InsuranceType.Member,
                     residencyPrinciple = ResidencyPrinciple.Berlin,
                     coPayment = CoPayment(
                         status = true,
                         validUntil = date
+                    ),
+                    reimbursement = Reimbursement(
+                        medicalCare = true,
+                        dentalCare = true,
+                        inpatientSector = true,
+                        initiatedServices = false
+                    ),
+                    selectiveContracts = SelectiveContracts(
+                        medical = SelectiveContractStatus.available,
+                        dental = SelectiveContractStatus.notUsed,
+                        contractType = ContractType(
+                            generalPractionerCare = true,
+                            structuredTreatmentProgram = false,
+                            integratedCare = false
+                        )
+                    ),
+                    dormantBenefitsEntitlement = DormantBenefitsEntitlement(
+                        start = Utils.getDate(2023, 1, 1),
+                        end = Utils.getDate(2025, 12, 31),
+                        dormancyType = DormancyType.complete
                     )
                 )
             )
@@ -459,13 +488,21 @@ class JsonLdTests {
 
     @Test
     fun frameVsdCredential() {
-        val transformedRdf = vsdCredential.normalize().trim().replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
-        val inputDocument = JsonDocument.of(JsonLd.fromRdf(RdfDocument.of(transformedRdf.byteInputStream(Charsets.ISO_8859_1))).get())
+        val normalizedCredential = vsdCredential.normalize().trim()
+        val normalizedTransformedCredential = normalizedCredential.replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
+        val expandedInputDocumentWrongBoolean = JsonDocument.of(
+            JsonLd.fromRdf(
+                RdfDocument.of(normalizedTransformedCredential.byteInputStream(Charsets.ISO_8859_1))
+            ).get()
+        )
+        val expandedDocument = expandedInputDocumentWrongBoolean.fixBooleans()
         val frameDocument = emptyVsdCredentialFrame.toJsonDocument()
-        val jsonObject = JsonLd.frame(inputDocument, frameDocument).options(defaultJsonLdOptions).get()
-        val framedCredential = Json.decodeFromString<Credential>(jsonObject.toString())
-        val framedRdf = framedCredential.normalize().trim().replace(Regex("<urn:bnid:(_:c14n[0-9]*)>"), "$1")
-        assertEquals(vsdCredential.normalize().trim(), framedRdf)
+        val framedJsonObject = JsonLd.frame(expandedDocument, frameDocument).options(defaultJsonLdOptions).get()
+        val framedCredential = Json.decodeFromString<Credential>(framedJsonObject.toString())
+        val normalizedTransformedFramedCredential = framedCredential.normalize().trim()
+        val normalizedFramedCredential = normalizedTransformedFramedCredential.replace(Regex("urn:bnid:(_:c14n[0-9]*)"), "$1")
+
+        assertEquals(normalizedTransformedCredential, normalizedTransformedFramedCredential)
         println(json.encodeToString(framedCredential))
     }
 

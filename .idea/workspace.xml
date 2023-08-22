@@ -7,9 +7,9 @@
     <list default="true" id="246e1cc3-192b-491f-8ba1-e76025f33fb5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/credentialSubjects/Vsd.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/credentialSubjects/Vsd.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/extensions/JsonLd.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/extensions/JsonLd.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/context/vsd_v1.jsonld" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/context/vsd_v1.jsonld" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/BbsProofTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/BbsProofTests.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/JsonLdTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/JsonLdTests.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -102,7 +102,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "ignore.virus.scanning.warn.message": "true",
-    "ktor.last.update.timestamp": "1692367079555",
+    "ktor.last.update.timestamp": "1692691136230",
     "last_opened_file_path": "C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -148,7 +148,7 @@
     </key>
   </component>
   <component name="RunManager" selected="Gradle.credentialExchangeLib [publishToMavenLocal]">
-    <configuration name="BbsProofTests.deriveAndVerifyVsdCredential" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="BbsProofTests.deriveAndVerifyCredential" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -161,7 +161,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;de.gematik.security.credentialExchangeLib.BbsProofTests.deriveAndVerifyVsdCredential&quot;" />
+            <option value="&quot;de.gematik.security.credentialExchangeLib.BbsProofTests.deriveAndVerifyCredential&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -269,8 +269,8 @@
         <item itemvalue="Gradle.credentialExchangeLib [publishToMavenLocal]" />
         <item itemvalue="Gradle.credentialExchangeLib [jar]" />
         <item itemvalue="Gradle.TestSuite" />
-        <item itemvalue="Gradle.BbsProofTests.deriveAndVerifyVsdCredential" />
         <item itemvalue="Gradle.JsonLdTests.frameVsdCredential" />
+        <item itemvalue="Gradle.BbsProofTests.deriveAndVerifyCredential" />
       </list>
     </recent_temporary>
   </component>
@@ -358,7 +358,8 @@
       <workItem from="1692186554791" duration="626000" />
       <workItem from="1692190043610" duration="1494000" />
       <workItem from="1692266961324" duration="1489000" />
-      <workItem from="1692279733063" duration="32709000" />
+      <workItem from="1692279733063" duration="32976000" />
+      <workItem from="1692622100598" duration="25511000" />
     </task>
     <task id="LOCAL-00001" summary="initial check in">
       <created>1683117220289</created>
@@ -619,7 +620,14 @@
       <option name="project" value="LOCAL" />
       <updated>1692023361515</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="chore: update vsd and create workaround for json boolean issue of jsonld lib">
+      <created>1692369219947</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1692369219947</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -637,7 +645,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="chore: change required to produced and publish artifact as library" />
     <MESSAGE value="chore: refactor wsconnection handling&#10;feat: add about info" />
     <MESSAGE value="chore: id in invitation is mandatory" />
     <MESSAGE value="chore: make logging available for jvm and android" />
@@ -662,20 +669,26 @@
     <MESSAGE value="feat: support of secp256k1" />
     <MESSAGE value="feat: support of biometric/async authentication" />
     <MESSAGE value="chore: update component diagram in README.adoc" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: update component diagram in README.adoc" />
+    <MESSAGE value="chore: update vsd and create workaround for json boolean issue of jsonld lib" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: update vsd and create workaround for json boolean issue of jsonld lib" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt</url>
-          <line>151</line>
-          <option name="timeStamp" value="19" />
+          <url>file://$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/JsonLdTests.kt</url>
+          <line>504</line>
+          <option name="timeStamp" value="22" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt</url>
-          <line>145</line>
-          <option name="timeStamp" value="20" />
+          <line>216</line>
+          <option name="timeStamp" value="26" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt</url>
+          <line>173</line>
+          <option name="timeStamp" value="28" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

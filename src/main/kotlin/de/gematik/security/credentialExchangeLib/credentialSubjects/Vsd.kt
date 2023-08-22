@@ -17,7 +17,7 @@ data class Insurant(
     val familyName: String,
     val givenName: String,
     val nameExtension: String? = null,
-    val birthdate: @Serializable(with = DateSerializer::class) Date,
+    val birthDate: @Serializable(with = DateSerializer::class) Date,
     val gender: Gender,
     val academicTitel: String? = null,
     val streetAddress: StreetAddress? = null,
@@ -35,7 +35,9 @@ data class Coverage(
     val specialGroupOfPersons: SpecialGroupOfPersons? = null,
     val dmpMark: DmpMark? = null,
     val selectiveContracts: SelectiveContracts? = null,
-    val coPayment: CoPayment? = null,
+    val coPayment: CoPayment = CoPayment(
+        status = false
+    ),
     val dormantBenefitsEntitlement: DormantBenefitsEntitlement? = null
 ) : JsonLdValue(listOf("Coverage"))
 
@@ -109,7 +111,7 @@ enum class Gender(code: Char) {
 @Serializable
 data class CoPayment(
     val status: Boolean,
-    val validUntil: @Serializable(with = DateSerializer::class) Date
+    val validUntil: @Serializable(with = DateSerializer::class) Date? = null
 ) : JsonLdValue(listOf("CoPayment"))
 
 @Serializable
@@ -138,14 +140,14 @@ enum class DmpMark(code: Int) {
 data class SelectiveContracts(
     val medical: SelectiveContractStatus,
     val dental: SelectiveContractStatus,
-    val contractType: SelectiveContractStatus
-) : JsonLdValue(listOf("SelectivContract"))
+    val contractType: ContractType,
+) : JsonLdValue(listOf("SelectiveContracts"))
 
 @Serializable
 enum class SelectiveContractStatus(code: Int) {
-    selectivContractAvailable(1),
-    selectivContractNotAvailable(0),
-    selectivContractMarkNotUsed(9)
+    available(1),
+    notAvailable(0),
+    notUsed(9)
 }
 
 @Serializable

@@ -134,9 +134,9 @@ class LdProof(
         // 1.1. normalize input document to rdf string
         val normalizedCredential = credentialWithoutProof.normalize().trim()
         // 1.2. convert internal blank node identifiers to uniform black node identifiers (urn:bnid)
-        val normalizeTransformedCredential = normalizedCredential.replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
+        val normalizedTransformedCredential = normalizedCredential.replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
         // 1.3. create expanded input document from rdf string
-        val expandedInputDocumentWrongBoolean = normalizeTransformedCredential.byteInputStream(Charsets.ISO_8859_1).use {
+        val expandedInputDocumentWrongBoolean = normalizedTransformedCredential.byteInputStream(Charsets.ISO_8859_1).use {
             JsonDocument.of(
                 JsonLd.fromRdf(
                     RdfDocument.of(it)
@@ -148,9 +148,10 @@ class LdProof(
         val framedCredential = json.decodeFromString<Credential>(
             JsonLd.frame(expandedInputDocument, frame.toJsonDocument()).options(defaultJsonLdOptions).get().toString()
         )
-        // 1.5. revert blank node identifier to internal blank node identifiers
-        val normalizedFramedCredential =
-            framedCredential.normalize().trim().replace(Regex("<urn:bnid:(_:c14n[0-9]*)>"), "$1")
+        // 1.5. normalize framed credential
+        val normalizedFramedCredential = framedCredential.normalize().trim()
+        // 1.6. revert blank node identifier to internal blank node identifiers
+        val normalizedTransformedFramedCredential = normalizedFramedCredential.replace(Regex("<urn:bnid:(_:c14n[0-9]*)>"), "$1")
         // 2. prepare list of proof messages
         // 2.1. init list of ProofMessage with messages from LdProof without proof value
         val newLdProof = deepCopy().apply { proofValue = null }
@@ -158,7 +159,7 @@ class LdProof(
             ProofMessage(ProofMessage.PROOF_MESSAGE_TYPE_REVEALED, it.toByteArray(), null)
         }.toMutableList()
         // 2.2. add proof messages from credential
-        val framedCredentialMessages = normalizedFramedCredential.split('\n')
+        val framedCredentialMessages = normalizedTransformedFramedCredential.split('\n')
         var j = 0
         normalizedCredential.split('\n').forEach {
             val type = if (j < framedCredentialMessages.size && it == framedCredentialMessages.get(j)) {
@@ -196,7 +197,7 @@ class LdProof(
 
     fun verifyProof(credential: Credential, verifier: ProofVerifier): Boolean {
 
-        // 1 prepare original proof
+        // 1. prepare original proof
         val ldProofWithoutProofValue = deepCopy().apply {
             // 1.1 remove proof value
             proofValue = null
@@ -205,14 +206,14 @@ class LdProof(
             //1.3 set original proof type
             type = listOf(ProofType.BbsBlsSignature2020.name)
         }
-        // 2 prepare credential
+        // 2. prepare credential
         val credentialWithoutProof = credential.deepCopy().apply { proof = null }
-        // 3 normalize credential and ldproof and revert uri blank node identifier (urn:bnid) back into internal blank node identifiers
+        // 3. normalize credential and ldproof and revert uri blank node identifier (urn:bnid) back into internal blank node identifiers
         val statements = listOf(
             ldProofWithoutProofValue.normalize().trim().replace(Regex("<urn:bnid:(_:c14n[0-9]*)>"), "$1").split('\n'),
             credentialWithoutProof.normalize().trim().replace(Regex("<urn:bnid:(_:c14n[0-9]*)>"), "$1").split('\n')
         ).flatMap { it.map { it.toByteArray() } }
-        // 4 get verifier and verify revealed messages
+        // 4. get verifier and verify revealed messages
         return verifier.verifyProof(
             statements,
             Base64.getDecoder().decode(proofValue),

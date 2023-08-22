@@ -61,8 +61,8 @@
           "@id": "https://gematik.de/vsd#insurantNameExtension",
           "@type": "http://schema.org/NameExtension"
         },
-        "birthdate": {
-          "@id": "https://gematik.de/vsd#insurantBirthdate",
+        "birthDate": {
+          "@id": "https://gematik.de/vsd#insurantBirthDate",
           "@type": "http://schema.org/Date"
         },
         "gender": {
@@ -174,7 +174,7 @@
         },
         "specialGroupOfPersons": {
           "@id": "https://gematik.de/vsd#coverageSpecialGroupOfPersons",
-          "@type": "https://gematik.de/vsd/#SpecialGroupOfPersons"
+          "@type": "https://gematik.de/vsd#SpecialGroupOfPersons"
         },
         "dmpMark": {
           "@id": "https://gematik.de/vsd#coverageDmpMark",
@@ -246,11 +246,36 @@
         "type": "@type",
         "medical": {
           "@id": "https://gematik.de/vsd#selectiveContractsMedical",
-          "@type": "https://gematik.de/vsd#Medical"
+          "@type": "https://gematik.de/vsd#SelectiveContractStatus"
         },
         "dental": {
           "@id": "https://gematik.de/vsd#selectiveContractsDental",
-          "@type": "https://gematik.de/vsd#Dental"
+          "@type": "https://gematik.de/vsd#SelectiveContractStatus"
+        },
+        "contractType": {
+          "@id": "https://gematik.de/vsd#selectiveContractsContractType",
+          "@type": "@id"
+        }
+      }
+    },
+    "ContractType": {
+      "@id": "https://gematik.de/vsd#ContractType",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "generalPractionerCare": {
+          "@id": "https://gematik.de/vsd#contractTypeGeneralPractionerCare",
+          "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+        },
+        "structuredTreatmentProgram": {
+          "@id": "https://gematik.de/vsd#contractTypeStructuredTreatmentProgram",
+          "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+        },
+        "integratedCare": {
+          "@id": "https://gematik.de/vsd#contractTypeIntegratedCare",
+          "@type": "http://www.w3.org/2001/XMLSchema#boolean"
         }
       }
     },
