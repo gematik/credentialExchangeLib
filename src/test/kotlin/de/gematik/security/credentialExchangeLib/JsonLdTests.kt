@@ -489,20 +489,16 @@ class JsonLdTests {
     @Test
     fun frameVsdCredential() {
         val normalizedCredential = vsdCredential.normalize().trim()
-        val normalizedTransformedCredential = normalizedCredential.replace(Regex("_:c14n[0-9]*"), "<urn:bnid:$0>")
         val expandedInputDocumentWrongBoolean = JsonDocument.of(
             JsonLd.fromRdf(
-                RdfDocument.of(normalizedTransformedCredential.byteInputStream(Charsets.ISO_8859_1))
+                RdfDocument.of(normalizedCredential.byteInputStream(Charsets.ISO_8859_1))
             ).get()
         )
         val expandedDocument = expandedInputDocumentWrongBoolean.fixBooleans()
         val frameDocument = emptyVsdCredentialFrame.toJsonDocument()
         val framedJsonObject = JsonLd.frame(expandedDocument, frameDocument).options(defaultJsonLdOptions).get()
         val framedCredential = Json.decodeFromString<Credential>(framedJsonObject.toString())
-        val normalizedTransformedFramedCredential = framedCredential.normalize().trim()
-        val normalizedFramedCredential = normalizedTransformedFramedCredential.replace(Regex("urn:bnid:(_:c14n[0-9]*)"), "$1")
-
-        assertEquals(normalizedTransformedCredential, normalizedTransformedFramedCredential)
+        assertEquals(normalizedCredential, framedCredential.normalize().trim())
         println(json.encodeToString(framedCredential))
     }
 
