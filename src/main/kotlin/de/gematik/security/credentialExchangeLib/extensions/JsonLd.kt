@@ -45,7 +45,8 @@ inline fun <reified T> JsonDocument.toJsonLdObject(): T {
 }
 
 fun JsonDocument.fixBooleansAndNumbers() : JsonDocument {
-        // quick and dirty workaround fixing the boolean issue of the jsonld library
+        //TODO: quick and dirty workaround fixing the boolean/number issue of the titan library
+        // fails if strings contain numbers or boolean values, e.g. "true" or "1223"
         return jsonContent.get().toString()
             .replace(Regex("\"(true|false|[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)\""), "$1").byteInputStream().use { JsonDocument.of ( it ) }
 }

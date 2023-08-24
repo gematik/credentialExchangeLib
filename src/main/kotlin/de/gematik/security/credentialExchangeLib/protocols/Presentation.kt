@@ -8,14 +8,21 @@ import kotlinx.serialization.Serializable
 import java.net.URI
 
 @Serializable
-class Presentation(
-    override val id: String? = null,
-    @Required @SerialName("@context") override var atContext: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<@Serializable(with = URISerializer::class) URI> = DEFAULT_JSONLD_CONTEXTS,
-    @Required override var type: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<String> = DEFAULT_JSONLD_TYPES,
-    val presentationSubmission: PresentationSubmission,
-    val verifiableCredential: List<Credential>,
+class Presentation : LdObject, Verifiable {
+    constructor(
+        id: String? = null,
+        atContext: List<URI> = DEFAULT_JSONLD_CONTEXTS,
+        type: List<String> = DEFAULT_JSONLD_TYPES,
+        presentationSubmission: PresentationSubmission,
+        verifiableCredential: List<Credential>
+    ) : super(id, atContext, type) {
+        this.presentationSubmission = presentationSubmission
+        this.verifiableCredential = verifiableCredential
+    }
+
+    val presentationSubmission: PresentationSubmission
+    val verifiableCredential: List<Credential>
     override var proof: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<LdProof>? = null
-) : LdObject, Verifiable {
 
     companion object : LdObject.Defaults() {
         override val DEFAULT_JSONLD_CONTEXTS = listOf(
@@ -26,20 +33,20 @@ class Presentation(
         )
     }
 
-    override fun sign(ldProof: LdProof, privateKey: ByteArray){
+    override fun sign(ldProof: LdProof, privateKey: ByteArray) {
         ldProof.sign(this, privateKey)
         proof = listOf(ldProof)
     }
 
-    suspend fun asyncSign(ldProof: LdProof, privateKey: ByteArray, context : Any){
+    suspend fun asyncSign(ldProof: LdProof, privateKey: ByteArray, context: Any) {
         ldProof.asyncSign(this, privateKey, context)
         proof = listOf(ldProof)
     }
 
-    override fun verify() : Boolean {
+    override fun verify(): Boolean {
         val singleProof = proof?.firstOrNull()
-        check(singleProof!=null){"presentation doesn't contain a proof for verification"}
-        check(proof?.size == 1){"verfication of multi signature not supported yet"}
+        check(singleProof != null) { "presentation doesn't contain a proof for verification" }
+        check(proof?.size == 1) { "verfication of multi signature not supported yet" }
         return singleProof.verify(this)
     }
 

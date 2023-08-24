@@ -10,10 +10,11 @@ import java.net.URI
 @Serializable(JsonLdObjectSerializer::class)
 public class JsonLdObject(
     private val content: Map<String, JsonElement>
-) : Map<String, JsonElement> by content, LdObject {
-    override val id: String? = content.get("id")?.jsonPrimitive?.content
-    override val atContext: List<URI> = content.get("@context")?.jsonArray?.map{URI(it.jsonPrimitive.content)}?: emptyList()
-    override val type: List<String>? = content.get("type")?.jsonArray?.map{it.jsonPrimitive.content}
+) : Map<String, JsonElement> by content, LdObject(
+    content.get("id")?.jsonPrimitive?.content,
+    content.get("@context")?.jsonArray?.map{URI(it.jsonPrimitive.content)}?: emptyList(),
+    content.get("type")?.jsonArray?.map{it.jsonPrimitive.content}?: emptyList()
+) {
     public override fun equals(other: Any?): Boolean = content == other
     public override fun hashCode(): Int = content.hashCode()
 }

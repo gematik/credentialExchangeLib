@@ -10,15 +10,22 @@ import java.net.URI
 import java.util.*
 
 @Serializable
-class PresentationSubmission(
-    override val id: String? = null,
-    @Required @SerialName("@context") override var atContext: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<@Serializable(with = URISerializer::class) URI> = DEFAULT_JSONLD_CONTEXTS,
-    @Required override var type: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<String> = DEFAULT_JSONLD_TYPES,
-    @SerialName("definition_id") val definitionId: @Serializable(with = UUIDSerializer::class) UUID,
-    @SerialName("descriptor_map") val descriptorMap: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<DescriptorMapEntry>
-) : LdObject {
+class PresentationSubmission : LdObject {
+    constructor(
+        id: String? = null,
+        definitionId: UUID,
+        descriptorMap: List<DescriptorMapEntry>
+    ) : super (id, DEFAULT_JSONLD_CONTEXTS, DEFAULT_JSONLD_TYPES){
+        _definitionId = definitionId.toString()
+        this.descriptorMap = descriptorMap
+    }
 
-    companion object : LdObject.Defaults() {
+    @SerialName("definition_id") private val _definitionId: String
+    val definitionId
+        get() = UUID.fromString(_definitionId)
+    @SerialName("descriptor_map") val descriptorMap: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<DescriptorMapEntry>
+
+    companion object : Defaults() {
         override val DEFAULT_JSONLD_CONTEXTS = listOf(
             URI("https://identity.foundation/presentation-exchange/submission/v1")
         )

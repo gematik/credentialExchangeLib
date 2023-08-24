@@ -14,6 +14,8 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import org.junit.jupiter.api.Test
 import java.net.URI
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 import kotlin.test.assertEquals
 
@@ -32,12 +34,12 @@ class EcdsaProofTest {
         )
     )
 
-    val date = Date(1684152736408)
+    val date = ZonedDateTime.of(2023,8,24,13,6,21,408000, ZoneId.of("UTC"))
 
     val ldProofP256 = LdProof(
         atContext = listOf(URI("https://www.w3.org/2018/credentials/v1")),
         type = listOf(ProofType.EcdsaSecp256r1Signature2019.name),
-        created = Date(1684152736408),
+        created = date,
         proofPurpose = ProofPurpose.ASSERTION_METHOD,
         verificationMethod = p256CryptoCredentials.verificationMethod
     )
@@ -45,7 +47,7 @@ class EcdsaProofTest {
     val ldProofP256K1 = LdProof(
         atContext = listOf(URI("https://www.w3.org/2018/credentials/v1")),
         type = listOf(ProofType.EcdsaSecp256k1Signature2019.name),
-        created = Date(1684152736408),
+        created = date,
         proofPurpose = ProofPurpose.ASSERTION_METHOD,
         verificationMethod = p256K1CryptoCredentials.verificationMethod
     )

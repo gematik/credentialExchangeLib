@@ -8,14 +8,15 @@ import kotlinx.serialization.Serializable
 import java.net.URI
 
 @Serializable
-class Close(
-    override val id: String? = null,
-    @Required @SerialName("@context") override var atContext: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<@Serializable(with = URISerializer::class) URI> = DEFAULT_JSONLD_CONTEXTS,
-    @Required override var type: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<String> = DEFAULT_JSONLD_TYPES,
-    val message: String,
-) : LdObject {
-
-    companion object : LdObject.Defaults() {
+class Close : LdObject {
+    constructor(
+        id: String? = null,
+        message: String
+    ) : super(id, DEFAULT_JSONLD_CONTEXTS, DEFAULT_JSONLD_TYPES){
+        this.message = message
+    }
+    val message: String
+    companion object : Defaults() {
         override val DEFAULT_JSONLD_CONTEXTS = listOf(
             URI("https://gematik.de/credential-exchange/v1")
         )

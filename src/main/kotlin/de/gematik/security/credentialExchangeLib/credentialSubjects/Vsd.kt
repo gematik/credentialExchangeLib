@@ -1,15 +1,18 @@
 package de.gematik.security.credentialExchangeLib.credentialSubjects
 
+import de.gematik.security.credentialExchangeLib.extensions.toZonedDateTime
+import de.gematik.security.credentialExchangeLib.protocols.LdObject
 import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.time.ZonedDateTime
 import java.util.*
 
 @Serializable
 data class Insurance(
     val insurant: Insurant,
     val coverage: Coverage? = null
-) : JsonLdValue(listOf("Insurance"))
+) : LdObject(type = listOf("Insurance"))
 
 @Serializable
 data class Insurant(
@@ -17,17 +20,17 @@ data class Insurant(
     val familyName: String,
     val givenName: String,
     val nameExtension: String? = null,
-    val birthDate: @Serializable(with = DateSerializer::class) Date,
+    val birthDate: String? = null,
     val gender: Gender,
     val academicTitel: String? = null,
     val streetAddress: StreetAddress? = null,
     val postBoxAddress: PostBoxAddress? = null
-) : JsonLdValue(listOf("Insurant"))
+) : LdObject(type = listOf("Insurant"))
 
 @Serializable
 data class Coverage(
-    val start: @Serializable(with = DateSerializer::class) Date,
-    val end: @Serializable(with = DateSerializer::class) Date? = null,
+    val start: String,
+    val end: String? = null,
     val costCenter: CostCenter? = null,
     val insuranceType: InsuranceType? = null,
     val reimbursement: Reimbursement? = null,
@@ -39,14 +42,14 @@ data class Coverage(
         status = false
     ),
     val dormantBenefitsEntitlement: DormantBenefitsEntitlement? = null
-) : JsonLdValue(listOf("Coverage"))
+) : LdObject(type = listOf("Coverage"))
 
 @Serializable
 data class CostCenter(
     val identification: Int,
     val countryCode: String,
     val name: String
-) : JsonLdValue(listOf("CostCenter"))
+) : LdObject(type = listOf("CostCenter"))
 
 @Serializable
 enum class InsuranceType(code: Int) {
@@ -82,7 +85,7 @@ data class Reimbursement(
     val dentalCare: Boolean,
     val inpatientSector: Boolean,
     val initiatedServices: Boolean
-) : JsonLdValue(listOf("Reimbursement"))
+) : LdObject(type = listOf("Reimbursement"))
 
 @Serializable
 data class PostBoxAddress(
@@ -90,7 +93,7 @@ data class PostBoxAddress(
     val location: String,
     val postBoxNumber: String,
     val country: String
-) : JsonLdValue(listOf("PostBoxAddress"))
+) : LdObject(type = listOf("PostBoxAddress"))
 
 @Serializable
 data class StreetAddress(
@@ -99,7 +102,7 @@ data class StreetAddress(
     val street: String,
     val streetNumber: String,
     val country: String
-) : JsonLdValue(listOf("StreetAddress"))
+) : LdObject(type = listOf("StreetAddress"))
 
 @Serializable
 enum class Gender(code: Char) {
@@ -111,8 +114,8 @@ enum class Gender(code: Char) {
 @Serializable
 data class CoPayment(
     val status: Boolean,
-    val validUntil: @Serializable(with = DateSerializer::class) Date? = null
-) : JsonLdValue(listOf("CoPayment"))
+    val validUntil: String? = null
+) : LdObject(type = listOf("CoPayment"))
 
 @Serializable
 enum class SpecialGroupOfPersons(code:Int) {
@@ -141,7 +144,7 @@ data class SelectiveContracts(
     val medical: SelectiveContractStatus,
     val dental: SelectiveContractStatus,
     val contractType: ContractType,
-) : JsonLdValue(listOf("SelectiveContracts"))
+) : LdObject(type = listOf("SelectiveContracts"))
 
 @Serializable
 enum class SelectiveContractStatus(code: Int) {
@@ -155,14 +158,14 @@ data class ContractType(
     val generalPractionerCare: Boolean,
     val structuredTreatmentProgram: Boolean,
     val integratedCare: Boolean
-) : JsonLdValue(listOf("ContractType"))
+) : LdObject(type = listOf("ContractType"))
 
 @Serializable
 data class DormantBenefitsEntitlement(
-    val start: @Serializable(with = DateSerializer::class) Date,
-    val end: @Serializable(with = DateSerializer::class) Date,
+    val start: String,
+    val end: String,
     val dormancyType: DormancyType
-) : JsonLdValue(listOf("DormantBenefitsEntitlement"))
+) : LdObject(type = listOf("DormantBenefitsEntitlement"))
 
 @Serializable
 enum class DormancyType(code: Int) {

@@ -12,6 +12,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import org.junit.jupiter.api.Test
 import java.net.URI
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 import kotlin.test.assertEquals
 
@@ -22,7 +24,7 @@ import kotlin.test.assertEquals
  */
 class SerializerTests {
 
-    val date = Date(1684152736000)
+    val date = ZonedDateTime.of(2023,5,15,12,12,16,0, ZoneId.of("UTC"))
     val presentationDefinitionId = UUID.fromString("250787ea-f892-11ed-b67e-0242ac120002")
     val inputDescriptorId = "3aa55a6e-f892-11ed-b67e-0242ac120002"
     val credential = Credential(
@@ -135,7 +137,7 @@ class SerializerTests {
         val credentialRequest = CredentialRequest(
             atId,
             outputDescriptor = Descriptor(UUID.randomUUID().toString(), Credential()),
-            holderKey = "did:key:holder"
+            holderKey = URI.create("did:key:holder")
         )
         val serializedCredentialRequest = json.encodeToString(credentialRequest)
         assert(

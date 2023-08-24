@@ -15,31 +15,53 @@ import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.net.URI
+import java.time.ZonedDateTime
 import java.util.*
 import kotlin.random.Random
 
 @Serializable
-class LdProof(
-    override val id: String? = null,
-    @SerialName("@context") override var atContext: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<@Serializable(
-        with = URISerializer::class
-    ) URI>? = null,
-    @Required override var type: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<String>? = DEFAULT_JSONLD_TYPES,
-    val creator: @Serializable(with = URISerializer::class) URI? = null,
-    val created: @Serializable(with = DateSerializer::class) Date,
-    val domain: String? = null,
-    val challenge: String? = null,
-    var nonce: String? = null,
-    val proofPurpose: ProofPurpose,
-    val verificationMethod: @Serializable(with = URISerializer::class) URI,
-    var proofValue: String? = null
-) : LdObject {
+class LdProof : LdObject {
+    constructor(
+        id: String? = null,
+        atContext: List<URI> = DEFAULT_JSONLD_CONTEXTS,
+        type: List<String>,
+        creator: URI? = null,
+        created: ZonedDateTime,
+        domain: String? = null,
+        challenge: String? = null,
+        nonce: String? = null,
+        proofPurpose: ProofPurpose,
+        verificationMethod: URI,
+        proofValue: String? = null
+    ) : super(id, atContext, type){
+        _creator = creator?.toString()
+        _created = created.toIsoInstantString()
+        this.domain = domain
+        this.challenge = challenge
+        this.nonce = nonce
+        this.proofPurpose = proofPurpose
+        _verificationMethod = verificationMethod.toString()
+        this.proofValue = proofValue
+    }
+
+    @SerialName("creator") private var _creator: String?
+    val creator
+        get() = URI.create(_creator)
+    @SerialName("created") private val _created: String
+    val domain: String?
+    val challenge: String?
+    var nonce: String?
+    val proofPurpose: ProofPurpose
+    @SerialName("verificationMethod") private val _verificationMethod: String
+    val verificationMethod
+        get() = URI.create(_verificationMethod)
+    var proofValue: String?
 
     companion object : LdObject.Defaults() {
         override val DEFAULT_JSONLD_CONTEXTS = listOf(
             URI("https://w3id.org/security/bbs/v1")
         )
-        override val DEFAULT_JSONLD_TYPES = listOf<String>()
+        override val DEFAULT_JSONLD_TYPES = emptyList<String>()
     }
 
     inline fun <reified T> sign(jsonLdObject: T, privateKey: ByteArray) where T : LdObject, T : Verifiable {

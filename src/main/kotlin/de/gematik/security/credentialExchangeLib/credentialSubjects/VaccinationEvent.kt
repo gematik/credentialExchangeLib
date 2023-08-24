@@ -1,5 +1,7 @@
 package de.gematik.security.credentialExchangeLib.credentialSubjects
 
+import de.gematik.security.credentialExchangeLib.protocols.JsonLdObject
+import de.gematik.security.credentialExchangeLib.protocols.LdObject
 import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
 import kotlinx.serialization.Serializable
 import java.util.*
@@ -8,22 +10,22 @@ import java.util.*
 data class VaccinationEvent(
     val order: String? = null,
     val batchNumber: String? = null,
-    val dateOfVaccination: @Serializable(with = DateSerializer::class) Date? = null,
+    val dateOfVaccination: String? = null,
     val administeringCentre: String? = null,
     val healthProfessional: String? = null,
     val countryOfVaccination: String? = null,
-    val nextVaccinationDate: @Serializable(with = DateSerializer::class) Date? = null,
+    val nextVaccinationDate: String? = null,
     val recipient: Recipient? = null,
     val vaccine: Vaccine? = null
-) : JsonLdValue(listOf("VaccinationEvent"))
+) : LdObject(type = listOf("VaccinationEvent"))
 
 @Serializable
 data class Recipient(
-    val birthDate: @Serializable(with = DateSerializer::class) Date? = null,
+    val birthDate: String? = null,
     val familyName: String? = null,
     val givenName: String? = null,
     val gender: String? = null
-) : JsonLdValue(listOf("VaccineRecipient"))
+) : LdObject(type = listOf("VaccineRecipient"))
 
 @Serializable
 data class Vaccine(
@@ -32,4 +34,4 @@ data class Vaccine(
     val vaccine: String? = null,
     val medicalProductName: String? = null,
     val marketingAuthorizationHolder: String? = null
-) : JsonLdValue(listOf("Vaccine"))
+) : LdObject(type = listOf("Vaccine"))

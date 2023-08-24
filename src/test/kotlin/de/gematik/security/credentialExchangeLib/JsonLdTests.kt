@@ -6,20 +6,19 @@ import com.apicatalog.jsonld.document.RdfDocument
 import de.gematik.security.credentialExchangeLib.credentialSubjects.*
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.extensions.*
-import de.gematik.security.credentialExchangeLib.protocols.Credential
-import de.gematik.security.credentialExchangeLib.protocols.JsonLdObject
-import de.gematik.security.credentialExchangeLib.protocols.LdProof
-import de.gematik.security.credentialExchangeLib.protocols.ProofPurpose
+import de.gematik.security.credentialExchangeLib.protocols.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import org.junit.jupiter.api.Test
 import java.net.URI
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 import kotlin.test.assertEquals
 
 class JsonLdTests {
 
-    val date = Date(1684152736000)
+    val date = ZonedDateTime.of(2023,5,15,12,12,16,0, ZoneId.of("UTC"))
     val recipientId =
         "did:key:zUC7CgahEtPMHR2JsTnFSbhjFE6bYAm5i2vbFWRUdSUNc45zFAg3rCA6UVoYcDzU5DHAk1HuLV5tgcd6edL8mKLoDRhbz7qzav5yzkDWWgZMh8wTieyjcXtoTSmxNq96nWUgP5V"
 
@@ -146,7 +145,7 @@ class JsonLdTests {
             type = listOf(ProofType.BbsBlsSignature2020.name),
             created = date,
             proofPurpose = ProofPurpose.ASSERTION_METHOD,
-            verificationMethod = URI("did:key:test#test")
+            verificationMethod = URI("did:key:test#test"),
         )
         val normalized = ldProof.normalize()
         val expectedNormalized = """
@@ -209,9 +208,9 @@ class JsonLdTests {
     @Test
     fun compactCredential() {
         val inputDocument = credential.toJsonDocument()
-        val context = Credential(
-            atContext = credential.atContext + credential.proof!!.get(0).atContext!!,
-            type = credential.type + credential.proof!!.get(0).type!!
+        val context = LdObject(
+            atContext = credential.atContext!! + credential.proof!!.get(0).atContext!!,
+            type = credential.type + credential.proof!!.get(0).type
         ).toJsonDocument()
         val compactedCredential = JsonLd.compact(inputDocument, context).options(defaultJsonLdOptions).get()
         println(json.encodeToString(json.parseToJsonElement(compactedCredential.toString())))
@@ -381,7 +380,7 @@ class JsonLdTests {
                     familyName = "Schühmann",
                     nameExtension = "Gräfin",
                     givenName = "Adele Maude Veronika Mimi M.",
-                    birthDate = Utils.getDate(1953, 10, 1),
+                    birthDate = getZonedDate(1953, 10, 1).toIsoInstantString() ,
                     gender = Gender.Female,
                     streetAddress = StreetAddress(
                         postalCode = 10176,
@@ -398,7 +397,7 @@ class JsonLdTests {
                     )
                 ),
                 coverage = Coverage(
-                    start = Utils.getDate(1993, 10, 7),
+                    start = getZonedDate(1993, 10, 7).toIsoInstantString(),
                     costCenter = CostCenter(
                         identification = 109500969,
                         countryCode = "GER",
@@ -409,7 +408,7 @@ class JsonLdTests {
                     residencyPrinciple = ResidencyPrinciple.Berlin,
                     coPayment = CoPayment(
                         status = true,
-                        validUntil = date
+                        validUntil = date.toIsoInstantString()
                     ),
                     reimbursement = Reimbursement(
                         medicalCare = true,
@@ -427,8 +426,8 @@ class JsonLdTests {
                         )
                     ),
                     dormantBenefitsEntitlement = DormantBenefitsEntitlement(
-                        start = Utils.getDate(2023, 1, 1),
-                        end = Utils.getDate(2025, 12, 31),
+                        start = getZonedDate(2023, 1, 1).toIsoInstantString(),
+                        end = getZonedDate(2025, 12, 31).toIsoInstantString(),
                         dormancyType = DormancyType.complete
                     )
                 )
@@ -461,7 +460,7 @@ class JsonLdTests {
             .use {
                 JsonDocument.of(it)
             }
-        val context = Credential(
+        val context = LdObject(
             atContext = vsdCredential.atContext,
             type = vsdCredential.type
         ).toJsonDocument()

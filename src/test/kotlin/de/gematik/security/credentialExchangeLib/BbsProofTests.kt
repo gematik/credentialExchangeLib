@@ -4,15 +4,15 @@ import de.gematik.security.credentialExchangeLib.credentialSubjects.*
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.crypto.bbs.BbsCryptoCredentials
-import de.gematik.security.credentialExchangeLib.extensions.Utils
-import de.gematik.security.credentialExchangeLib.extensions.deepCopy
-import de.gematik.security.credentialExchangeLib.extensions.hexToByteArray
+import de.gematik.security.credentialExchangeLib.extensions.*
 import de.gematik.security.credentialExchangeLib.protocols.*
 import io.github.novacrypto.base58.Base58
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import org.junit.jupiter.api.Test
 import java.net.URI
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 import kotlin.test.assertEquals
 
@@ -31,20 +31,20 @@ class BbsProofTests {
         )
     )
 
-    val date = Date(1684152736408)
+    val date = ZonedDateTime.of(2023,8,24,13,6,21,408000000, ZoneId.of("UTC"))
     val presentationDefinitionId = UUID.fromString("250787ea-f892-11ed-b67e-0242ac120002")
     val inputDescriptorId = "3aa55a6e-f892-11ed-b67e-0242ac120002"
 
     val ldProofIssuer = LdProof(
         type = listOf(ProofType.BbsBlsSignature2020.name),
-        created = Date(1684152736408),
+        created = date,
         proofPurpose = ProofPurpose.ASSERTION_METHOD,
         verificationMethod = credentialIssuer.verificationMethod
     )
 
     val ldProofHolder = LdProof(
         type = listOf(ProofType.BbsBlsSignature2020.name),
-        created = Date(1684152736408),
+        created = date,
         proofPurpose = ProofPurpose.AUTHENTICATION,
         verificationMethod = credentialHolder.verificationMethod
     )
@@ -55,7 +55,7 @@ class BbsProofTests {
         credentialSubject = JsonObject(
             mapOf(
                 "type" to JsonPrimitive("VaccinationEvent"),
-                "batchNumber" to JsonPrimitive("1626382736"),
+                "batchNumber" to JsonPrimitive("X1626382736"),
                 "dateOfVaccination" to JsonPrimitive("2021-06-23T13:40:12Z"),
                 "administeringCentre" to JsonPrimitive("Praxis Sommergarten"),
                 "healthProfessional" to JsonPrimitive("883110000015376"),
@@ -174,7 +174,7 @@ class BbsProofTests {
                         familyName = "Schühmann",
                         nameExtension = "Gräfin",
                         givenName = "Adele Maude Veronika Mimi M.",
-                        birthDate = Utils.getDate(1953, 10, 1),
+                        birthDate = getZonedDate(1953, 10, 1).toIsoInstantString(),
                         gender = Gender.Female,
                         streetAddress = StreetAddress(
                             postalCode = 10176,
@@ -185,7 +185,7 @@ class BbsProofTests {
                         )
                     ),
                     coverage = Coverage(
-                        start = Utils.getDate(1993, 10, 7),
+                        start = getZonedDate(1993, 10, 7).toIsoInstantString(),
                         costCenter = CostCenter(
                             identification = 109500969,
                             countryCode = "GER",

@@ -11,17 +11,26 @@ import java.net.URI
 import java.util.*
 
 @Serializable
-class Invitation(
-    override val id: String,
-    @Required @SerialName("@context") override val atContext: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<@Serializable(
-        with = URISerializer::class
-    ) URI> = DEFAULT_JSONLD_CONTEXTS,
-    @Required override var type: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<String>? = DEFAULT_JSONLD_TYPES,
-    val label: String,
-    val goal: String,
-    val goalCode: GoalCode,
-    val service: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<Service>,
-) : LdObject {
+class Invitation : LdObject {
+    constructor(
+        id: String? = null,
+        atContext: List<URI> = DEFAULT_JSONLD_CONTEXTS,
+        type: List<String> = DEFAULT_JSONLD_TYPES,
+        label: String,
+        goal: String,
+        goalCode: GoalCode,
+        service: List<Service>
+    ) : super(id, atContext, type){
+        this.label = label
+        this.goal = goal
+        this.goalCode = goalCode
+        this.service = service
+    }
+    val label: String
+    val goal: String
+    val goalCode: GoalCode
+    val service: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<Service>
+
     companion object : LdObject.Defaults() {
         override val DEFAULT_JSONLD_CONTEXTS = listOf(
             URI("https://gematik.de/credential-exchange/v1/")

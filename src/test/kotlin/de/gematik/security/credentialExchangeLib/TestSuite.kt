@@ -10,6 +10,7 @@ import org.junit.platform.suite.api.Suite
     EcdsaProofTest::class,
     SerializerTests::class,
     ConnectionTests::class,
-    ProtocolTests::class
+    ProtocolTests::class,
+    AcapyInteropTest::class
 )
 class TestSuite

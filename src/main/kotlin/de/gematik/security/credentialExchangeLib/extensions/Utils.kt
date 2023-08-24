@@ -11,6 +11,9 @@ import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toJavaInstant
 import java.math.BigInteger
 import java.net.URI
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 fun String.hexToByteArray(): ByteArray {
@@ -57,3 +60,18 @@ fun BigInteger.toByteArray(size: Int): ByteArray {
     return byteList.toByteArray().copyInto(ByteArray(size),size - byteList.size, 0, size)
 }
 
+fun ZonedDateTime.toIsoInstantString(): String {
+    return format(DateTimeFormatter.ISO_INSTANT)
+}
+
+fun String.toZonedDateTime(): ZonedDateTime {
+    return ZonedDateTime.parse(this)
+}
+
+fun getZonedTime(year: Int, month: Int, day: Int, hour: Int, minute: Int ) : ZonedDateTime{
+    return ZonedDateTime.of(year, month, day, hour, minute, 0,0,ZoneId.of("UTC"))
+}
+
+fun getZonedDate(year: Int, month: Int, day: Int) : ZonedDateTime{
+    return ZonedDateTime.of(year, month, day, 0, 0, 0,0,ZoneId.of("UTC"))
+}

@@ -15,6 +15,8 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import org.junit.jupiter.api.Test
 import java.net.URI
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 import kotlin.test.assertEquals
 
@@ -74,18 +76,18 @@ class ProtocolTests {
     )
     val verificationMethodHolder = URI.create("${didKeyHolder}#${didKeyHolder.drop(8)}")
 
-    val date = Date(1684152736408)
+    val date = ZonedDateTime.of(2023,8,24,13,6,21,408000, ZoneId.of("UTC"))
 
     val ldProofIssuer = LdProof(
         type = listOf(ProofType.BbsBlsSignature2020.name),
-        created = Date(1684152736408),
+        created = date,
         proofPurpose = ProofPurpose.ASSERTION_METHOD,
         verificationMethod = verificationMethodIssuer
     )
 
     val ldProofHolder = LdProof(
         type = listOf(ProofType.BbsBlsSignature2020.name),
-        created = Date(1684152736408),
+        created = date,
         proofPurpose = ProofPurpose.AUTHENTICATION,
         verificationMethod = verificationMethodHolder
     )
@@ -210,7 +212,7 @@ class ProtocolTests {
 
             val credentialSubject = json.decodeFromJsonElement<CredentialSubject>(credential.credentialSubject!!)
             credentialSubject.recipient =
-                credentialSubject.recipient?.apply { id = (credentialRequest as CredentialRequest).holderKey }
+                credentialSubject.recipient?.apply { id = (credentialRequest as CredentialRequest).holderKey.toString() }
             val updatedCredential = credential.deepCopy().apply {
                 this.credentialSubject =
                     json.encodeToJsonElement(CredentialSubject.serializer(), credentialSubject).jsonObject
@@ -238,7 +240,7 @@ class ProtocolTests {
                     CredentialRequest(
                         UUID.randomUUID().toString(),
                         outputDescriptor = (credentialOffer as CredentialOffer).outputDescriptor,
-                        holderKey = didKeyHolder
+                        holderKey = URI.create(didKeyHolder)
                     )
                 )
                 assert(it.receive() is CredentialSubmit)

@@ -1,22 +1,26 @@
 package de.gematik.security.credentialExchangeLib.protocols
 
-import de.gematik.security.credentialExchangeLib.serializer.URISerializer
-import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
-import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.net.URI
 
 @Serializable
-class CredentialRequest(
-    override val id: String? = null,
-    @Required @SerialName("@context") override var atContext: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<@Serializable(with = URISerializer::class) URI> = DEFAULT_JSONLD_CONTEXTS,
-    @Required override var type: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<String> = DEFAULT_JSONLD_TYPES,
-    val outputDescriptor: Descriptor,
-    val holderKey: String
-) : LdObject {
+class CredentialRequest : LdObject {
+    constructor(
+        id: String? = null,
+        outputDescriptor: Descriptor,
+        holderKey: URI
+    ) : super (id, DEFAULT_JSONLD_CONTEXTS, DEFAULT_JSONLD_TYPES){
+        this.outputDescriptor = outputDescriptor
+        _holderKey = holderKey.toString()
+    }
 
-    companion object : LdObject.Defaults() {
+    val outputDescriptor: Descriptor
+    @SerialName("holderKey") private val _holderKey : String
+    val holderKey
+        get() = URI.create(_holderKey)
+
+    companion object : Defaults() {
         override val DEFAULT_JSONLD_CONTEXTS = listOf(
             URI("https://gematik.de/credential-exchange/v1")
         )
