@@ -19,7 +19,7 @@ import kotlin.test.assertEquals
 
 class JsonLdTests {
 
-    val date = Date(1684152736408)
+    val date = Date(1684152736000)
     val recipientId =
         "did:key:zUC7CgahEtPMHR2JsTnFSbhjFE6bYAm5i2vbFWRUdSUNc45zFAg3rCA6UVoYcDzU5DHAk1HuLV5tgcd6edL8mKLoDRhbz7qzav5yzkDWWgZMh8wTieyjcXtoTSmxNq96nWUgP5V"
 
@@ -210,7 +210,7 @@ class JsonLdTests {
     fun compactCredential() {
         val inputDocument = credential.toJsonDocument()
         val context = Credential(
-            atContext = credential.atContext + credential.proof!!.get(0).atContext,
+            atContext = credential.atContext + credential.proof!!.get(0).atContext!!,
             type = credential.type + credential.proof!!.get(0).type!!
         ).toJsonDocument()
         val compactedCredential = JsonLd.compact(inputDocument, context).options(defaultJsonLdOptions).get()
@@ -494,7 +494,7 @@ class JsonLdTests {
                 RdfDocument.of(normalizedCredential.byteInputStream(Charsets.ISO_8859_1))
             ).get()
         )
-        val expandedDocument = expandedInputDocumentWrongBoolean.fixBooleans()
+        val expandedDocument = expandedInputDocumentWrongBoolean.fixBooleansAndNumbers()
         val frameDocument = emptyVsdCredentialFrame.toJsonDocument()
         val framedJsonObject = JsonLd.frame(expandedDocument, frameDocument).options(defaultJsonLdOptions).get()
         val framedCredential = Json.decodeFromString<Credential>(framedJsonObject.toString())
@@ -503,29 +503,67 @@ class JsonLdTests {
     }
 
     @Test
-    fun testFixBooleans() {
+    fun testFixBooleansAndNumbers() {
         val cred = """
         {
             "@context": {
                 "jsonBoolean": {
                   "@id": "http://example.org/test#jsonBoolean",  
                   "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+                },
+                "jsonNumber": {
+                  "@id": "http://example.org/test#jsonNumber",  
+                  "@type": "http://www.w3.org/2001/XMLSchema#decimal"
+                },
+                "jsonNull": {
+                  "@id": "http://example.org/test#jsonNull",  
+                  "@type": "http://www.w3.org/2001/XMLSchema#string"
                 }
             },
-            "jsonBoolean" : true
+            "jsonBoolean" : true,
+            "jsonNumber": [12345.6E17, 12, -25, -10E-10],
+            "jsonNull": null
         }
         """.trimIndent()
+
+        val context = """
+        {
+            "@context": {
+                "jsonBoolean": {
+                  "@id": "http://example.org/test#jsonBoolean",  
+                  "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+                },
+                "jsonNumber": {
+                  "@id": "http://example.org/test#jsonNumber",  
+                  "@type": "http://www.w3.org/2001/XMLSchema#decimal"
+                },
+                "jsonNull": {
+                  "@id": "http://example.org/test#jsonNull",  
+                  "@type": "http://www.w3.org/2001/XMLSchema#string"
+                }
+            }
+        }
+        """.trimIndent()
+
         val inputDocument = cred.byteInputStream(Charsets.ISO_8859_1).use {
+            JsonDocument.of(it)
+        }
+        val contextDocument = context.byteInputStream(Charsets.ISO_8859_1).use {
             JsonDocument.of(it)
         }
         val rdfDocumentOfInputDocument = RdfDocument.of(JsonLd.toRdf(inputDocument).get())
         val inputDocumentFromRdfDocument = JsonDocument.of(JsonLd.fromRdf(rdfDocumentOfInputDocument).get())
-        val inputDocumentFromRdfFixed = inputDocumentFromRdfDocument.fixBooleans()
+        val inputDocumentFromRdfFixed = inputDocumentFromRdfDocument.fixBooleansAndNumbers()
         assert(inputDocument.jsonContent.get().toString().contains("\"jsonBoolean\":true"))
         println(inputDocument.jsonContent.get())
         assert(inputDocumentFromRdfDocument.jsonContent.get().toString().contains("\"@value\":\"true\""))
         assert(inputDocumentFromRdfFixed.jsonContent.get().toString().contains("\"@value\":true"))
+        assert(inputDocumentFromRdfFixed.jsonContent.get().toString().contains("\"@value\":1.23456E+21"))
+        assert(inputDocumentFromRdfFixed.jsonContent.get().toString().contains("\"@value\":12"))
+        assert(inputDocumentFromRdfFixed.jsonContent.get().toString().contains("\"@value\":-25"))
+        assert(inputDocumentFromRdfFixed.jsonContent.get().toString().contains("\"@value\":-1.0E-9"))
         println(inputDocumentFromRdfFixed.jsonContent.get())
+        println(JsonLd.compact(inputDocumentFromRdfFixed, contextDocument).get())
     }
 
 }

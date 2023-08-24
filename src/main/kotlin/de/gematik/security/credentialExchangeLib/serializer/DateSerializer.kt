@@ -7,21 +7,28 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import java.text.SimpleDateFormat
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
+import java.time.format.DateTimeFormatter
+
+
+
 
 object DateSerializer : KSerializer<Date> {
 
-    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX").apply {
-        timeZone = TimeZone.getTimeZone("UTC")
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ").apply {
+        this.withZone(ZoneId.of("UTC"))
     }
 
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Date", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: Date) {
-        encoder.encodeString(simpleDateFormat.format(value))
+        val zonedDateTime = ZonedDateTime.ofInstant(value.toInstant(),ZoneId.of("UTC"))
+        encoder.encodeString( zonedDateTime.format(DateTimeFormatter.ISO_INSTANT))
     }
 
     override fun deserialize(decoder: Decoder): Date {
-        return simpleDateFormat.parse(decoder.decodeString())
+        return Date.from(ZonedDateTime.parse(decoder.decodeString()).toInstant());
     }
 }

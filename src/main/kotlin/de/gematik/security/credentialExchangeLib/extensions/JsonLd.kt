@@ -44,9 +44,10 @@ inline fun <reified T> JsonDocument.toJsonLdObject(): T {
     return json.decodeFromString<T>(jsonContent.get().toString())
 }
 
-fun JsonDocument.fixBooleans() : JsonDocument {
+fun JsonDocument.fixBooleansAndNumbers() : JsonDocument {
         // quick and dirty workaround fixing the boolean issue of the jsonld library
-        return jsonContent.get().toString().replace(Regex("\"((true|false))\""), "$1").byteInputStream().use { JsonDocument.of ( it ) }
+        return jsonContent.get().toString()
+            .replace(Regex("\"(true|false|[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)\""), "$1").byteInputStream().use { JsonDocument.of ( it ) }
 }
 
 

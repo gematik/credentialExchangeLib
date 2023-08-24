@@ -21,9 +21,9 @@ import kotlin.random.Random
 @Serializable
 class LdProof(
     override val id: String? = null,
-    @Required @SerialName("@context") override val atContext: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<@Serializable(
+    @SerialName("@context") override var atContext: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<@Serializable(
         with = URISerializer::class
-    ) URI> = DEFAULT_JSONLD_CONTEXTS,
+    ) URI>? = null,
     @Required override var type: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<String>? = DEFAULT_JSONLD_TYPES,
     val creator: @Serializable(with = URISerializer::class) URI? = null,
     val created: @Serializable(with = DateSerializer::class) Date,
@@ -143,7 +143,7 @@ class LdProof(
                 ).options(defaultJsonLdOptions).get()
             )
         }
-        val expandedInputDocument = expandedInputDocumentWrongBoolean.fixBooleans()
+        val expandedInputDocument = expandedInputDocumentWrongBoolean.fixBooleansAndNumbers()
         // 1.4. frame
         val framedCredential = json.decodeFromString<Credential>(
             JsonLd.frame(expandedInputDocument, frame.toJsonDocument()).options(defaultJsonLdOptions).get().toString()

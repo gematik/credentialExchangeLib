@@ -52,6 +52,15 @@ class Credential(
         val singleProof = proof?.firstOrNull()
         check(singleProof!=null){"credential doesn't contain a proof for verification"}
         check(proof?.size == 1){"verification of multi signature not supported yet"}
+        singleProof.atContext = if(singleProof.atContext == null){
+            atContext
+        } else {
+            (singleProof.atContext as MutableList<URI>).apply {
+                atContext.forEach {
+                    if(!contains(it)) add(it)
+                }
+            }
+        }
         return singleProof.verify(this)
     }
 
