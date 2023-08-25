@@ -53,7 +53,7 @@ class AcapyInteropTest {
     """.trimIndent()
 
     @Test
-    fun verifyAcapyW3cCredential(){
+    fun verifyAcapyW3cCredentialWithBbsSignature(){
         val credential = json.decodeFromString<Credential>(acapyCredential)
         println(json.encodeToString(credential))
         val isVerified = credential.verify()

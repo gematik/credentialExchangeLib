@@ -55,7 +55,7 @@ class BbsProofTests {
         credentialSubject = JsonObject(
             mapOf(
                 "type" to JsonPrimitive("VaccinationEvent"),
-                "batchNumber" to JsonPrimitive("X1626382736"),
+                "batchNumber" to JsonPrimitive("1626382736"),
                 "dateOfVaccination" to JsonPrimitive("2021-06-23T13:40:12Z"),
                 "administeringCentre" to JsonPrimitive("Praxis Sommergarten"),
                 "healthProfessional" to JsonPrimitive("883110000015376"),

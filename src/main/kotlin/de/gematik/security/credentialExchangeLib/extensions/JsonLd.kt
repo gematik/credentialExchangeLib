@@ -45,10 +45,14 @@ inline fun <reified T> JsonDocument.toJsonLdObject(): T {
 }
 
 fun JsonDocument.fixBooleansAndNumbers() : JsonDocument {
-        //TODO: quick and dirty workaround fixing the boolean/number issue of the titan library
-        // fails if strings contain numbers or boolean values, e.g. "true" or "1223"
+        // quick and dirty workaround fixing the boolean/number issue of the titan library
+        // if you use this workaround make sure that
+        // no types http://www.w3.org/2001/XMLSchema#* are defined for json booleans and numbers
         return jsonContent.get().toString()
-            .replace(Regex("\"(true|false|[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)\""), "$1").byteInputStream().use { JsonDocument.of ( it ) }
+            .replace(
+                Regex("\"(true|false|[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)\",\"@type\":\"http://www.w3.org/2001/XMLSchema#[^\"]*\""),
+                "$1")
+            .byteInputStream().use { JsonDocument.of ( it ) }
 }
 
 

@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test
 import java.net.URI
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.*
 import kotlin.test.assertEquals
 
 class JsonLdTests {
@@ -503,48 +502,30 @@ class JsonLdTests {
 
     @Test
     fun testFixBooleansAndNumbers() {
-        val cred = """
+        val input = """
         {
             "@context": {
-                "jsonBoolean": {
-                  "@id": "http://example.org/test#jsonBoolean",  
-                  "@type": "http://www.w3.org/2001/XMLSchema#boolean"
-                },
-                "jsonNumber": {
-                  "@id": "http://example.org/test#jsonNumber",  
-                  "@type": "http://www.w3.org/2001/XMLSchema#decimal"
-                },
-                "jsonNull": {
-                  "@id": "http://example.org/test#jsonNull",  
-                  "@type": "http://www.w3.org/2001/XMLSchema#string"
-                }
+                "jsonBoolean": "http://example.org/test#jsonBoolean",
+                "jsonNumber": "http://example.org/test#jsonNumber",
+                "jsonString": "http://example.org/test#jsonString"
             },
             "jsonBoolean" : true,
             "jsonNumber": [12345.6E17, 12, -25, -10E-10],
-            "jsonNull": null
+            "jsonString": "123456"
         }
         """.trimIndent()
 
         val context = """
         {
             "@context": {
-                "jsonBoolean": {
-                  "@id": "http://example.org/test#jsonBoolean",  
-                  "@type": "http://www.w3.org/2001/XMLSchema#boolean"
-                },
-                "jsonNumber": {
-                  "@id": "http://example.org/test#jsonNumber",  
-                  "@type": "http://www.w3.org/2001/XMLSchema#decimal"
-                },
-                "jsonNull": {
-                  "@id": "http://example.org/test#jsonNull",  
-                  "@type": "http://www.w3.org/2001/XMLSchema#string"
-                }
+                "jsonBoolean": "http://example.org/test#jsonBoolean",
+                "jsonNumber": "http://example.org/test#jsonNumber",
+                "jsonString": "http://example.org/test#jsonString"
             }
         }
         """.trimIndent()
 
-        val inputDocument = cred.byteInputStream(Charsets.ISO_8859_1).use {
+        val inputDocument = input.byteInputStream(Charsets.ISO_8859_1).use {
             JsonDocument.of(it)
         }
         val contextDocument = context.byteInputStream(Charsets.ISO_8859_1).use {
@@ -552,17 +533,10 @@ class JsonLdTests {
         }
         val rdfDocumentOfInputDocument = RdfDocument.of(JsonLd.toRdf(inputDocument).get())
         val inputDocumentFromRdfDocument = JsonDocument.of(JsonLd.fromRdf(rdfDocumentOfInputDocument).get())
+
         val inputDocumentFromRdfFixed = inputDocumentFromRdfDocument.fixBooleansAndNumbers()
-        assert(inputDocument.jsonContent.get().toString().contains("\"jsonBoolean\":true"))
-        println(inputDocument.jsonContent.get())
-        assert(inputDocumentFromRdfDocument.jsonContent.get().toString().contains("\"@value\":\"true\""))
-        assert(inputDocumentFromRdfFixed.jsonContent.get().toString().contains("\"@value\":true"))
-        assert(inputDocumentFromRdfFixed.jsonContent.get().toString().contains("\"@value\":1.23456E+21"))
-        assert(inputDocumentFromRdfFixed.jsonContent.get().toString().contains("\"@value\":12"))
-        assert(inputDocumentFromRdfFixed.jsonContent.get().toString().contains("\"@value\":-25"))
-        assert(inputDocumentFromRdfFixed.jsonContent.get().toString().contains("\"@value\":-1.0E-9"))
-        println(inputDocumentFromRdfFixed.jsonContent.get())
         println(JsonLd.compact(inputDocumentFromRdfFixed, contextDocument).get())
+        assert(JsonLd.compact(inputDocumentFromRdfFixed, contextDocument).get().toString().contains("\"@id\":\"_:b0\",\"jsonBoolean\":true,\"jsonNumber\":[1.23456E+21,12,-25,-1.0E-9],\"jsonString\":\"123456\""))
     }
 
 }
