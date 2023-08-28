@@ -14,7 +14,6 @@ open class LdObject {
         this.type = type
     }
     var id: String? = null
-        private set
     @SerialName("@context") private var _atContext: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<String>? = null
     var atContext
         get() = _atContext?.map { URI.create(it) }

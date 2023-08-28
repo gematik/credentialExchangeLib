@@ -265,18 +265,9 @@
         "@protected": true,
         "id": "@id",
         "type": "@type",
-        "generalPractionerCare": {
-          "@id": "https://gematik.de/vsd#contractTypeGeneralPractionerCare",
-          "@type": "http://www.w3.org/2001/XMLSchema#boolean"
-        },
-        "structuredTreatmentProgram": {
-          "@id": "https://gematik.de/vsd#contractTypeStructuredTreatmentProgram",
-          "@type": "http://www.w3.org/2001/XMLSchema#boolean"
-        },
-        "integratedCare": {
-          "@id": "https://gematik.de/vsd#contractTypeIntegratedCare",
-          "@type": "http://www.w3.org/2001/XMLSchema#boolean"
-        }
+        "generalPractionerCare": "https://gematik.de/vsd#contractTypeGeneralPractionerCare",
+        "structuredTreatmentProgram": "https://gematik.de/vsd#contractTypeStructuredTreatmentProgram",
+        "integratedCare": "https://gematik.de/vsd#contractTypeIntegratedCare"
       }
     },
     "CoPayment": {
@@ -287,8 +278,7 @@
         "id": "@id",
         "type": "@type",
         "status": {
-          "@id": "https://gematik.de/vsd#coPaymentStatus",
-          "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+          "@id": "https://gematik.de/vsd#coPaymentStatus"
         },
         "validUntil": {
           "@id": "https://gematik.de/vsd#coPaymentValidUntil",

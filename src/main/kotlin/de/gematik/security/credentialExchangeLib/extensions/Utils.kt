@@ -3,7 +3,6 @@ package de.gematik.security.credentialExchangeLib.extensions
 import bbs.signatures.Bbs
 import de.gematik.security.credentialExchangeLib.crypto.ecdsa.EcdsaCryptoCredentials
 import de.gematik.security.credentialExchangeLib.crypto.ecdsa.Ed25519CryptoCredentials
-import de.gematik.security.credentialExchangeLib.crypto.ecdsa.P256CryptoCredentials
 import io.github.novacrypto.base58.Base58
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -61,7 +60,7 @@ fun BigInteger.toByteArray(size: Int): ByteArray {
 }
 
 fun ZonedDateTime.toIsoInstantString(): String {
-    return format(DateTimeFormatter.ISO_INSTANT)
+    return withNano(0).format(DateTimeFormatter.ISO_INSTANT)
 }
 
 fun String.toZonedDateTime(): ZonedDateTime {
@@ -73,5 +72,5 @@ fun getZonedTime(year: Int, month: Int, day: Int, hour: Int, minute: Int ) : Zon
 }
 
 fun getZonedDate(year: Int, month: Int, day: Int) : ZonedDateTime{
-    return ZonedDateTime.of(year, month, day, 0, 0, 0,0,ZoneId.of("UTC"))
+    return ZonedDateTime.of(year, month, day, 12, 0, 0,0,ZoneId.of("UTC"))
 }
