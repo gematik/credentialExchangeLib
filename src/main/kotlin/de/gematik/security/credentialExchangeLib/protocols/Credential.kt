@@ -42,7 +42,7 @@ class Credential : LdObject, Verifiable {
     }
 
     var credentialSubject: JsonLdObject?
-    @SerialName("issuer") private val _issuer: String?
+    @SerialName("issuer") private var _issuer: String? = null
     val issuer
         get() = _issuer?.let{URI.create(it)}
     @SerialName("issuanceDate") private var _issuanceDate: String? = null
