@@ -30,7 +30,7 @@ class SerializerTests {
     val credential = Credential(
         atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
         type = Credential.DEFAULT_JSONLD_TYPES + listOf("VaccinationCertificate"),
-        credentialSubject = JsonObject(
+        credentialSubject = JsonLdObject(
             mapOf(
                 "type" to JsonPrimitive("VaccinationEvent"),
                 "batchNumber" to JsonPrimitive("1626382736"),
@@ -254,7 +254,7 @@ class SerializerTests {
         val serializedCredential = json.encodeToString(credential)
         assertEquals(
             "1626382736",
-            json.decodeFromString<Credential>(serializedCredential).credentialSubject?.get("batchNumber")?.jsonPrimitive?.content
+            json.decodeFromString<Credential>(serializedCredential).credentialSubject?.jsonContent?.jsonObject?.get("batchNumber")?.jsonPrimitive?.content
         )
         println(json.encodeToString(credential))
     }

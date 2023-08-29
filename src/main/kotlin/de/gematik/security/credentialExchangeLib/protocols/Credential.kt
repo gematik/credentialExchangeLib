@@ -22,27 +22,44 @@ class Credential : LdObject, Verifiable {
         id: String? = null,
         atContext: List<URI> = DEFAULT_JSONLD_CONTEXTS,
         type: List<String> = DEFAULT_JSONLD_TYPES,
-        credentialSubject: JsonObject? = null,
+        credentialSubject: JsonLdObject? = null,
         issuer: URI? = null,
         issuanceDate: ZonedDateTime? = null,
+        expirationDate: ZonedDateTime? = null,
+        credentialStatus: JsonLdObject? = null,
+        evidence: List<JsonLdObject>? = null,
+        termsOfUse: List<JsonLdObject>? = null,
         proof: List<LdProof>? = null
     ) : super(id, atContext, type) {
         this.credentialSubject = credentialSubject
         _issuer = issuer?.toString()
         _issuanceDate = issuanceDate?.toIsoInstantString()
+        _expirationDate = expirationDate?.toIsoInstantString()
+        this.credentialStatus = credentialStatus
+        this.evidence = evidence
+        this.termsOfUse = termsOfUse
         this.proof = proof
     }
 
-    var credentialSubject: JsonObject?
+    var credentialSubject: JsonLdObject?
     @SerialName("issuer") private val _issuer: String?
     val issuer
         get() = _issuer?.let{URI.create(it)}
-    @SerialName("issuanceDate") private val _issuanceDate: String?
+    @SerialName("issuanceDate") private var _issuanceDate: String? = null
     val issuanceDate
         get() = _issuanceDate?.toZonedDateTime()
+    @SerialName("expirationDate") private var _expirationDate: String? = null
+    val expirationDate
+        get() = _expirationDate?.toZonedDateTime()
+    var credentialStatus: JsonLdObject? = null
+        private set
+    var evidence: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<JsonLdObject>? = null
+        private set
+    var termsOfUse: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<JsonLdObject>? = null
+        private set
     override var proof: @Serializable(with = UnwrappingSingleValueJsonArrays::class) List<LdProof>? = null
 
-    companion object : LdObject.Defaults() {
+    companion object : Defaults() {
         override val DEFAULT_JSONLD_CONTEXTS = listOf(
             URI("https://www.w3.org/2018/credentials/v1")
         )

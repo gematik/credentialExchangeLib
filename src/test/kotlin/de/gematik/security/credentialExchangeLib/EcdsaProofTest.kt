@@ -7,6 +7,7 @@ import de.gematik.security.credentialExchangeLib.crypto.ecdsa.P256K1CryptoCreden
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.hexToByteArray
 import de.gematik.security.credentialExchangeLib.protocols.Credential
+import de.gematik.security.credentialExchangeLib.protocols.JsonLdObject
 import de.gematik.security.credentialExchangeLib.protocols.LdProof
 import de.gematik.security.credentialExchangeLib.protocols.ProofPurpose
 import kotlinx.serialization.encodeToString
@@ -55,7 +56,7 @@ class EcdsaProofTest {
     val credential = Credential(
         atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
         type = Credential.DEFAULT_JSONLD_TYPES + listOf("VaccinationCertificate"),
-        credentialSubject = JsonObject(
+        credentialSubject = JsonLdObject(
             mapOf(
                 "type" to JsonPrimitive("VaccinationEvent"),
                 "batchNumber" to JsonPrimitive("1626382736"),

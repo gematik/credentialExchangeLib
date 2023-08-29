@@ -23,7 +23,7 @@ import kotlin.test.assertEquals
 class ProtocolTests {
 
     @Serializable
-    data class CredentialSubject(
+    data class VaccinationEvent(
         var id: String? = null,
         var type: String? = null,
         var batchNumber: String? = null,
@@ -95,7 +95,7 @@ class ProtocolTests {
     val credential = Credential(
         atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
         type = Credential.DEFAULT_JSONLD_TYPES + listOf("VaccinationCertificate"),
-        credentialSubject = JsonObject(
+        credentialSubject = JsonLdObject(
             mapOf(
                 "type" to JsonPrimitive("VaccinationEvent"),
                 "batchNumber" to JsonPrimitive("1626382736"),
@@ -210,12 +210,12 @@ class ProtocolTests {
             val credentialRequest = it.receive()
             assert(credentialRequest is CredentialRequest)
 
-            val credentialSubject = json.decodeFromJsonElement<CredentialSubject>(credential.credentialSubject!!)
-            credentialSubject.recipient =
-                credentialSubject.recipient?.apply { id = (credentialRequest as CredentialRequest).holderKey.toString() }
+            val vaccinationEvent = json.decodeFromJsonElement<VaccinationEvent>((credential.credentialSubject as JsonLdObject).jsonContent)
+            vaccinationEvent.recipient =
+                vaccinationEvent.recipient?.apply { id = (credentialRequest as CredentialRequest).holderKey.toString() }
             val updatedCredential = credential.deepCopy().apply {
                 this.credentialSubject =
-                    json.encodeToJsonElement(CredentialSubject.serializer(), credentialSubject).jsonObject
+                    JsonLdObject(json.encodeToJsonElement(VaccinationEvent.serializer(), vaccinationEvent).jsonObject.toMap())
             }
 
             it.submitCredential(

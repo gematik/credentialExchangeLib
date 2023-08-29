@@ -17,7 +17,7 @@ import kotlin.test.assertEquals
 
 class JsonLdTests {
 
-    val date = ZonedDateTime.of(2023,5,15,12,12,16,0, ZoneId.of("UTC"))
+    val date = ZonedDateTime.of(2023, 5, 15, 12, 12, 16, 0, ZoneId.of("UTC"))
     val recipientId =
         "did:key:zUC7CgahEtPMHR2JsTnFSbhjFE6bYAm5i2vbFWRUdSUNc45zFAg3rCA6UVoYcDzU5DHAk1HuLV5tgcd6edL8mKLoDRhbz7qzav5yzkDWWgZMh8wTieyjcXtoTSmxNq96nWUgP5V"
 
@@ -27,7 +27,7 @@ class JsonLdTests {
     val credential = Credential(
         atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
         type = Credential.DEFAULT_JSONLD_TYPES + listOf("VaccinationCertificate"),
-        credentialSubject = JsonObject(
+        credentialSubject = JsonLdObject(
             mapOf(
                 "type" to JsonPrimitive("VaccinationEvent"),
                 "batchNumber" to JsonPrimitive("1626382736"),
@@ -133,8 +133,8 @@ class JsonLdTests {
         val clone = credential.deepCopy()
         assert(clone != credential) // different objects
         assertEquals( // but same content
-            clone.credentialSubject!!.get("recipient")!!.jsonObject.get("gender")!!.jsonPrimitive.content,
-            credential.credentialSubject!!.get("recipient")!!.jsonObject.get("gender")!!.jsonPrimitive.content
+            (clone.credentialSubject as JsonLdObject).jsonContent.get("recipient")!!.jsonObject.get("gender")!!.jsonPrimitive.content,
+            (credential.credentialSubject as JsonLdObject).jsonContent.get("recipient")!!.jsonObject.get("gender")!!.jsonPrimitive.content
         )
     }
 
@@ -372,66 +372,64 @@ class JsonLdTests {
     val vsdCredential = Credential(
         atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://gematik.de/vsd/v1")),
         type = Credential.DEFAULT_JSONLD_TYPES + listOf("InsuranceCertificate"),
-        credentialSubject = json.encodeToJsonElement(
-            Insurance(
-                insurant = Insurant(
-                    insurantId = "X110403565",
-                    familyName = "Schühmann",
-                    nameExtension = "Gräfin",
-                    givenName = "Adele Maude Veronika Mimi M.",
-                    birthDate = getZonedDate(1953, 10, 1).toIsoInstantString() ,
-                    gender = Gender.Female,
-                    streetAddress = StreetAddress(
-                        postalCode = 10176,
-                        location = "Berlin",
-                        street = "Dorfstrasse",
-                        streetNumber = "1",
-                        country = "GER"
-                    ),
-                    postBoxAddress = PostBoxAddress(
-                        postalCode = 10176,
-                        location = "Berlin",
-                        postBoxNumber = "123456",
-                        country = "GER"
+        credentialSubject = Insurance(
+            insurant = Insurant(
+                insurantId = "X110403565",
+                familyName = "Schühmann",
+                nameExtension = "Gräfin",
+                givenName = "Adele Maude Veronika Mimi M.",
+                birthDate = getZonedDate(1953, 10, 1).toIsoInstantString(),
+                gender = Gender.Female,
+                streetAddress = StreetAddress(
+                    postalCode = 10176,
+                    location = "Berlin",
+                    street = "Dorfstrasse",
+                    streetNumber = "1",
+                    country = "GER"
+                ),
+                postBoxAddress = PostBoxAddress(
+                    postalCode = 10176,
+                    location = "Berlin",
+                    postBoxNumber = "123456",
+                    country = "GER"
+                )
+            ),
+            coverage = Coverage(
+                start = getZonedDate(1993, 10, 7).toIsoInstantString(),
+                costCenter = CostCenter(
+                    identification = 109500969,
+                    countryCode = "GER",
+                    name = "Test GKV-SV"
+                ),
+                dmpMark = DmpMark.CHD_CoronaryHeartDisease,
+                insuranceType = InsuranceType.Member,
+                residencyPrinciple = ResidencyPrinciple.Berlin,
+                coPayment = CoPayment(
+                    status = true,
+                    validUntil = date.toIsoInstantString()
+                ),
+                reimbursement = Reimbursement(
+                    medicalCare = true,
+                    dentalCare = true,
+                    inpatientSector = true,
+                    initiatedServices = false
+                ),
+                selectiveContracts = SelectiveContracts(
+                    medical = SelectiveContractStatus.available,
+                    dental = SelectiveContractStatus.notUsed,
+                    contractType = ContractType(
+                        generalPractionerCare = true,
+                        structuredTreatmentProgram = false,
+                        integratedCare = false
                     )
                 ),
-                coverage = Coverage(
-                    start = getZonedDate(1993, 10, 7).toIsoInstantString(),
-                    costCenter = CostCenter(
-                        identification = 109500969,
-                        countryCode = "GER",
-                        name = "Test GKV-SV"
-                    ),
-                    dmpMark = DmpMark.CHD_CoronaryHeartDisease,
-                    insuranceType = InsuranceType.Member,
-                    residencyPrinciple = ResidencyPrinciple.Berlin,
-                    coPayment = CoPayment(
-                        status = true,
-                        validUntil = date.toIsoInstantString()
-                    ),
-                    reimbursement = Reimbursement(
-                        medicalCare = true,
-                        dentalCare = true,
-                        inpatientSector = true,
-                        initiatedServices = false
-                    ),
-                    selectiveContracts = SelectiveContracts(
-                        medical = SelectiveContractStatus.available,
-                        dental = SelectiveContractStatus.notUsed,
-                        contractType = ContractType(
-                            generalPractionerCare = true,
-                            structuredTreatmentProgram = false,
-                            integratedCare = false
-                        )
-                    ),
-                    dormantBenefitsEntitlement = DormantBenefitsEntitlement(
-                        start = getZonedDate(2023, 1, 1).toIsoInstantString(),
-                        end = getZonedDate(2025, 12, 31).toIsoInstantString(),
-                        dormancyType = DormancyType.complete
-                    )
+                dormantBenefitsEntitlement = DormantBenefitsEntitlement(
+                    start = getZonedDate(2023, 1, 1).toIsoInstantString(),
+                    end = getZonedDate(2025, 12, 31).toIsoInstantString(),
+                    dormancyType = DormancyType.complete
                 )
             )
-        ).jsonObject,
+        ).toJsonLdObject(),
         issuanceDate = date,
         issuer = URI.create(issuer)
     )
@@ -536,7 +534,10 @@ class JsonLdTests {
 
         val inputDocumentFromRdfFixed = inputDocumentFromRdfDocument.fixBooleansAndNumbers()
         println(JsonLd.compact(inputDocumentFromRdfFixed, contextDocument).get())
-        assert(JsonLd.compact(inputDocumentFromRdfFixed, contextDocument).get().toString().contains("\"@id\":\"_:b0\",\"jsonBoolean\":true,\"jsonNumber\":[1.23456E+21,12,-25,-1.0E-9],\"jsonString\":\"123456\""))
+        assert(
+            JsonLd.compact(inputDocumentFromRdfFixed, contextDocument).get().toString()
+                .contains("\"@id\":\"_:b0\",\"jsonBoolean\":true,\"jsonNumber\":[1.23456E+21,12,-25,-1.0E-9],\"jsonString\":\"123456\"")
+        )
     }
 
 }

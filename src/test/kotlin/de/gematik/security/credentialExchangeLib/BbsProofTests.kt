@@ -31,7 +31,7 @@ class BbsProofTests {
         )
     )
 
-    val date = ZonedDateTime.of(2023,8,24,13,6,21,408000000, ZoneId.of("UTC"))
+    val date = ZonedDateTime.of(2023, 8, 24, 13, 6, 21, 408000000, ZoneId.of("UTC"))
     val presentationDefinitionId = UUID.fromString("250787ea-f892-11ed-b67e-0242ac120002")
     val inputDescriptorId = "3aa55a6e-f892-11ed-b67e-0242ac120002"
 
@@ -52,7 +52,7 @@ class BbsProofTests {
     val credential = Credential(
         atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
         type = Credential.DEFAULT_JSONLD_TYPES + listOf("VaccinationCertificate"),
-        credentialSubject = JsonObject(
+        credentialSubject = JsonLdObject(
             mapOf(
                 "type" to JsonPrimitive("VaccinationEvent"),
                 "batchNumber" to JsonPrimitive("1626382736"),
@@ -103,7 +103,7 @@ class BbsProofTests {
             "VerifiableCredential",
             "VaccinationCertificate"
         ),
-        credentialSubject = JsonObject(
+        credentialSubject = JsonLdObject(
             mapOf(
                 "@explicit" to JsonPrimitive(true),
                 "type" to JsonArray(
@@ -138,7 +138,8 @@ class BbsProofTests {
         println(cryptoCredentials.verKey)
         assertEquals(
             cryptoCredentials.verificationMethod.toString(),
-            cryptoCredentials.didKey.toString()+"#"+cryptoCredentials.didKey.toString().drop(8))
+            cryptoCredentials.didKey.toString() + "#" + cryptoCredentials.didKey.toString().drop(8)
+        )
         println(cryptoCredentials.verificationMethod)
     }
 
@@ -167,35 +168,33 @@ class BbsProofTests {
         val vsdCredential = Credential(
             atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://gematik.de/vsd/v1")),
             type = Credential.DEFAULT_JSONLD_TYPES + listOf("InsuranceCertificate"),
-            credentialSubject = json.encodeToJsonElement(
-                Insurance(
-                    insurant = Insurant(
-                        insurantId = "X110403565",
-                        familyName = "Schühmann",
-                        nameExtension = "Gräfin",
-                        givenName = "Adele Maude Veronika Mimi M.",
-                        birthDate = getZonedDate(1953, 10, 1).toIsoInstantString(),
-                        gender = Gender.Female,
-                        streetAddress = StreetAddress(
-                            postalCode = 10176,
-                            location = "Berlin",
-                            street = "Dorfstrasse",
-                            streetNumber = "1",
-                            country = "GER"
-                        )
-                    ),
-                    coverage = Coverage(
-                        start = getZonedDate(1993, 10, 7).toIsoInstantString(),
-                        costCenter = CostCenter(
-                            identification = 109500969,
-                            countryCode = "GER",
-                            name = "Test GKV-SV"
-                        ),
-                        insuranceType = InsuranceType.Member,
-                        residencyPrinciple = ResidencyPrinciple.Berlin
+            credentialSubject = Insurance(
+                insurant = Insurant(
+                    insurantId = "X110403565",
+                    familyName = "Schühmann",
+                    nameExtension = "Gräfin",
+                    givenName = "Adele Maude Veronika Mimi M.",
+                    birthDate = getZonedDate(1953, 10, 1).toIsoInstantString(),
+                    gender = Gender.Female,
+                    streetAddress = StreetAddress(
+                        postalCode = 10176,
+                        location = "Berlin",
+                        street = "Dorfstrasse",
+                        streetNumber = "1",
+                        country = "GER"
                     )
+                ),
+                coverage = Coverage(
+                    start = getZonedDate(1993, 10, 7).toIsoInstantString(),
+                    costCenter = CostCenter(
+                        identification = 109500969,
+                        countryCode = "GER",
+                        name = "Test GKV-SV"
+                    ),
+                    insuranceType = InsuranceType.Member,
+                    residencyPrinciple = ResidencyPrinciple.Berlin
                 )
-            ).jsonObject,
+            ).toJsonLdObject(),
             issuanceDate = date,
             issuer = credentialIssuer.didKey
         )

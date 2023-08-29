@@ -13,7 +13,7 @@ object JsonLdObjectSerializer : KSerializer<JsonLdObject> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("JsonLdObject", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: JsonLdObject) {
-        encoder.encodeSerializableValue( JsonObject.serializer(), JsonObject(value))
+        encoder.encodeSerializableValue( JsonObject.serializer(), value.jsonContent)
     }
 
     override fun deserialize(decoder: Decoder): JsonLdObject {

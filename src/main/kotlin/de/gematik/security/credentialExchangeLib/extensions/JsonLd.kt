@@ -6,11 +6,13 @@ import com.apicatalog.rdf.RdfDataset
 import com.apicatalog.rdf.io.nquad.NQuadsWriter
 import de.gematik.security.credentialExchangeLib.defaultJsonLdOptions
 import de.gematik.security.credentialExchangeLib.json
+import de.gematik.security.credentialExchangeLib.protocols.JsonLdObject
 import de.gematik.security.credentialExchangeLib.protocols.LdObject
 import io.setl.rdf.normalization.RdfNormalize
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
 import java.io.StringWriter
 
 inline fun <reified T : LdObject> T.deepCopy(): T {
@@ -42,6 +44,10 @@ inline fun <reified T : LdObject> T.normalize(): String {
 
 inline fun <reified T> JsonDocument.toJsonLdObject(): T {
     return json.decodeFromString<T>(jsonContent.get().toString())
+}
+
+inline fun <reified T : LdObject> T.toJsonLdObject(): JsonLdObject {
+    return JsonLdObject(json.encodeToJsonElement<T>(this).jsonObject.toMap())
 }
 
 fun JsonDocument.fixBooleansAndNumbers() : JsonDocument {

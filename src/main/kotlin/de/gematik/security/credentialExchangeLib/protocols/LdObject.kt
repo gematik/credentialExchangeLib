@@ -1,9 +1,13 @@
 package de.gematik.security.credentialExchangeLib.protocols
 
+import de.gematik.security.credentialExchangeLib.json
+import de.gematik.security.credentialExchangeLib.serializer.JsonLdObjectSerializer
 import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.encodeToJsonElement
 import java.net.URI
 
 @Serializable
