@@ -50,6 +50,10 @@ inline fun <reified T : LdObject> T.toJsonLdObject(): JsonLdObject {
     return JsonLdObject(json.encodeToJsonElement<T>(this).jsonObject.toMap())
 }
 
+inline fun <reified T : LdObject> JsonLdObject.toObject(): T {
+    return json.decodeFromJsonElement<T>(jsonContent)
+}
+
 fun JsonDocument.fixBooleansAndNumbers() : JsonDocument {
         // quick and dirty workaround fixing the boolean/number issue of the titan library
         // if you use this workaround make sure that
