@@ -11,6 +11,7 @@ import org.junit.platform.suite.api.Suite
     SerializerTests::class,
     ConnectionTests::class,
     ProtocolTests::class,
-    AcapyInteropTest::class
+    AcapyInteropTest::class,
+    DilithiumProofTest::class
 )
 class TestSuite

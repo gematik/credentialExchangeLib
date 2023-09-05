@@ -8,10 +8,6 @@ import de.gematik.security.credentialExchangeLib.crypto.*
 import de.gematik.security.credentialExchangeLib.defaultJsonLdOptions
 import de.gematik.security.credentialExchangeLib.extensions.*
 import de.gematik.security.credentialExchangeLib.json
-import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
-import de.gematik.security.credentialExchangeLib.serializer.URISerializer
-import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
-import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.net.URI
@@ -46,7 +42,7 @@ class LdProof : LdObject {
 
     @SerialName("creator") private var _creator: String?
     val creator
-        get() = URI.create(_creator)
+        get() = _creator?.let { URI.create(it)}
     @SerialName("created") private val _created: String
     val domain: String?
     val challenge: String?
@@ -57,7 +53,7 @@ class LdProof : LdObject {
         get() = URI.create(_verificationMethod)
     var proofValue: String?
 
-    companion object : LdObject.Defaults() {
+    companion object : Defaults() {
         override val DEFAULT_JSONLD_CONTEXTS = listOf(
             URI("https://w3id.org/security/bbs/v1")
         )
@@ -67,7 +63,7 @@ class LdProof : LdObject {
     inline fun <reified T> sign(jsonLdObject: T, privateKey: ByteArray) where T : LdObject, T : Verifiable {
         check(proofValue == null) { "proof already contains proof value" }
         check(jsonLdObject.proof == null) { "jsonLdObject already signed" }
-        val signer = type?.firstOrNull()?.let {
+        val signer = type.firstOrNull()?.let {
             runCatching {
                 CryptoRegistry.getSigner(
                     ProofType.valueOf(it),
@@ -80,7 +76,7 @@ class LdProof : LdObject {
         }
         check(
             signer != null
-        ) { "no signer registered for proof type: ${type?.firstOrNull()}" }
+        ) { "no signer registered for proof type: ${type.firstOrNull()}" }
         val statements = listOf(
             normalize().trim().split('\n'),
             jsonLdObject.normalize<T>().trim().split('\n')
@@ -91,7 +87,7 @@ class LdProof : LdObject {
     inline suspend fun <reified T> asyncSign(jsonLdObject: T, privateKey: ByteArray, context: Any) where T : LdObject, T : Verifiable {
         check(proofValue == null) { "proof already contains proof value" }
         check(jsonLdObject.proof == null) { "jsonLdObject already signed" }
-        val signer = type?.firstOrNull()?.let {
+        val signer = type.firstOrNull()?.let {
             runCatching {
                 CryptoRegistry.getSigner(
                     ProofType.valueOf(it),
@@ -104,7 +100,7 @@ class LdProof : LdObject {
         } as? AsyncSigner
         check(
             signer != null
-        ) { "no async signer registered for proof type: ${type?.firstOrNull()}" }
+        ) { "no async signer registered for proof type: ${type.firstOrNull()}" }
         val statements = listOf(
             normalize().trim().split('\n'),
             jsonLdObject.normalize<T>().trim().split('\n')
@@ -115,7 +111,7 @@ class LdProof : LdObject {
     inline fun <reified T> verify(
         jsonLdObject: T
     ): Boolean where T : LdObject, T : Verifiable {
-        val singleType = type?.firstOrNull() ?: return false
+        val singleType = type.firstOrNull() ?: return false
         val verifier =
             runCatching {
                 CryptoRegistry.getVerifier(
@@ -139,7 +135,7 @@ class LdProof : LdObject {
     fun deriveProof(credential: Credential, frame: Credential): Credential {
 
         // 0. check if signature is suitable for deriving proof
-        val signer = type?.firstOrNull()?.let {
+        val signer = type.firstOrNull()?.let {
             runCatching {
                 CryptoRegistry.getSigner(
                     ProofType.valueOf(it),

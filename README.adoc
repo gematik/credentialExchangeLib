@@ -24,9 +24,10 @@ skinparam component {
 [JsonLd-Signatures] <<implemented>> as JsonLdSignatures
 [jsonld titanium] <<implemented>> as JsonLd
 [bbs-signatures (java wrapper)] <<implemented>> as BbsSignature
-[ECDSA (secp256r1)] <<implemented>> as secp256r1
-[ECDSA (secp256k1)] <<implemented>> as secp256k1
-[EdDSA (ed25519)]  <<implemented>> as ed25519
+[   ECDSA\n(secp256r1)] <<implemented>> as secp256r1
+[   ECDSA\n(secp256k1)] <<implemented>> as secp256k1
+[   EdDSA\n(ed25519)]  <<implemented>> as ed25519
+[           Dilithium\n(2(aes), 3(aes) 5(aes))]  <<implemented>> as dilithium
 [HW AndroidKeystore] <<implemented>> as AndroidKeystore
 [CL-Signatures] as ClSignatures
 [bbs_plus (rust)] <<implemented>> as BbsPlus
@@ -51,12 +52,14 @@ JsonLdSignatures -down- RdfUrdna
 JsonLdSignatures -down- secp256r1
 JsonLdSignatures -down- secp256k1
 JsonLdSignatures -down- ed25519
+JsonLdSignatures -down- dilithium
 JsonLdSignatures -down- ClSignatures
 BbsSignature -down- BbsPlus
 secp256r1 -down- AndroidKeystore
 secp256r1 -down- Bouncy
 secp256k1 -down- Bouncy
 ed25519 -down- Bouncy
+dilithium -down- Bouncy
 BbsSignature -left[hidden]- RdfUrdna
 secp256r1 -left[hidden]- BbsSignature
 secp256k1 -left[hidden]- secp256r1

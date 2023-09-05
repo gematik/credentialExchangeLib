@@ -14,7 +14,8 @@ object HttpLoaderWithCache : HttpLoader(DefaultHttpClient.defaultInstance()) {
         "https://w3id.org/security/bbs/v1" to getContext("/context/security_bbs_v1.jsonld"),
         "https://identity.foundation/presentation-exchange/submission/v1/" to getContext("/context/submission_v1.jsonld"),
         "https://gematik.de/credential-exchange/v1/" to getContext("/context/credentialexchange_v1.jsonld"),
-        "https://w3id.org/security/data-integrity/v1" to getContext("/context/security_dataintegrity_v1.jsonld")
+        "https://w3id.org/security/data-integrity/v1" to getContext("/context/security_dataintegrity_v1.jsonld"),
+        "https://w3id.org/security/dilithium/v1" to getContext("/context/security_dilithium_v1.jsonld")
     )
 
     override fun loadDocument(uri: URI?, options: DocumentLoaderOptions?): Document {

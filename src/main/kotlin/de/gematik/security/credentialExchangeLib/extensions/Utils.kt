@@ -1,6 +1,9 @@
 package de.gematik.security.credentialExchangeLib.extensions
 
 import bbs.signatures.Bbs
+import de.gematik.security.credentialExchangeLib.crypto.dilithium.Dilithium2CryptoCredentials
+import de.gematik.security.credentialExchangeLib.crypto.dilithium.Dilithium3CryptoCredentials
+import de.gematik.security.credentialExchangeLib.crypto.dilithium.Dilithium5CryptoCredentials
 import de.gematik.security.credentialExchangeLib.crypto.ecdsa.EcdsaCryptoCredentials
 import de.gematik.security.credentialExchangeLib.crypto.ecdsa.Ed25519CryptoCredentials
 import io.github.novacrypto.base58.Base58
@@ -34,6 +37,9 @@ fun URI.toPublicKey(): ByteArray {
         "zDn" -> if(byteArray.size == EcdsaCryptoCredentials.publicKeySize) byteArray else throw IllegalArgumentException("zDn : wrong key size")
         "z6M" -> if(byteArray.size == Ed25519CryptoCredentials.publicKeySize) byteArray else throw IllegalArgumentException("z6M : wrong key size")
         "zQ3" -> if(byteArray.size == EcdsaCryptoCredentials.publicKeySize) byteArray else throw IllegalArgumentException("zQ3 : wrong key size")
+        "z4d" -> if(byteArray.size == Dilithium2CryptoCredentials.publicKeySize) byteArray else throw IllegalArgumentException("zX9 : wrong key size")
+        "z4z" -> if(byteArray.size == Dilithium3CryptoCredentials.publicKeySize) byteArray else throw IllegalArgumentException("z4z : wrong key size")
+        "z5P" -> if(byteArray.size == Dilithium5CryptoCredentials.publicKeySize) byteArray else throw IllegalArgumentException("z5P : wrong key size")
         else -> throw IllegalArgumentException("unsupported multiformat prefix: ${schemeSpecificPart.substring(4,7)}")
     }
 }
