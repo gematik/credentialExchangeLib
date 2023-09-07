@@ -194,7 +194,7 @@ class LdProof : LdObject {
         // 4. complete new proof, add to new credential and return
         return framedCredential.apply {
             proof = listOf(newLdProof.apply {
-                type = listOf(ProofType.BbsBlsSignatureProof2020.name)
+                type = listOf(signer.derivedProofType.name)
                 proofValue = Base64.getEncoder().encodeToString(signature)
                 this.nonce = Base64.getEncoder().encodeToString(nonce)
             })
@@ -222,7 +222,7 @@ class LdProof : LdObject {
             //1.2 remove nonce
             nonce = null
             //1.3 set original proof type
-            type = listOf(ProofType.BbsBlsSignature2020.name)
+            type = listOf(verifier.originalProofType.name)
         }
         // 2. prepare credential
         val credentialWithoutProof = credential.deepCopy().apply { proof = null }

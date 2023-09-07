@@ -1,6 +1,7 @@
 package de.gematik.security.credentialExchangeLib.crypto.bbs
 
 import bbs.signatures.Bbs
+import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.crypto.ProofVerifier
 import de.gematik.security.credentialExchangeLib.crypto.Verifier
 import java.security.GeneralSecurityException
@@ -23,4 +24,6 @@ class BbsPlusVerifier(override val publicKey : ByteArray) : Verifier, ProofVerif
             Bbs.blsVerifyProof(publicKey, proof, nonce, content.toTypedArray());
         }.onFailure{throw GeneralSecurityException(it.message) }.getOrThrow()
     }
+
+    override val originalProofType = ProofType.BbsBlsSignature2020
 }

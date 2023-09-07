@@ -2,6 +2,8 @@ package de.gematik.security.credentialExchangeLib.crypto
 
 import de.gematik.security.credentialExchangeLib.crypto.bbs.BbsPlusSigner
 import de.gematik.security.credentialExchangeLib.crypto.bbs.BbsPlusVerifier
+import de.gematik.security.credentialExchangeLib.crypto.dilithium.Dilithium2SdSigner
+import de.gematik.security.credentialExchangeLib.crypto.dilithium.Dilithium2SdVerifier
 import de.gematik.security.credentialExchangeLib.crypto.dilithium.Dilithium2Signer
 import de.gematik.security.credentialExchangeLib.crypto.dilithium.Dilithium2Verifier
 import de.gematik.security.credentialExchangeLib.crypto.ecdsa.*
@@ -13,7 +15,8 @@ object CryptoRegistry {
         ProofType.EcdsaSecp256r1Signature2019 to { P256Signer(it) },
         ProofType.EcdsaSecp256k1Signature2019 to { P256K1Signer(it) },
         ProofType.Ed25519Signature2018 to { Ed25519Signer(it) },
-        ProofType.Dilithium2Signature2023 to { Dilithium2Signer(it) }
+        ProofType.Dilithium2Signature2023 to { Dilithium2Signer(it) },
+        ProofType.Dilithium2SdSignature2023 to { Dilithium2SdSigner(it) }
     )
     private val verifiers = mutableMapOf<ProofType, (ByteArray) -> Verifier>(
         ProofType.BbsBlsSignature2020 to { BbsPlusVerifier(it) },
@@ -21,7 +24,9 @@ object CryptoRegistry {
         ProofType.EcdsaSecp256r1Signature2019 to { P256Verifier(it) },
         ProofType.EcdsaSecp256k1Signature2019 to { P256K1Verifier(it) },
         ProofType.Ed25519Signature2018 to { Ed25519Verifier(it) },
-        ProofType.Dilithium2Signature2023 to { Dilithium2Verifier(it) }
+        ProofType.Dilithium2Signature2023 to { Dilithium2Verifier(it) },
+        ProofType.Dilithium2SdSignature2023 to { Dilithium2SdVerifier(it) },
+        ProofType.Dilithium2SdSignatureProof2023 to { Dilithium2SdVerifier(it) }
     )
 
     fun registerSigner(type: ProofType, initializer: (KeyPair) -> Signer) {

@@ -1,48 +1,45 @@
 {
   "@context": {
     "@version": 1.1,
+    "@protected": true,
     "id": "@id",
     "type": "@type",
-    "Dilithium2Signature2023": {
-      "@id": "https://w3id.org/security#Dilithium2Signature2023",
+    "sec": "https://w3id.org/security#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "Dilithium2Signature2023": "sec:Dilithium2Signature2023",
+    "Dilithium2SdSignature2023": "sec:Dilithium2SdSignature2023",
+    "Dilithium2SdSignatureProof2023": "sec:Dilithium2SdSignatureProof2023",
+    "challenge": "sec:challenge",
+    "created": {
+      "@id": "http://purl.org/dc/terms/created",
+      "@type": "xsd:dateTime"
+    },
+    "domain": "sec:domain",
+    "proofValue": "sec:proofValue",
+    "nonce": "sec:nonce",
+    "proofPurpose": {
+      "@id": "sec:proofPurpose",
+      "@type": "@vocab",
       "@context": {
         "@version": 1.1,
         "@protected": true,
         "id": "@id",
         "type": "@type",
-        "challenge": "https://w3id.org/security#challenge",
-        "created": {
-          "@id": "http://purl.org/dc/terms/created",
-          "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+        "assertionMethod": {
+          "@id": "sec:assertionMethod",
+          "@type": "@id",
+          "@container": "@set"
         },
-        "domain": "https://w3id.org/security#domain",
-        "proofValue": "https://w3id.org/security#proofValue",
-        "nonce": "https://w3id.org/security#nonce",
-        "proofPurpose": {
-          "@id": "https://w3id.org/security#proofPurpose",
-          "@type": "@vocab",
-          "@context": {
-            "@version": 1.1,
-            "@protected": true,
-            "id": "@id",
-            "type": "@type",
-            "assertionMethod": {
-              "@id": "https://w3id.org/security#assertionMethod",
-              "@type": "@id",
-              "@container": "@set"
-            },
-            "authentication": {
-              "@id": "https://w3id.org/security#authenticationMethod",
-              "@type": "@id",
-              "@container": "@set"
-            }
-          }
-        },
-        "verificationMethod": {
-          "@id": "https://w3id.org/security#verificationMethod",
-          "@type": "@id"
+        "authentication": {
+          "@id": "sec:authenticationMethod",
+          "@type": "@id",
+          "@container": "@set"
         }
       }
+    },
+    "verificationMethod": {
+      "@id": "sec:verificationMethod",
+      "@type": "@id"
     }
   }
 }

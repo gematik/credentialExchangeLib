@@ -8,6 +8,7 @@ import de.gematik.security.credentialExchangeLib.protocols.JsonLdObject
 import de.gematik.security.credentialExchangeLib.protocols.LdProof
 import de.gematik.security.credentialExchangeLib.protocols.ProofPurpose
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import org.junit.jupiter.api.Test
@@ -24,14 +25,6 @@ class DilithiumProofTest {
 
     val date = ZonedDateTime.of(2023,8,24,13,6,21,408000, ZoneId.of("UTC"))
 
-    val ldProof = LdProof(
-        atContext = listOf(URI("https://w3id.org/security/dilithium/v1")),
-        type = listOf(ProofType.Dilithium2Signature2023.name),
-        created = date,
-        proofPurpose = ProofPurpose.ASSERTION_METHOD,
-        verificationMethod = dilithium2CryptoCredentials.verificationMethod
-    )
-
     val credential = Credential(
         atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
         type = Credential.DEFAULT_JSONLD_TYPES + listOf("VaccinationCertificate"),
@@ -47,6 +40,7 @@ class DilithiumProofTest {
                 "order" to JsonPrimitive("3/3"),
                 "recipient" to JsonObject(
                     mapOf(
+                        "id" to JsonPrimitive("did:key:base58-coded-public-key-of-recepient"),
                         "type" to JsonPrimitive("VaccineRecipient"),
                         "givenName" to JsonPrimitive("Marion"),
                         "familyName" to JsonPrimitive("Mustermann"),
@@ -88,11 +82,92 @@ class DilithiumProofTest {
     }
 
     @Test
-    fun signVerifyCredential(){
+    fun signVerifyCredentialDilithium2(){
+        val ldProof = LdProof(
+            atContext = listOf(URI("https://w3id.org/security/dilithium/v1")),
+            type = listOf(ProofType.Dilithium2Signature2023.name),
+            created = date,
+            proofPurpose = ProofPurpose.ASSERTION_METHOD,
+            verificationMethod = dilithium2CryptoCredentials.verificationMethod
+        )
         val signedCredential =
             credential.deepCopy().apply { sign(ldProof, dilithium2CryptoCredentials.keyPair.privateKey!!) }
         println(json.encodeToString(signedCredential))
         val result = signedCredential.verify()
         assert(result)
     }
+
+    @Test
+    fun signVerifyDeriveAndVerifyDerivedCredential(){
+        // sign
+        val ldProof = LdProof(
+            atContext = listOf(URI("https://w3id.org/security/dilithium/v1")),
+            type = listOf(ProofType.Dilithium2SdSignature2023.name),
+            created = date,
+            proofPurpose = ProofPurpose.ASSERTION_METHOD,
+            verificationMethod = dilithium2CryptoCredentials.verificationMethod
+        )
+        val signedCredential =
+            credential.deepCopy().apply { sign(ldProof, dilithium2CryptoCredentials.keyPair.privateKey!!) }
+        println(json.encodeToString(signedCredential))
+        // verify
+        var result = signedCredential.verify()
+        assert(result)
+        // derive
+        val frame = Credential(
+            // frame requesting complete vaccination credential
+            atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
+            type = Credential.DEFAULT_JSONLD_TYPES + listOf("VaccinationCertificate")
+        )
+        val derivedCredential = signedCredential.derive(frame)
+        println(json.encodeToString(derivedCredential))
+        //verify derived credential
+        result = derivedCredential.verify()
+        assert(result)
+    }
+
+    @Test
+    fun signVerifyDeriveAndVerifyDerivedCredentialSelective(){
+        // sign
+        val ldProof = LdProof(
+            atContext = listOf(URI("https://w3id.org/security/dilithium/v1")),
+            type = listOf(ProofType.Dilithium2SdSignature2023.name),
+            created = date,
+            proofPurpose = ProofPurpose.ASSERTION_METHOD,
+            verificationMethod = dilithium2CryptoCredentials.verificationMethod
+        )
+        val signedCredential =
+            credential.deepCopy().apply { sign(ldProof, dilithium2CryptoCredentials.keyPair.privateKey!!) }
+        println(json.encodeToString(signedCredential))
+        // verify
+        var result = signedCredential.verify()
+        assert(result)
+        // derive
+        val frame = Credential(
+            // frame requesting vaccination status only
+            atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
+            type = Credential.DEFAULT_JSONLD_TYPES + listOf("VaccinationCertificate"),
+            credentialSubject = JsonLdObject(
+                mapOf(
+                    "@explicit" to JsonPrimitive(true),
+                    "@requireAll" to JsonPrimitive(true),
+                    "type" to JsonArray(listOf(JsonPrimitive("VaccinationEvent"))),
+                    "order" to JsonArray(listOf(JsonPrimitive("3/3"))),
+                    "recipient" to JsonObject(
+                        mapOf(
+                            "@explicit" to JsonPrimitive(true),
+                            "type" to JsonArray(listOf(JsonPrimitive("VaccineRecipient"))),
+                            "id" to JsonObject(mapOf())
+                        )
+                    )
+                )
+            ),
+        )
+        val derivedCredential = signedCredential.derive(frame)
+        println(json.encodeToString(derivedCredential))
+        //verify derived credential
+        result = derivedCredential.verify()
+        assert(result)
+    }
+
 }

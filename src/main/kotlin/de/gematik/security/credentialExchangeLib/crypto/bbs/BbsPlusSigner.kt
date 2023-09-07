@@ -3,6 +3,7 @@ package de.gematik.security.credentialExchangeLib.crypto.bbs
 import bbs.signatures.Bbs
 import bbs.signatures.ProofMessage
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
+import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.crypto.Proofer
 import de.gematik.security.credentialExchangeLib.crypto.Signer
 import java.security.GeneralSecurityException
@@ -34,4 +35,6 @@ class BbsPlusSigner(override val keyPair: KeyPair) : Signer, Proofer {
             Bbs.blsCreateProof(keyPair.publicKey, nonce, signature, content.toTypedArray());
         }.onFailure { throw GeneralSecurityException(it.message) }.getOrThrow()
     }
+
+    override val derivedProofType = ProofType.BbsBlsSignatureProof2020
 }

@@ -41,5 +41,8 @@ abstract class DilithiumVerifier(publicKey: ByteArray, val params: DilithiumPara
 }
 
 class Dilithium2Verifier(publicKey: ByteArray) : DilithiumVerifier(publicKey, DilithiumParameters.dilithium2, 2420)
+class Dilithium2AesVerifier(publicKey: ByteArray) : DilithiumVerifier(publicKey, DilithiumParameters.dilithium2_aes, 2420)
 class Dilithium3Verifier(publicKey: ByteArray) : DilithiumVerifier(publicKey, DilithiumParameters.dilithium3, 3293)
+class Dilithium3AesVerifier(publicKey: ByteArray) : DilithiumVerifier(publicKey, DilithiumParameters.dilithium3_aes, 3293)
 class Dilithium5Verifier(publicKey: ByteArray) : DilithiumVerifier(publicKey, DilithiumParameters.dilithium5, 4595)
+class Dilithium5AesVerifier(publicKey: ByteArray) : DilithiumVerifier(publicKey, DilithiumParameters.dilithium5_aes, 4595)

@@ -3,6 +3,7 @@ package de.gematik.security.credentialExchangeLib.crypto.dilithium
 import org.bouncycastle.pqc.crypto.crystals.dilithium.DilithiumParameters
 import org.bouncycastle.pqc.crypto.crystals.dilithium.DilithiumPrivateKeyParameters
 import org.bouncycastle.pqc.crypto.crystals.dilithium.DilithiumPublicKeyParameters
+import java.security.MessageDigest
 
 fun DilithiumParameters.getPrivateKeyParameters(encoded: ByteArray): DilithiumPrivateKeyParameters {
 
@@ -89,4 +90,18 @@ fun DilithiumParameters.getPublicKeyParameters(encoded: ByteArray): DilithiumPub
         encoded.copyOfRange(startIndex, startIndex.let { startIndex = it + sizes.rho; startIndex }),
         encoded.copyOfRange(startIndex, startIndex.let { startIndex = it + sizes.t1; startIndex })
     )
+}
+
+fun List<ByteArray>.getSaltedHashes(salt: ByteArray) : List<ByteArray>{
+    val saltedHashes = emptyList<ByteArray>().toMutableList()
+    var s = salt
+    forEach {
+        val saltedHash = MessageDigest.getInstance("SHA-256").apply {
+            update(s)
+            update(it)
+        }.digest()
+        saltedHashes.add(saltedHash)
+        s = saltedHash
+    }
+    return saltedHashes
 }

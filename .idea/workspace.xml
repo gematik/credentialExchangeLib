@@ -5,20 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="246e1cc3-192b-491f-8ba1-e76025f33fb5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/dilithium/DilithiumCryptoCredentials.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/dilithium/DilithiumSigner.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/dilithium/DilithiumVerifier.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/dilithium/Extensions.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/context/security_dilithium_v1.jsonld" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/DilithiumProofTest.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/dilithium/DilithiumSdSigner.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/dilithium/DilithiumSdVerifier.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.adoc" beforeDir="false" afterPath="$PROJECT_DIR$/README.adoc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/HttpLoaderWithCache.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/HttpLoaderWithCache.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/CryptoRegistry.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/CryptoRegistry.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ProofType.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ProofType.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/extensions/Utils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/extensions/Utils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ProofVerifier.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/ProofVerifier.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/Proofer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/Proofer.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/bbs/BbsPlusSigner.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/bbs/BbsPlusSigner.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/bbs/BbsPlusVerifier.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/bbs/BbsPlusVerifier.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/dilithium/DilithiumVerifier.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/dilithium/DilithiumVerifier.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/dilithium/Extensions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/dilithium/Extensions.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/TestSuite.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/TestSuite.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/context/security_dilithium_v1.jsonld" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/context/security_dilithium_v1.jsonld" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/DilithiumProofTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/DilithiumProofTest.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -110,8 +110,8 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "ignore.virus.scanning.warn.message": "true",
-    "ktor.last.update.timestamp": "1693904458835",
-    "last_opened_file_path": "C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources/context",
+    "ktor.last.update.timestamp": "1694079129329",
+    "last_opened_file_path": "C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/dilithium",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -127,11 +127,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\rk\IntelliJIDEAProjects\credentialExchangeLib\src\main\kotlin\de\gematik\security\credentialExchangeLib\crypto\dilithium" />
       <recent name="C:\Users\rk\IntelliJIDEAProjects\credentialExchangeLib\src\main\resources\context" />
       <recent name="C:\Users\rk\IntelliJIDEAProjects\credentialExchangeLib\src\main\kotlin\de\gematik\security\credentialExchangeLib\crypto" />
       <recent name="C:\Users\rk\IntelliJIDEAProjects\credentialExchangeLib\src\main\resources\files" />
       <recent name="C:\Users\rk\IntelliJIDEAProjects\credentialExchangeLib\src\main\resources" />
-      <recent name="C:\Users\rk\IntelliJIDEAProjects\credentialExchangeLib\src\test\resources" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\rk\IntelliJIDEAProjects\credentialExchangeLib\src\main\kotlin\de\gematik\security\credentialExchangeLib\protocols\credentialSubjects" />
@@ -156,7 +156,7 @@
     </key>
   </component>
   <component name="RunManager" selected="Gradle.TestSuite">
-    <configuration name="DilithiumProofTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="DilithiumProofTest.signVerifyCredentialDilithium2" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -169,7 +169,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;de.gematik.security.credentialExchangeLib.DilithiumProofTest&quot;" />
+            <option value="&quot;de.gematik.security.credentialExchangeLib.DilithiumProofTest.signVerifyCredentialDilithium2&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -180,7 +180,7 @@
       <ForceTestExec>true</ForceTestExec>
       <method v="2" />
     </configuration>
-    <configuration name="DilithiumProofTest.signVerify" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="DilithiumProofTest.signVerifyDeriveAndVerifyDerivedCredential" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -193,7 +193,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;de.gematik.security.credentialExchangeLib.DilithiumProofTest.signVerify&quot;" />
+            <option value="&quot;de.gematik.security.credentialExchangeLib.DilithiumProofTest.signVerifyDeriveAndVerifyDerivedCredential&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -204,7 +204,7 @@
       <ForceTestExec>true</ForceTestExec>
       <method v="2" />
     </configuration>
-    <configuration name="DilithiumProofTest.signVerifyCredential" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="DilithiumProofTest.signVerifyDeriveAndVerifyDerivedCredentialSelective" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -217,7 +217,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;de.gematik.security.credentialExchangeLib.DilithiumProofTest.signVerifyCredential&quot;" />
+            <option value="&quot;de.gematik.security.credentialExchangeLib.DilithiumProofTest.signVerifyDeriveAndVerifyDerivedCredentialSelective&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -279,10 +279,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.TestSuite" />
-        <item itemvalue="Gradle.DilithiumProofTest.signVerifyCredential" />
+        <item itemvalue="Gradle.DilithiumProofTest.signVerifyDeriveAndVerifyDerivedCredentialSelective" />
+        <item itemvalue="Gradle.DilithiumProofTest.signVerifyDeriveAndVerifyDerivedCredential" />
+        <item itemvalue="Gradle.DilithiumProofTest.signVerifyCredentialDilithium2" />
         <item itemvalue="Gradle.DilithiumProofTest.signVerifySingleMessage" />
-        <item itemvalue="Gradle.DilithiumProofTest" />
-        <item itemvalue="Gradle.DilithiumProofTest.signVerify" />
       </list>
     </recent_temporary>
   </component>
@@ -380,7 +380,9 @@
       <workItem from="1693233015982" duration="5169000" />
       <workItem from="1693330175071" duration="857000" />
       <workItem from="1693383496700" duration="6373000" />
-      <workItem from="1693817431364" duration="38103000" />
+      <workItem from="1693817431364" duration="38174000" />
+      <workItem from="1693992502150" duration="17922000" />
+      <workItem from="1694074058013" duration="18054000" />
     </task>
     <task id="LOCAL-00001" summary="initial check in">
       <created>1683117220289</created>
@@ -704,7 +706,14 @@
       <option name="project" value="LOCAL" />
       <updated>1693395759565</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="feat: add Dilithium Signatures (PQC)">
+      <created>1693923994154</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1693923994154</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -722,7 +731,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="chore: minor corrections and improved unit tests" />
     <MESSAGE value="chore: jsonld test add recepient id in credential" />
     <MESSAGE value="fix: jsonld test" />
     <MESSAGE value="feat: vsd" />
@@ -747,16 +755,12 @@
     <MESSAGE value="fix: fix workaround for boolean and number issue of titan library" />
     <MESSAGE value="chore: refinement of credential" />
     <MESSAGE value="feat: add extension function JsonLdObject.toObject()" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add extension function JsonLdObject.toObject()" />
+    <MESSAGE value="feat: add Dilithium Signatures (PQC)" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add Dilithium Signatures (PQC)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt</url>
-          <line>234</line>
-          <option name="timeStamp" value="26" />
-        </line-breakpoint>
         <line-breakpoint type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/SerializerTests.kt</url>
           <line>301</line>
@@ -769,7 +773,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/bbs/BbsPlusSigner.kt</url>
-          <line>33</line>
+          <line>34</line>
           <option name="timeStamp" value="39" />
         </line-breakpoint>
         <line-breakpoint type="kotlin-line">
@@ -779,7 +783,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/bbs/BbsPlusVerifier.kt</url>
-          <line>22</line>
+          <line>23</line>
           <option name="timeStamp" value="41" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
@@ -788,48 +792,27 @@
           <option name="timeStamp" value="42" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt</url>
-          <line>181</line>
-          <properties>
-            <option name="lambda-ordinal" value="-1" />
-          </properties>
-          <option name="timeStamp" value="43" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/LdProof.kt</url>
-          <line>182</line>
-          <option name="timeStamp" value="45" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/DilithiumProofTest.kt</url>
-          <line>86</line>
-          <option name="timeStamp" value="56" />
+          <line>67</line>
+          <option name="timeStamp" value="46" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/DilithiumProofTest.kt</url>
-          <line>91</line>
-          <option name="timeStamp" value="59" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Credential.kt</url>
-          <line>71</line>
-          <properties>
-            <option name="lambda-ordinal" value="-1" />
-          </properties>
-          <option name="timeStamp" value="60" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Credential.kt</url>
+          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/dilithium/DilithiumSdSigner.kt</url>
           <line>72</line>
+          <option name="timeStamp" value="64" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/dilithium/DilithiumSdSigner.kt</url>
+          <line>77</line>
+          <option name="timeStamp" value="67" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/crypto/dilithium/DilithiumSdVerifier.kt</url>
+          <line>79</line>
           <properties>
             <option name="lambda-ordinal" value="-1" />
           </properties>
-          <option name="timeStamp" value="61" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/test/kotlin/de/gematik/security/credentialExchangeLib/DilithiumProofTest.kt</url>
-          <line>94</line>
-          <option name="timeStamp" value="62" />
+          <option name="timeStamp" value="68" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
