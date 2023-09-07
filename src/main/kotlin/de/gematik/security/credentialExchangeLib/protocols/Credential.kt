@@ -85,7 +85,7 @@ class Credential : LdObject, Verifiable {
     }
 
     override fun verify(): Boolean {
-        val singleProof = proof?.firstOrNull()
+        val singleProof = proof?.firstOrNull()?.deepCopy()
         check(singleProof != null) { "credential doesn't contain a proof for verification" }
         check(proof?.size == 1) { "verification of multi signature not supported yet" }
         singleProof.atContext = if (singleProof.atContext == null) {
