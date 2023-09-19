@@ -68,8 +68,8 @@ class PresentationExchangeHolderProtocol private constructor(connection: Connect
             handler: suspend (PresentationExchangeHolderProtocol) -> Unit
         ) {
             connectionFactory.connect(connectionArgs) {
-                val oob = connectionArgs.endpoint.query.params("oob")
-                val invitation = if (oob.isEmpty()) null else Invitation.fromBase64(oob)
+                val oob = connectionArgs.endpoint.query?.params("oob")
+                val invitation = oob?.let { if (it.isEmpty()) null else Invitation.fromBase64(oob) }
                 PresentationExchangeHolderProtocol(it).also {
                     protocols[it.id] = it
                 }.use {

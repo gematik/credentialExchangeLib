@@ -76,7 +76,7 @@ class WsConnection private constructor(val session: DefaultWebSocketSession) : C
         ) {
             val args = connectionArgs?:WsConnectionArgs(createUri("127.0.0.1", 8090, "/ws"))
             check(args is WsConnectionArgs)
-            client.webSocket(method = HttpMethod.Get, host = args.endpoint.host, port = args.endpoint.port, path = "${args.endpoint.path}?${args.endpoint.query}") {
+            client.webSocket(method = HttpMethod.Get, host = args.endpoint.host, port = args.endpoint.port, path = args.endpoint.path?.let{"$it${args.endpoint.query?.let{"?$it"}?:""}"}) {
                 WsConnection(this).also {
                     connections[it.id] = it
                 }.use {
