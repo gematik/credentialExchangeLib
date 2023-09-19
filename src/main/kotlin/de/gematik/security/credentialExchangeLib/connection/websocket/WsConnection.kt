@@ -1,14 +1,17 @@
-package de.gematik.security.credentialExchangeLib.connection
+package de.gematik.security.credentialExchangeLib.connection.websocket
 
+import de.gematik.security.credentialExchangeLib.connection.*
+import de.gematik.security.credentialExchangeLib.extensions.createUri
 import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.protocols.Close
 import io.ktor.client.*
-import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.websocket.*
+import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.http.*
 import io.ktor.serialization.*
 import io.ktor.serialization.kotlinx.*
 import io.ktor.server.application.*
+import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import io.ktor.server.http.content.*
 import io.ktor.server.response.*
@@ -31,24 +34,25 @@ class WsConnection private constructor(val session: DefaultWebSocketSession) : C
 
         private val engines = mutableMapOf<String, ApplicationEngine>()
 
-        private val client = HttpClient(CIO) {
-            install(io.ktor.client.plugins.websocket.WebSockets) {
+        private val client = HttpClient(io.ktor.client.engine.cio.CIO) {
+            install(WebSockets) {
                 contentConverter = KotlinxWebsocketSerializationConverter(Json)
             }
         }
 
         override fun listen(
-            host: String,
-            port: Int,
-            path: String,
+            connectionArgs: ConnectionArgs?,
             handler: suspend (WsConnection) -> Unit
         ) {
-            val engine = embeddedServer(io.ktor.server.cio.CIO, host = host, port = port) {
+            val args = connectionArgs?:WsConnectionArgs()
+            check(args is WsConnectionArgs)
+            check(args.endpoint.host!=null && !args.endpoint.host.isBlank())
+            val engine = embeddedServer(CIO, host = args.endpoint.host, port = args.endpoint.port) {
                 install(io.ktor.server.websocket.WebSockets) {
                     contentConverter = KotlinxWebsocketSerializationConverter(Json)
                 }
                 routing {
-                    webSocket(path) {
+                    webSocket(args.endpoint.path) {
                         WsConnection(this).also {
                             connections[it.id] = it
                         }.use {
@@ -63,16 +67,16 @@ class WsConnection private constructor(val session: DefaultWebSocketSession) : C
                 }
             }
             engine.start()
-            engines.put("$host:$port", engine)
+            engines.put("${args.endpoint.host}:${args.endpoint.port}", engine)
         }
 
         override suspend fun connect(
-            host: String,
-            port: Int,
-            path: String,
+            connectionArgs: ConnectionArgs?,
             handler: suspend (WsConnection) -> Unit
         ) {
-            client.webSocket(method = HttpMethod.Get, host = host, port = port, path = path) {
+            val args = connectionArgs?:WsConnectionArgs(createUri("127.0.0.1", 8090, "/ws"))
+            check(args is WsConnectionArgs)
+            client.webSocket(method = HttpMethod.Get, host = args.endpoint.host, port = args.endpoint.port, path = "${args.endpoint.path}?${args.endpoint.query}") {
                 WsConnection(this).also {
                     connections[it.id] = it
                 }.use {
@@ -81,13 +85,12 @@ class WsConnection private constructor(val session: DefaultWebSocketSession) : C
             }
         }
 
-        override fun stopListening(host: String?, port: Int?) {
+        override fun stopListening(connectionArgs: ConnectionArgs?) {
+            val args = connectionArgs ?: WsConnectionArgs()
+            check(args is WsConnectionArgs)
+            check(args.endpoint.host!=null && !args.endpoint.host.isBlank())
             engines.filter {
-                "${host ?: ""}:${port ?: ""}" == "${
-                    if (host != null) it.key.substringBefore(":") else ""
-                }:${
-                    if (host != null) it.key.substringAfter(":") else ""
-                }"
+                "${args.endpoint.host}:${args.endpoint.port}" == it.key
             }.values.forEach { it.stop() }
         }
 
@@ -177,4 +180,3 @@ class WsConnection private constructor(val session: DefaultWebSocketSession) : C
         }
     }
 }
-

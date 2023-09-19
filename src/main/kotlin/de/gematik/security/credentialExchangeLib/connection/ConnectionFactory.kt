@@ -1,22 +1,20 @@
 package de.gematik.security.credentialExchangeLib.connection
 
+import de.gematik.security.credentialExchangeLib.connection.websocket.WsConnectionArgs
+import java.net.URI
+
 interface ConnectionFactory<T : Connection> {
     fun listen(
-        host: String = "0.0.0.0",
-        port: Int = 8090,
-        path: String = "ws",
+        connectionArgs: ConnectionArgs? = null,
         handler: suspend (T) -> Unit
     )
 
     fun stopListening(
-        host: String? = null,
-        port: Int? = null
+        connectionArgs: ConnectionArgs? = null
     )
 
     suspend fun connect(
-        host: String = "127.0.0.1",
-        port: Int = 8090,
-        path: String = "ws",
+        connectionArgs: ConnectionArgs? = null,
         handler: suspend (T) -> Unit
     )
 }

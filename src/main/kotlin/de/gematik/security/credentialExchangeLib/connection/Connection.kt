@@ -5,7 +5,7 @@ import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
-sealed class Connection : Closeable {
+abstract class Connection : Closeable {
 
     companion object {
         @JvmStatic

@@ -1,7 +1,10 @@
 package de.gematik.security.credentialExchangeLib
 
+import de.gematik.security.credentialExchangeLib.connection.ConnectionArgs
 import de.gematik.security.credentialExchangeLib.connection.Message
-import de.gematik.security.credentialExchangeLib.connection.WsConnection
+import de.gematik.security.credentialExchangeLib.connection.websocket.WsConnection
+import de.gematik.security.credentialExchangeLib.connection.websocket.WsConnectionArgs
+import de.gematik.security.credentialExchangeLib.extensions.createUri
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -50,24 +53,24 @@ class ConnectionTests {
 
     @Test
     fun pingPong2TwoListener() {
-        WsConnection.listen(port = 1200) {
+        WsConnection.listen(WsConnectionArgs(createUri("0.0.0.0", 1200))) {
             val response = it.receive().content.get("shot")?.jsonPrimitive?.content?.replace("ping", "pong")
             delay(100)
             it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive(response)))))
         }
-        WsConnection.listen(port = 1201) {
+        WsConnection.listen(WsConnectionArgs(createUri("0.0.0.0", 1201))) {
             val response = it.receive().content.get("shot")?.jsonPrimitive?.content?.replace("ping", "peng")
             delay(100)
             it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive(response)))))
         }
         runBlocking {
             launch {
-                WsConnection.connect(port = 1200) {
+                WsConnection.connect(WsConnectionArgs(createUri("0.0.0.0", 1200))) {
                     it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive("ping1" )))))
                     assertEquals("pong1", it.receive().content.get("shot")?.jsonPrimitive?.content)
                 }
             }
-            WsConnection.connect(port = 1201) {
+            WsConnection.connect(WsConnectionArgs(createUri("0.0.0.0", 1201))) {
                 it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive("ping2" )))))
                 assertEquals("peng2", it.receive().content.get("shot")?.jsonPrimitive?.content)
             }

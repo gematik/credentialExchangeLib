@@ -1,9 +1,7 @@
 package de.gematik.security.credentialExchangeLib.protocols
 
-import de.gematik.security.credentialExchangeLib.connection.Connection
-import de.gematik.security.credentialExchangeLib.connection.ConnectionFactory
-import de.gematik.security.credentialExchangeLib.connection.Message
-import de.gematik.security.credentialExchangeLib.connection.MessageType
+import de.gematik.security.credentialExchangeLib.connection.*
+import de.gematik.security.credentialExchangeLib.extensions.params
 import de.gematik.security.credentialExchangeLib.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -39,12 +37,10 @@ class CredentialExchangeIssuerProtocol private constructor(connection: Connectio
     companion object : ProtocolFactory<CredentialExchangeIssuerProtocol>() {
         override fun listen(
             connectionFactory: ConnectionFactory<*>,
-            host: String,
-            port: Int,
-            path: String,
+            connectionArgs: ConnectionArgs,
             handler: suspend (CredentialExchangeIssuerProtocol) -> Unit
         ) {
-            connectionFactory.listen(host, port, path) {
+            connectionFactory.listen(connectionArgs) {
                 CredentialExchangeIssuerProtocol(it).also {
                     protocols[it.id] = it
                 }.use {
@@ -68,13 +64,11 @@ class CredentialExchangeIssuerProtocol private constructor(connection: Connectio
 
         override suspend fun connect(
             connectionFactory: ConnectionFactory<*>,
-            host: String,
-            port: Int,
-            path: String,
+            connectionArgs: ConnectionArgs,
             handler: suspend (CredentialExchangeIssuerProtocol) -> Unit
         ) {
-            connectionFactory.connect(host, port, path) {
-                val oob = path.substringAfter("oob=", "").substringBefore("&")
+            connectionFactory.connect(connectionArgs) {
+                val oob = connectionArgs.endpoint.query.params("oob")
                 val invitation = if (oob.isEmpty()) null else Invitation.fromBase64(oob)
                 CredentialExchangeIssuerProtocol(it).also {
                     protocols[it.id] = it

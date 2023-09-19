@@ -1,8 +1,10 @@
 package de.gematik.security.credentialExchangeLib
 
-import de.gematik.security.credentialExchangeLib.connection.WsConnection
+import de.gematik.security.credentialExchangeLib.connection.websocket.WsConnection
+import de.gematik.security.credentialExchangeLib.connection.websocket.WsConnectionArgs
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
+import de.gematik.security.credentialExchangeLib.extensions.createUri
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.hexToByteArray
 import de.gematik.security.credentialExchangeLib.protocols.*
@@ -183,7 +185,7 @@ class ProtocolTests {
             // connection is closed automatically - close is sent to peer
         }
         runBlocking {
-            CredentialExchangeHolderProtocol.connect(WsConnection, path = "ws?oob=${invitation.toBase64()}") {
+            CredentialExchangeHolderProtocol.connect(WsConnection, WsConnectionArgs(createUri("127.0.0.1", 8090, path = "/ws", query = "oob=${invitation.toBase64()}"))) {
                 assert(it.receive() is Close)
             }
         }

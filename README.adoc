@@ -26,7 +26,7 @@ skinparam component {
 [bbs-signatures (java wrapper)] <<implemented>> as BbsSignature
 [   ECDSA\n(secp256r1)] <<implemented>> as secp256r1
 [   ECDSA\n(secp256k1)] <<implemented>> as secp256k1
-[   EdDSA\n(ed25519)]  <<implemented>> as ed25519
+= [   EdDSA\n(ed25519)]  <<implemented>> as ed25519
 [           Dilithium\n(2(aes), 3(aes) 5(aes))]  <<implemented>> as dilithium
 [HW AndroidKeystore] <<implemented>> as AndroidKeystore
 [CL-Signatures] as ClSignatures

@@ -1,9 +1,7 @@
 package de.gematik.security.credentialExchangeLib.protocols
 
-import de.gematik.security.credentialExchangeLib.connection.Connection
-import de.gematik.security.credentialExchangeLib.connection.ConnectionFactory
-import de.gematik.security.credentialExchangeLib.connection.Message
-import de.gematik.security.credentialExchangeLib.connection.MessageType
+import de.gematik.security.credentialExchangeLib.connection.*
+import de.gematik.security.credentialExchangeLib.extensions.params
 import de.gematik.security.credentialExchangeLib.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -39,12 +37,10 @@ class PresentationExchangeHolderProtocol private constructor(connection: Connect
     companion object : ProtocolFactory<PresentationExchangeHolderProtocol>() {
         override fun listen(
             connectionFactory: ConnectionFactory<*>,
-            host: String,
-            port: Int,
-            path: String,
+            connectionArgs: ConnectionArgs,
             handler: suspend (PresentationExchangeHolderProtocol) -> Unit
         ) {
-            return connectionFactory.listen(host, port, path) {
+            return connectionFactory.listen(connectionArgs) {
                 PresentationExchangeHolderProtocol(it).also {
                     protocols[it.id] = it
                 }.use {
@@ -68,13 +64,11 @@ class PresentationExchangeHolderProtocol private constructor(connection: Connect
 
         override suspend fun connect(
             connectionFactory: ConnectionFactory<*>,
-            host: String,
-            port: Int,
-            path: String,
+            connectionArgs: ConnectionArgs,
             handler: suspend (PresentationExchangeHolderProtocol) -> Unit
         ) {
-            connectionFactory.connect(host, port, path) {
-                val oob = path.substringAfter("oob=", "").substringBefore("&")
+            connectionFactory.connect(connectionArgs) {
+                val oob = connectionArgs.endpoint.query.params("oob")
                 val invitation = if (oob.isEmpty()) null else Invitation.fromBase64(oob)
                 PresentationExchangeHolderProtocol(it).also {
                     protocols[it.id] = it
