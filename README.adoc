@@ -26,7 +26,7 @@ skinparam component {
 [bbs-signatures (java wrapper)] <<implemented>> as BbsSignature
 [   ECDSA\n(secp256r1)] <<implemented>> as secp256r1
 [   ECDSA\n(secp256k1)] <<implemented>> as secp256k1
-= [   EdDSA\n(ed25519)]  <<implemented>> as ed25519
+[   EdDSA\n(ed25519)]  <<implemented>> as ed25519
 [           Dilithium\n(2(aes), 3(aes) 5(aes))]  <<implemented>> as dilithium
 [HW AndroidKeystore] <<implemented>> as AndroidKeystore
 [CL-Signatures] as ClSignatures
@@ -120,7 +120,8 @@ The holder receives the invitation of the issuer out of band (e.g. qr-code, nfc,
 Initialized --> WaitForCredentialOffer : send invitation
 Initialized --> Closed : close
 WaitForCredentialOffer --> SendCredentialRequest : receive offer
-WaitForCredentialOffer --> SendPresentation : receive presenation request
+WaitForCredentialOffer --> WaitForCredential : send credential request
+WaitForCredentialOffer --> SendPresentation : receive presentation request
 SendPresentation --> WaitForCredentialOffer : send presentation
 SendPresentation --> Closed : close
 WaitForCredentialOffer --> Closed : close
@@ -145,6 +146,7 @@ Please note that the issuer acts as verifier if he needs additional data from th
 Initialized --> SendCredentialOffer : receive invitation
 Initialized --> Closed : close
 SendCredentialOffer --> WaitForCredentialRequest : send offer
+SendCredentialOffer --> SubmitCredential : receive request
 SendCredentialOffer --> WaitForPresentation : send presentation request
 WaitForPresentation --> SendCredentialOffer : receive presenation
 WaitForPresentation --> Closed : close

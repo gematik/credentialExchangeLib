@@ -32,6 +32,10 @@ dependencies {
     implementation("io.ktor:ktor-client-websockets:2.3.1")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.1")
 
+    implementation ("org.didcommx:peerdid:0.3.0")
+    implementation ("org.didcommx:didcomm:0.3.2")
+
+
     testImplementation("org.junit.platform:junit-platform-suite-engine:1.9.1")
     testImplementation(kotlin("test"))
 

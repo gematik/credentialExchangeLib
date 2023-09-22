@@ -7,16 +7,11 @@ import de.gematik.security.credentialExchangeLib.crypto.dilithium.Dilithium5Cryp
 import de.gematik.security.credentialExchangeLib.crypto.ecdsa.EcdsaCryptoCredentials
 import de.gematik.security.credentialExchangeLib.crypto.ecdsa.Ed25519CryptoCredentials
 import io.github.novacrypto.base58.Base58
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.toJavaInstant
 import java.math.BigInteger
 import java.net.URI
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
 
 fun String.hexToByteArray(): ByteArray {
     check(length % 2 == 0) { "Must have an even length" }

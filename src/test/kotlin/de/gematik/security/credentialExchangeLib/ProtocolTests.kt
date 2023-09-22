@@ -1,10 +1,8 @@
 package de.gematik.security.credentialExchangeLib
 
 import de.gematik.security.credentialExchangeLib.connection.websocket.WsConnection
-import de.gematik.security.credentialExchangeLib.connection.websocket.WsConnectionArgs
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
-import de.gematik.security.credentialExchangeLib.extensions.createUri
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.hexToByteArray
 import de.gematik.security.credentialExchangeLib.protocols.*
@@ -78,7 +76,7 @@ class ProtocolTests {
     )
     val verificationMethodHolder = URI.create("${didKeyHolder}#${didKeyHolder.drop(8)}")
 
-    val date = ZonedDateTime.of(2023,8,24,13,6,21,408000, ZoneId.of("UTC"))
+    val date = ZonedDateTime.of(2023, 8, 24, 13, 6, 21, 408000, ZoneId.of("UTC"))
 
     val ldProofIssuer = LdProof(
         type = listOf(ProofType.BbsBlsSignature2020.name),
@@ -143,17 +141,27 @@ class ProtocolTests {
     )
 
     @Test
-    fun manageProtocolInstances(){
+    fun manageProtocolInstances() {
         CredentialExchangeIssuerProtocol.listen(WsConnection) {
-            assertEquals(1, Protocol.getNumberOfProtocolInstances())
-            assert(it.receive() is Invitation)
+            assertEquals(2, Protocol.getNumberOfProtocolInstances())
+            val request = it.receive()
+            assert(request is CredentialRequest)
             // connection is closed automatically - close is sent to peer
         }
         runBlocking {
             CredentialExchangeHolderProtocol.connect(WsConnection) {
-                assertEquals(2, Protocol.getNumberOfProtocolInstances())
-                it.sendInvitation(invitation)
-                assert(it.receive() is Close)
+                assertEquals(1, Protocol.getNumberOfProtocolInstances())
+                it.requestCredential(
+                    CredentialRequest(
+                        outputDescriptor = Descriptor(
+                            id = UUID.randomUUID().toString(),
+                            frame = Credential()
+                        ),
+                        holderKey = URI.create(didKeyHolder)
+                    )
+                )
+                val close = it.receive()
+                assert(close is Close)
                 assertEquals(1, Protocol.getNumberOfProtocolInstances())
             }
         }
@@ -162,42 +170,10 @@ class ProtocolTests {
     }
 
     @Test
-    fun acceptInvitation() {
-        CredentialExchangeIssuerProtocol.listen(WsConnection) {
-            assert(it.receive() is Invitation)
-            println("\"issuer\": ${json.encodeToString(it.protocolState)}")
-            // connection is closed automatically - close is sent to peer
-        }
-        runBlocking {
-            CredentialExchangeHolderProtocol.connect(WsConnection) {
-                it.sendInvitation(invitation)
-                assert(it.receive() is Close)
-            }
-        }
-        CredentialExchangeIssuerProtocol.stopListening()
-    }
-
-    @Test
-    fun acceptInvitationInPath() {
-        CredentialExchangeIssuerProtocol.listen(WsConnection) {
-            assert(it.receive() is Invitation)
-            println("\"issuer\": ${json.encodeToString(it.protocolState)}")
-            // connection is closed automatically - close is sent to peer
-        }
-        runBlocking {
-            CredentialExchangeHolderProtocol.connect(WsConnection, WsConnectionArgs(createUri("127.0.0.1", 8090, path = "/ws", query = "oob=${invitation.toBase64()}"))) {
-                assert(it.receive() is Close)
-            }
-        }
-        CredentialExchangeIssuerProtocol.stopListening()
-    }
-
-    @Test
     fun issueCredential() {
 
         //start issuer
         CredentialExchangeIssuerProtocol.listen(WsConnection) {
-            assert(it.receive() is Invitation)
             it.sendOffer(
                 CredentialOffer(
                     UUID.randomUUID().toString(),
@@ -212,12 +188,18 @@ class ProtocolTests {
             val credentialRequest = it.receive()
             assert(credentialRequest is CredentialRequest)
 
-            val vaccinationEvent = json.decodeFromJsonElement<VaccinationEvent>((credential.credentialSubject as JsonLdObject).jsonContent)
+            val vaccinationEvent =
+                json.decodeFromJsonElement<VaccinationEvent>((credential.credentialSubject as JsonLdObject).jsonContent)
             vaccinationEvent.recipient =
                 vaccinationEvent.recipient?.apply { id = (credentialRequest as CredentialRequest).holderKey.toString() }
             val updatedCredential = credential.deepCopy().apply {
                 this.credentialSubject =
-                    JsonLdObject(json.encodeToJsonElement(VaccinationEvent.serializer(), vaccinationEvent).jsonObject.toMap())
+                    JsonLdObject(
+                        json.encodeToJsonElement(
+                            VaccinationEvent.serializer(),
+                            vaccinationEvent
+                        ).jsonObject.toMap()
+                    )
             }
 
             it.submitCredential(
@@ -235,7 +217,6 @@ class ProtocolTests {
                 WsConnection,
             )
             {
-                it.sendInvitation(invitation)
                 val credentialOffer = it.receive()
                 assert(credentialOffer is CredentialOffer)
                 it.requestCredential(
@@ -248,7 +229,6 @@ class ProtocolTests {
                 assert(it.receive() is CredentialSubmit)
                 println("\"holder\": ${json.encodeToString(it.protocolState)}")
             }
-
         }
 
         CredentialExchangeIssuerProtocol.stopListening()
@@ -259,7 +239,6 @@ class ProtocolTests {
 
         //start holder
         PresentationExchangeHolderProtocol.listen(WsConnection) {
-            assert(it.receive() is Invitation)
             it.sendOffer(
                 PresentationOffer(
                     UUID.randomUUID().toString(),
@@ -307,7 +286,6 @@ class ProtocolTests {
                 WsConnection
             )
             {
-                it.sendInvitation(invitation)
                 val presentationOffer = it.receive()
                 assert(presentationOffer is PresentationOffer)
                 it.requestPresentation(
@@ -322,6 +300,5 @@ class ProtocolTests {
         }
         PresentationExchangeHolderProtocol.stopListening()
     }
-
 }
 

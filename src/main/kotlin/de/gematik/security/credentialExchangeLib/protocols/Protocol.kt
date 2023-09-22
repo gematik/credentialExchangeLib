@@ -27,5 +27,4 @@ sealed class Protocol(val connection: Connection) : Closeable {
     }
 
     abstract suspend fun receive() : LdObject
-    protected abstract fun connected(invitation: Invitation)
 }

@@ -3,11 +3,8 @@ package de.gematik.security.credentialExchangeLib.crypto.dilithium
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.crypto.ProofVerifier
 import de.gematik.security.credentialExchangeLib.crypto.Verifier
-import io.ktor.util.*
 import org.bouncycastle.pqc.crypto.crystals.dilithium.DilithiumParameters
 import org.bouncycastle.pqc.crypto.crystals.dilithium.DilithiumPublicKeyParameters
-import java.io.BufferedReader
-import java.io.ByteArrayInputStream
 import java.nio.ByteBuffer
 import java.security.MessageDigest
 

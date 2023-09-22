@@ -1,10 +1,7 @@
 package de.gematik.security.credentialExchangeLib.credentialSubjects
 
-import de.gematik.security.credentialExchangeLib.protocols.JsonLdObject
 import de.gematik.security.credentialExchangeLib.protocols.LdObject
-import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
 import kotlinx.serialization.Serializable
-import java.util.*
 
 @Serializable
 data class VaccinationEvent(

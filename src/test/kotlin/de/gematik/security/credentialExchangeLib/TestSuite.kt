@@ -9,7 +9,7 @@ import org.junit.platform.suite.api.Suite
     BbsProofTests::class,
     EcdsaProofTest::class,
     SerializerTests::class,
-    ConnectionTests::class,
+    WsConnectionTests::class,
     ProtocolTests::class,
     AcapyInteropTest::class,
     DilithiumProofTest::class

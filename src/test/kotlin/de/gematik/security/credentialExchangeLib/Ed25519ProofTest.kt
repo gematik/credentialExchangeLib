@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test
 import java.net.URI
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.*
 
 class Ed25519ProofTest {
     val credentialIssuer = Ed25519CryptoCredentials(

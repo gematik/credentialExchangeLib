@@ -1,11 +1,7 @@
 package de.gematik.security.credentialExchangeLib.protocols
 
-import de.gematik.security.credentialExchangeLib.serializer.URISerializer
-import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
-import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import sun.rmi.transport.Endpoint
 import java.net.URI
 
 

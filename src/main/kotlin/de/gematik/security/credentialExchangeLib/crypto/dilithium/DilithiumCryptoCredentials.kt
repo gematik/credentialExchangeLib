@@ -2,19 +2,9 @@ package de.gematik.security.credentialExchangeLib.crypto.dilithium
 
 import de.gematik.security.credentialExchangeLib.crypto.CryptoCredentials
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
-import de.gematik.security.credentialExchangeLib.crypto.ecdsa.P256CryptoCredentials
 import io.github.novacrypto.base58.Base58
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair
-import org.bouncycastle.crypto.params.ECDomainParameters
-import org.bouncycastle.math.ec.FixedPointCombMultiplier
-import org.bouncycastle.pqc.crypto.crystals.dilithium.DilithiumKeyGenerationParameters
-import org.bouncycastle.pqc.crypto.crystals.dilithium.DilithiumKeyPairGenerator
-import org.bouncycastle.pqc.crypto.crystals.dilithium.DilithiumParameters
-import org.bouncycastle.pqc.crypto.crystals.dilithium.DilithiumPrivateKeyParameters
-import org.bouncycastle.pqc.crypto.crystals.dilithium.DilithiumPublicKeyParameters
-import java.math.BigInteger
+import org.bouncycastle.pqc.crypto.crystals.dilithium.*
 import java.net.URI
-import java.security.PrivateKey
 import java.security.SecureRandom
 
 abstract class DilithiumCryptoCredentials(keyPair: KeyPair, privateKeySize: Int, publicKeySize: Int, multiCodecId: ByteArray) : CryptoCredentials {

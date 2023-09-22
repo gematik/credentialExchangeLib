@@ -1,11 +1,8 @@
 package de.gematik.security.credentialExchangeLib.crypto.dilithium
 
 import de.gematik.security.credentialExchangeLib.crypto.Verifier
-import org.bouncycastle.crypto.signers.ECDSASigner
 import org.bouncycastle.pqc.crypto.crystals.dilithium.DilithiumParameters
-import org.bouncycastle.pqc.crypto.crystals.dilithium.DilithiumPrivateKeyParameters
 import org.bouncycastle.pqc.crypto.crystals.dilithium.DilithiumPublicKeyParameters
-import java.math.BigInteger
 import java.security.MessageDigest
 
 abstract class DilithiumVerifier(publicKey: ByteArray, val params: DilithiumParameters, val signatureSize: Int) : Verifier {

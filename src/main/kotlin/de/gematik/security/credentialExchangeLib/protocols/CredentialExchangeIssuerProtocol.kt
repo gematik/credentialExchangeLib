@@ -1,13 +1,18 @@
 package de.gematik.security.credentialExchangeLib.protocols
 
-import de.gematik.security.credentialExchangeLib.connection.*
-import de.gematik.security.credentialExchangeLib.extensions.params
+import de.gematik.security.credentialExchangeLib.connection.Connection
+import de.gematik.security.credentialExchangeLib.connection.ConnectionFactory
+import de.gematik.security.credentialExchangeLib.connection.Message
+import de.gematik.security.credentialExchangeLib.connection.MessageType
 import de.gematik.security.credentialExchangeLib.json
+import de.gematik.security.credentialExchangeLib.serializer.UUIDSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
+import java.net.URI
 import java.security.InvalidParameterException
+import java.util.*
 
 class CredentialExchangeIssuerProtocol private constructor(connection: Connection) : Protocol(connection) {
 
@@ -25,22 +30,22 @@ class CredentialExchangeIssuerProtocol private constructor(connection: Connectio
     @Serializable
     data class ProtocolState(
         var state: State = State.INITIALIZED,
-        var invitation: Invitation? = null,
+        var invitationId: @Serializable(with = UUIDSerializer::class) UUID? = null,
         var offer: CredentialOffer? = null,
         var request: CredentialRequest? = null,
         var submit: CredentialSubmit? = null,
         var close: Close? = null
     )
 
-    val protocolState = ProtocolState()
+    val protocolState = ProtocolState(state = State.SEND_CREDENTIAL_OFFER, invitationId = connection.id)
 
     companion object : ProtocolFactory<CredentialExchangeIssuerProtocol>() {
         override fun listen(
             connectionFactory: ConnectionFactory<*>,
-            connectionArgs: ConnectionArgs,
+            serviceEndpoint: URI,
             handler: suspend (CredentialExchangeIssuerProtocol) -> Unit
         ) {
-            connectionFactory.listen(connectionArgs) {
+            connectionFactory.listen(serviceEndpoint) {
                 CredentialExchangeIssuerProtocol(it).also {
                     protocols[it.id] = it
                 }.use {
@@ -51,12 +56,10 @@ class CredentialExchangeIssuerProtocol private constructor(connection: Connectio
 
         override suspend fun bind(
             connection: Connection,
-            invitation: Invitation,
             handler: suspend (CredentialExchangeIssuerProtocol) -> Unit
         ) {
             CredentialExchangeIssuerProtocol(connection).also {
                 protocols[it.id] = it
-                it.connected(invitation)
             }.use {
                 handler(it)
             }
@@ -64,16 +67,16 @@ class CredentialExchangeIssuerProtocol private constructor(connection: Connectio
 
         override suspend fun connect(
             connectionFactory: ConnectionFactory<*>,
-            connectionArgs: ConnectionArgs,
+            to: URI?,
+            from: URI?,
+            invitationId: UUID?,
+            firstProtocolMessage: Message?,
             handler: suspend (CredentialExchangeIssuerProtocol) -> Unit
         ) {
-            connectionFactory.connect(connectionArgs) {
-                val oob = connectionArgs.endpoint.query.params("oob")
-                val invitation = if (oob.isEmpty()) null else Invitation.fromBase64(oob)
+            connectionFactory.connect(to, from, invitationId, firstProtocolMessage) {
                 CredentialExchangeIssuerProtocol(it).also {
                     protocols[it.id] = it
                 }.use {
-                    invitation?.let { inv -> it.connected(inv) }
                     handler(it)
                 }
             }
@@ -85,16 +88,8 @@ class CredentialExchangeIssuerProtocol private constructor(connection: Connectio
         while (pm == null) {
             val message = connection.receive()
             pm = when (message.type) {
-                MessageType.INVITATION_ACCEPT -> {
-                    check(protocolState.state == State.INITIALIZED) { "invalid state: ${protocolState.state.name}" }
-                    json.decodeFromJsonElement<Invitation>(message.content).also {
-                        protocolState.invitation = it
-                        protocolState.state = State.SEND_CREDENTIAL_OFFER
-                    }
-                }
-
                 MessageType.CREDENTIAL_REQUEST -> {
-                    check(protocolState.state == State.WAIT_FOR_CREDENTIAL_REQUEST) { "invalid state: ${protocolState.state.name}" }
+                    check(protocolState.state == State.WAIT_FOR_CREDENTIAL_REQUEST  || protocolState.state == State.SEND_CREDENTIAL_OFFER) { "invalid state: ${protocolState.state.name}" }
                     json.decodeFromJsonElement<CredentialRequest>(message.content).also {
                         protocolState.request = it
                         protocolState.state = State.SUBMIT_CREDENTIAL
@@ -112,12 +107,6 @@ class CredentialExchangeIssuerProtocol private constructor(connection: Connectio
             }
         }
         return pm
-    }
-
-    override fun connected(invitation: Invitation) {
-        check(protocolState.state == State.INITIALIZED)
-        protocolState.invitation = invitation
-        protocolState.state = State.SEND_CREDENTIAL_OFFER
     }
 
     suspend fun sendOffer(credentialOffer: CredentialOffer) {

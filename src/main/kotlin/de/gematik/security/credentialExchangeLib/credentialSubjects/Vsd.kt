@@ -1,12 +1,7 @@
 package de.gematik.security.credentialExchangeLib.credentialSubjects
 
-import de.gematik.security.credentialExchangeLib.extensions.toZonedDateTime
 import de.gematik.security.credentialExchangeLib.protocols.LdObject
-import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.time.ZonedDateTime
-import java.util.*
 
 @Serializable
 data class Insurance(

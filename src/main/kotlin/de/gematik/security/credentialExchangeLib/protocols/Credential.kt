@@ -3,17 +3,12 @@ package de.gematik.security.credentialExchangeLib.protocols
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.toIsoInstantString
 import de.gematik.security.credentialExchangeLib.extensions.toZonedDateTime
-import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
-import de.gematik.security.credentialExchangeLib.serializer.URISerializer
 import de.gematik.security.credentialExchangeLib.serializer.UnwrappingSingleValueJsonArrays
-import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
 import okhttp3.internal.toImmutableList
 import java.net.URI
 import java.time.ZonedDateTime
-import java.util.*
 
 @Serializable
 class Credential : LdObject, Verifiable {

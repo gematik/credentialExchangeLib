@@ -1,13 +1,18 @@
 package de.gematik.security.credentialExchangeLib.protocols
 
-import de.gematik.security.credentialExchangeLib.connection.*
-import de.gematik.security.credentialExchangeLib.extensions.params
+import de.gematik.security.credentialExchangeLib.connection.Connection
+import de.gematik.security.credentialExchangeLib.connection.ConnectionFactory
+import de.gematik.security.credentialExchangeLib.connection.Message
+import de.gematik.security.credentialExchangeLib.connection.MessageType
 import de.gematik.security.credentialExchangeLib.json
+import de.gematik.security.credentialExchangeLib.serializer.UUIDSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
+import java.net.URI
 import java.security.InvalidParameterException
+import java.util.*
 
 class PresentationExchangeHolderProtocol private constructor(connection: Connection) : Protocol(connection) {
 
@@ -25,22 +30,22 @@ class PresentationExchangeHolderProtocol private constructor(connection: Connect
     @Serializable
     data class ProtocolState(
         var state: State = State.INITIALIZED,
-        var invitation: Invitation? = null,
+        var invitationId: @Serializable(with = UUIDSerializer::class) UUID? = null,
         var offer: PresentationOffer? = null,
         var request: PresentationRequest? = null,
         var submit: PresentationSubmit? = null,
         var close: Close? = null
     )
 
-    val protocolState = ProtocolState()
+    val protocolState = ProtocolState(state = State.SEND_PRESENTATION_OFFER, invitationId = connection.invitationId)
 
     companion object : ProtocolFactory<PresentationExchangeHolderProtocol>() {
         override fun listen(
             connectionFactory: ConnectionFactory<*>,
-            connectionArgs: ConnectionArgs,
+            serviceEndpoint: URI,
             handler: suspend (PresentationExchangeHolderProtocol) -> Unit
         ) {
-            return connectionFactory.listen(connectionArgs) {
+            return connectionFactory.listen(serviceEndpoint) {
                 PresentationExchangeHolderProtocol(it).also {
                     protocols[it.id] = it
                 }.use {
@@ -51,12 +56,10 @@ class PresentationExchangeHolderProtocol private constructor(connection: Connect
 
         override suspend fun bind(
             connection: Connection,
-            invitation: Invitation,
             handler: suspend (PresentationExchangeHolderProtocol) -> Unit
         ) {
             PresentationExchangeHolderProtocol(connection).also {
                 protocols[it.id] = it
-                it.connected(invitation)
             }.use {
                 handler(it)
             }
@@ -64,16 +67,16 @@ class PresentationExchangeHolderProtocol private constructor(connection: Connect
 
         override suspend fun connect(
             connectionFactory: ConnectionFactory<*>,
-            connectionArgs: ConnectionArgs,
+            to: URI?,
+            from: URI?,
+            invitationId: UUID?,
+            firstProtocolMessage: Message?,
             handler: suspend (PresentationExchangeHolderProtocol) -> Unit
         ) {
-            connectionFactory.connect(connectionArgs) {
-                val oob = connectionArgs.endpoint.query?.params("oob")
-                val invitation = oob?.let { if (it.isEmpty()) null else Invitation.fromBase64(oob) }
+            connectionFactory.connect(to, from, invitationId,firstProtocolMessage) {
                 PresentationExchangeHolderProtocol(it).also {
                     protocols[it.id] = it
                 }.use {
-                    invitation?.let{inv -> it.connected(inv)}
                     handler(it)
                 }
             }
@@ -85,14 +88,6 @@ class PresentationExchangeHolderProtocol private constructor(connection: Connect
         while (pm == null) {
             val message = connection.receive()
             pm = when (message.type) {
-                MessageType.INVITATION_ACCEPT -> {
-                    check(protocolState.state == State.INITIALIZED) { "invalid state: ${protocolState.state.name}" }
-                    json.decodeFromJsonElement<Invitation>(message.content).also {
-                        protocolState.invitation = it
-                        protocolState.state = State.SEND_PRESENTATION_OFFER
-                    }
-                }
-
                 MessageType.PRESENTATION_REQUEST -> {
                     check(protocolState.state == State.WAIT_FOR_PRESENTATION_REQUEST || protocolState.state == State.SEND_PRESENTATION_OFFER) { "invalid state: ${protocolState.state.name}" }
                     json.decodeFromJsonElement<PresentationRequest>(message.content).also {
@@ -112,19 +107,6 @@ class PresentationExchangeHolderProtocol private constructor(connection: Connect
             }
         }
         return pm
-    }
-
-    override fun connected(invitation: Invitation) {
-        check(protocolState.state == State.INITIALIZED)
-        protocolState.invitation = invitation
-        protocolState.state = State.SEND_PRESENTATION_OFFER
-    }
-
-    suspend fun sendInvitation(invitation: Invitation) {
-        check(protocolState.state == State.INITIALIZED)
-        protocolState.invitation = invitation
-        connection.send(Message(json.encodeToJsonElement(invitation).jsonObject, MessageType.INVITATION_ACCEPT))
-        protocolState.state = State.SEND_PRESENTATION_OFFER
     }
 
     suspend fun sendOffer(presentationOffer: PresentationOffer) {
