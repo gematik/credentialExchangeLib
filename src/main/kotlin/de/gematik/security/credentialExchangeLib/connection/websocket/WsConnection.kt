@@ -43,8 +43,12 @@ class WsConnection private constructor(val session: DefaultWebSocketSession, rol
         while (!isCancelledOrClosed) {
             val message = kotlin.runCatching {
                 when (session) {
-                    is DefaultClientWebSocketSession -> session.receiveDeserialized<Message>()
-                    is DefaultWebSocketServerSession -> session.receiveDeserialized<Message>()
+                    is DefaultClientWebSocketSession -> session.receiveDeserialized<Message>().also {
+                        logger.info { "receive (client): ${Json.encodeToString(it)}" }
+                    }
+                    is DefaultWebSocketServerSession -> session.receiveDeserialized<Message>().also {
+                        logger.info { "receive (server): ${Json.encodeToString(it)}" }
+                    }
                     else -> throw IllegalStateException("wrong session type")
                 }
             }.onFailure {
@@ -71,7 +75,6 @@ class WsConnection private constructor(val session: DefaultWebSocketSession, rol
                 }
             }.getOrNull()
             message ?: continue
-            logger.info { "receive: ${Json.encodeToString(message)}" }
             _messageFlow.emit(message)
         }
     }
@@ -191,13 +194,18 @@ class WsConnection private constructor(val session: DefaultWebSocketSession, rol
     }
 
     override suspend fun send(message: Message) {
-        logger.info { "send: ${Json.encodeToString(message)}" }
         runCatching {
             when (session) {
-                is DefaultClientWebSocketSession -> session.sendSerialized(message)
-                is DefaultWebSocketServerSession -> session.sendSerialized(message)
+                is DefaultClientWebSocketSession -> {
+                    logger.info { "send (client): ${Json.encodeToString(message)}" }
+                    session.sendSerialized(message)
+                }
+                is DefaultWebSocketServerSession -> {
+                    logger.info { "send (server): ${Json.encodeToString(message)}" }
+                    session.sendSerialized(message)
+                }
             }
-        }.onFailure { logger.debug {"message not send due to: $it" } }
+        }.onFailure { logger.debug {"message not send because of: $it" } }
     }
 
 }
