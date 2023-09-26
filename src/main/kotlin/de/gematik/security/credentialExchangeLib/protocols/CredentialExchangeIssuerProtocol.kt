@@ -37,7 +37,7 @@ class CredentialExchangeIssuerProtocol private constructor(connection: Connectio
         var close: Close? = null
     )
 
-    val protocolState = ProtocolState(state = State.SEND_CREDENTIAL_OFFER, invitationId = connection.id)
+    val protocolState = ProtocolState(state = State.SEND_CREDENTIAL_OFFER, invitationId = connection.invitationId)
 
     companion object : ProtocolFactory<CredentialExchangeIssuerProtocol>() {
         override fun listen(
