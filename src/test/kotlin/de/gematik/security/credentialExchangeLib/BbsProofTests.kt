@@ -8,7 +8,9 @@ import de.gematik.security.credentialExchangeLib.extensions.*
 import de.gematik.security.credentialExchangeLib.protocols.*
 import io.github.novacrypto.base58.Base58
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.jupiter.api.Test
 import java.net.URI
 import java.time.ZoneId

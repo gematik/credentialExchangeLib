@@ -6,6 +6,7 @@ import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.extensions.deepCopy
 import de.gematik.security.credentialExchangeLib.extensions.hexToByteArray
 import de.gematik.security.credentialExchangeLib.protocols.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -128,18 +129,6 @@ class ProtocolTests {
         issuer = URI.create(didKeyIssuer)
     )
 
-    val invitation = Invitation(
-        UUID.randomUUID().toString(),
-        label = "Test Insurance Company",
-        goal = "Issue Insurance Certificate",
-        goalCode = GoalCode.OFFER_CREDENDIAL,
-        service = listOf(
-            Service(
-                serviceEndpoint = URI("ws://127.0.0.1:8090/ws")
-            )
-        )
-    )
-
     @Test
     fun manageProtocolInstances() {
         CredentialExchangeIssuerProtocol.listen(WsConnection) {
@@ -230,7 +219,6 @@ class ProtocolTests {
                 println("\"holder\": ${json.encodeToString(it.protocolState)}")
             }
         }
-
         CredentialExchangeIssuerProtocol.stopListening()
     }
 
@@ -297,8 +285,10 @@ class ProtocolTests {
                 assert(it.receive() is PresentationSubmit)
                 println("\"holder\": ${json.encodeToString(it.protocolState)}")
             }
+            delay(1000)
         }
         PresentationExchangeHolderProtocol.stopListening()
     }
 }
+
 

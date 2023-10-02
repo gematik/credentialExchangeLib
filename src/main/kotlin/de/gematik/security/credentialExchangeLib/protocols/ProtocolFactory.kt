@@ -6,7 +6,6 @@ import de.gematik.security.credentialExchangeLib.connection.Message
 import de.gematik.security.credentialExchangeLib.connection.websocket.WsConnection
 import de.gematik.security.credentialExchangeLib.extensions.createUri
 import java.net.URI
-import java.util.*
 
 abstract class ProtocolFactory<T : Protocol> {
     abstract fun listen(
@@ -28,9 +27,9 @@ abstract class ProtocolFactory<T : Protocol> {
 
     abstract suspend fun connect(
         connectionFactory: ConnectionFactory<*>,
-        to: URI? = null,
+        to: URI = createUri("127.0.0.1", 8090, "/ws"),
         from: URI? = null,
-        invitationId: UUID? = null,
+        invitationId: String? = null,
         firstProtocolMessage: Message? = null,
         handler: suspend (T) -> Unit
     )

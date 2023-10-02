@@ -1,14 +1,12 @@
 package de.gematik.security.credentialExchangeLib.connection
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.channels.Channel
 import mu.KotlinLogging
 import java.io.Closeable
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
-abstract class Connection(val role: Role, val invitationId: UUID?) : Closeable {
+abstract class Connection(val role: Role, val invitationId: String?) : Closeable {
 
     enum class Role {
         INVITER,
@@ -29,15 +27,15 @@ abstract class Connection(val role: Role, val invitationId: UUID?) : Closeable {
     }
 
     init{
-        logger.info { "new connection: $id" }
+        logger.info { "new connection - role: $role, id: $id, invitationId: $invitationId" }
     }
 
-    protected val _messageFlow = MutableSharedFlow<Message>()
-    public val messageFlow = _messageFlow.asSharedFlow()
+    val channel = Channel<Message>(10)
 
     abstract suspend fun send(message: Message)
 
     open suspend fun receive() : Message{
-        return messageFlow.first()
+        return channel.receive()
     }
+
 }

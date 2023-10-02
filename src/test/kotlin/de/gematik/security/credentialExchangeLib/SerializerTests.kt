@@ -1,5 +1,6 @@
 package de.gematik.security.credentialExchangeLib
 
+import de.gematik.security.credentialExchangeLib.connection.Invitation
 import de.gematik.security.credentialExchangeLib.extensions.toJsonDocument
 import de.gematik.security.credentialExchangeLib.extensions.toJsonLdObject
 import de.gematik.security.credentialExchangeLib.protocols.*
@@ -102,19 +103,17 @@ class SerializerTests {
 
     @Test
     fun serializeInvitation() {
-        val atId = UUID.randomUUID().toString()
         val invitation = Invitation(
-            atId,
+            id = UUID.randomUUID().toString(),
             label = "Test Medical Office",
             goal = "Issue Vaccination Certificate",
             goalCode = GoalCode.OFFER_CREDENDIAL,
-
-            service = listOf(Service(serviceEndpoint = URI.create("http://example.com")))
+            from = URI.create("http://example.com")
         )
         val serializedInvitation = json.encodeToString(invitation)
         assertEquals(
-            invitation.service.get(0).serviceEndpoint,
-            json.decodeFromString<Invitation>(serializedInvitation).service.get(0).serviceEndpoint)
+            invitation.from,
+            json.decodeFromString<Invitation>(serializedInvitation).from)
         println(serializedInvitation)
     }
 

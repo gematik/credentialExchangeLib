@@ -29,11 +29,10 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import mu.KotlinLogging
 import java.net.URI
-import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
-class WsConnection private constructor(val session: DefaultWebSocketSession, role : Role, invitationId: UUID?) :
+class WsConnection private constructor(val session: DefaultWebSocketSession, role : Role, invitationId: String?) :
     Connection(role, invitationId) {
 
     private lateinit var job : Job
@@ -71,11 +70,13 @@ class WsConnection private constructor(val session: DefaultWebSocketSession, rol
                         null
                     }
                 }?.let {
-                    _messageFlow.emit(it)
+                    channel.send(it)
                 }
             }.getOrNull()
             message ?: continue
-            _messageFlow.emit(message)
+            channel.send(message)
+            logger.info { "send to channel: ${Json.encodeToString(message)}" }
+
         }
     }
 
@@ -89,24 +90,28 @@ class WsConnection private constructor(val session: DefaultWebSocketSession, rol
             }
         }
 
+        override fun listen(handler: suspend (WsConnection) -> Unit) {
+            listen(createUri("0.0.0.0", 8090, "/ws"), handler)
+        }
+
         override fun listen(
-            to: URI?,
+            serviceEndpoint: URI,
             handler: suspend (WsConnection) -> Unit
         ) {
-            val serviceEndPoint = to ?: createUri("0.0.0.0", 8090, "/ws")
-            check(serviceEndPoint.host != null && !serviceEndPoint.host.isBlank())
-            val engine = embeddedServer(CIO, host = serviceEndPoint.host, port = serviceEndPoint.port) {
+            check(serviceEndpoint.host != null && !serviceEndpoint.host.isBlank()) {"invalid host"}
+            check(serviceEndpoint.port > 0) {"invalid port"}
+            val engine = embeddedServer(CIO, host = serviceEndpoint.host, port = serviceEndpoint.port) {
                 install(io.ktor.server.websocket.WebSockets) {
                     contentConverter = KotlinxWebsocketSerializationConverter(Json)
                 }
                 routing {
-                    webSocket(serviceEndPoint.path) {// new connection
+                    webSocket(serviceEndpoint.path) {// new connection
                         // first message is always 'invitation accept' - > set invitationId
                         val message = receiveDeserialized<Message>()
                         logger.info { "receive: ${Json.encodeToString(message)}" }
                         val invitationId = message.content.getOrDefault("invitationId", null)?.jsonPrimitive?.contentOrNull
                         // create connection, start connection and hand over to handler
-                        WsConnection(this, Role.INVITER, invitationId?.let{UUID.fromString(it)}).also {
+                        WsConnection(this, Role.INVITER, invitationId?.let{it}).also {
                             it.job = launch { it.start() }
                             connections[it.id] = it
                         }.use {
@@ -120,22 +125,30 @@ class WsConnection private constructor(val session: DefaultWebSocketSession, rol
                 }
             }
             engine.start()
-            engines.put("${serviceEndPoint.host}:${serviceEndPoint.port}", engine)
+            engines.put("${serviceEndpoint.host}:${serviceEndpoint.port}", engine)
         }
 
         override suspend fun connect(
-            to: URI?,
-            from: URI?,
-            invitationId: UUID?,
+            ownUri: URI?,
+            invitationId: String?,
             firstProtocolMessage: Message?,
             handler: suspend (WsConnection) -> Unit
         ) {
-            val serviceEndpoint = to ?: createUri("127.0.0.1", 8090, "/ws")
+            connect(createUri("127.0.0.1", 8090, "/ws"), ownUri, invitationId, firstProtocolMessage, handler)
+        }
+
+            override suspend fun connect(
+            remoteUri: URI,
+            ownUri: URI?,
+            invitationId: String?,
+            firstProtocolMessage: Message?,
+            handler: suspend (WsConnection) -> Unit
+        ) {
             client.webSocket(
                 method = HttpMethod.Get,
-                host = serviceEndpoint.host,
-                port = serviceEndpoint.port,
-                path = serviceEndpoint.path
+                host = remoteUri.host,
+                port = remoteUri.port,
+                path = remoteUri.path
             ) {
                 val invitationAccept = Message(
                     content = JsonObject(
@@ -158,18 +171,13 @@ class WsConnection private constructor(val session: DefaultWebSocketSession, rol
             }
         }
 
-        override fun stopListening(to: URI?) {
-            if (to == null) {
+        override fun stopListening(serviceEndpoint: URI?) {
+            if (serviceEndpoint == null) {
                 engines.values.forEach { it.stop() }
-                return
+            }else{
+                val key = "${serviceEndpoint.host}:${serviceEndpoint.port}"
+                engines.filter {it.key == key}.values.forEach { it.stop() }
             }
-            engines.filter {
-                "${to.host ?: ""}:${to.port < 0}" == "${
-                    if (to.host != null) it.key.substringBefore(":") else ""
-                }:${
-                    if (to.port < 0) it.key.substringAfter(":") else ""
-                }"
-            }.values.forEach { it.stop() }
         }
 
     }

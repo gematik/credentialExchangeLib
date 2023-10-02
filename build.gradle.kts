@@ -32,8 +32,8 @@ dependencies {
     implementation("io.ktor:ktor-client-websockets:2.3.1")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.1")
 
-    implementation ("org.didcommx:peerdid:0.3.0")
-    implementation ("org.didcommx:didcomm:0.3.2")
+    implementation ("org.didcommx:didcomm:0.3.3-SNAPSHOT")
+    implementation ("org.didcommx:peerdid:0.4.0-SNAPSHOT")
 
 
     testImplementation("org.junit.platform:junit-platform-suite-engine:1.9.1")

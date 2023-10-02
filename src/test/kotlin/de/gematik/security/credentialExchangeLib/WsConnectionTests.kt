@@ -18,14 +18,15 @@ class WsConnectionTests {
         WsConnection.listen {
             val response = it.receive().content.get("shot")?.jsonPrimitive?.content
             assertEquals("ping", response)
-            it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive("pong" )))))
+            it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive("pong")))))
         }
         runBlocking {
             WsConnection.connect {
-                it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive("ping" )))))
+                it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive("ping")))))
                 val response = it.receive().content.get("shot")?.jsonPrimitive?.content
                 assertEquals("pong", response)
             }
+            delay(100)
         }
         WsConnection.stopListening()
     }
@@ -33,20 +34,33 @@ class WsConnectionTests {
     @Test
     fun pingPong2() {
         WsConnection.listen {
-            val response = it.receive().content.get("shot")?.jsonPrimitive?.content?.replace("ping", "pong")
-            delay(100)
+            // two instances: one for ping and another for pong
+            var response = it.receive().content.get("shot")?.jsonPrimitive?.content?.replace("ping", "pong")
+            it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive(response)))))
+            response = it.receive().content.get("shot")?.jsonPrimitive?.content?.replace("ping", "pong")
             it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive(response)))))
         }
         runBlocking {
             launch {
                 WsConnection.connect {
-                    it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive("ping1" )))))
-                    assertEquals("pong1", it.receive().content.get("shot")?.jsonPrimitive?.content)
+                    it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive("pingA1")))))
+                    assertEquals("pongA1", it.receive().content.get("shot")?.jsonPrimitive?.content)
+                    println("A1")
+                    delay(100)
+                    it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive("pingA2")))))
+                    println("A2")
+                    assertEquals("pongA2", it.receive().content.get("shot")?.jsonPrimitive?.content)
                 }
             }
             WsConnection.connect {
-                it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive("ping2" )))))
-                assertEquals("pong2", it.receive().content.get("shot")?.jsonPrimitive?.content)
+                delay(50)
+                it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive("pingB1")))))
+                assertEquals("pongB1", it.receive().content.get("shot")?.jsonPrimitive?.content)
+                println("B1")
+                delay(100)
+                it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive("pingB2")))))
+                assertEquals("pongB2", it.receive().content.get("shot")?.jsonPrimitive?.content)
+                println("B2")
             }
         }
         WsConnection.stopListening()
@@ -67,16 +81,16 @@ class WsConnectionTests {
         runBlocking {
             launch {
                 WsConnection.connect(createUri("0.0.0.0", 1200)) {
-                    it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive("ping1" )))))
+                    it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive("ping1")))))
                     assertEquals("pong1", it.receive().content.get("shot")?.jsonPrimitive?.content)
                 }
             }
             WsConnection.connect(createUri("0.0.0.0", 1201)) {
-                it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive("ping2" )))))
+                it.send(Message(JsonObject(mapOf("shot" to JsonPrimitive("ping2")))))
                 assertEquals("peng2", it.receive().content.get("shot")?.jsonPrimitive?.content)
             }
+            delay(1000)
         }
         WsConnection.stopListening()
     }
-
 }

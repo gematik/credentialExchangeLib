@@ -1,6 +1,7 @@
 package de.gematik.security.credentialExchangeLib.connection.DidCommV2OverHttp
 
 import de.gematik.security.credentialExchangeLib.connection.Connection
+import de.gematik.security.credentialExchangeLib.connection.ConnectionFactory
 import de.gematik.security.credentialExchangeLib.connection.Message
 import de.gematik.security.credentialExchangeLib.connection.MessageType
 import de.gematik.security.credentialExchangeLib.extensions.createUri
@@ -17,13 +18,10 @@ import io.ktor.server.routing.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.*
 import mu.KotlinLogging
+import org.didcommx.didcomm.diddoc.DIDDoc
 import java.net.URI
-import java.util.*
 import kotlin.collections.set
 import kotlin.jvm.optionals.getOrNull
 
@@ -33,8 +31,7 @@ class DidCommV2OverHttpConnection private constructor(
     role: Role,
     var ownDid: URI,
     var remoteDid: URI,
-    var remoteServiceEndpoint: URI,
-    invitationId: UUID?
+    invitationId: String?
 ) : Connection(role, invitationId) {
 
     enum class ConnectionState {
@@ -51,70 +48,88 @@ class DidCommV2OverHttpConnection private constructor(
 
     var state: ConnectionState = ConnectionState.INITIALIZED
 
-    companion object {
+    private var ownDidDoc: DIDDoc
+    private val ownServiceEndpoint: URI
+    private var remoteDidDoc: DIDDoc
+    private val remoteServiceEndpoint: URI
+
+    init {
+        ownServiceEndpoint = DIDDocResolverPeerDID.resolve(ownDid.toString()).getOrNull().let {
+            check(it != null) { "ownDid is not resolveable" }
+            check(!it.didCommServices.isEmpty()) { "own service missing" }
+            ownDidDoc = it
+            URI.create(it.didCommServices[0].serviceEndpoint)
+        }
+        remoteServiceEndpoint = DIDDocResolverPeerDID.resolve(remoteDid.toString()).getOrNull().let {
+            check(it != null) { "remoteDid is not resolveable" }
+            check(!it.didCommServices.isEmpty()) { "remote service missing" }
+            remoteDidDoc = it
+            URI.create(it.didCommServices[0].serviceEndpoint)
+        }
+        logger.info { "new connection - ownDid: $ownDid, ownServiceEndpoint: $ownServiceEndpoint" }
+        logger.info { "new connection - remoteDid: $remoteDid, remoteServiceEndpoint: $remoteServiceEndpoint" }
+    }
+
+    companion object : ConnectionFactory<DidCommV2OverHttpConnection> {
 
         private val engines = mutableMapOf<String, ApplicationEngine>()
 
         private val client = HttpClient(CIO)
 
-        fun getConnection(ownId: URI, remoteId: URI): DidCommV2OverHttpConnection? {
+        fun getConnection(ownDid: URI, remoteDid: URI): DidCommV2OverHttpConnection? {
             return connections.values.firstOrNull {
                 (it as? DidCommV2OverHttpConnection)?.let {
-                    (it.ownDid == ownId) && (it.remoteDid == remoteId)
+                    (it.ownDid == ownDid) && (it.remoteDid == remoteDid)
                 } ?: false
             } as? DidCommV2OverHttpConnection
         }
 
-        fun getConnection(invitationId: UUID): DidCommV2OverHttpConnection? {
-            return connections.values.firstOrNull {
-                (it as? DidCommV2OverHttpConnection)?.let {
-                    it.invitationId == invitationId
-                } ?: false
-            } as? DidCommV2OverHttpConnection
+        override fun listen(handler: suspend (DidCommV2OverHttpConnection) -> Unit) {
+            listen(createUri("0.0.0.0", 8090, "/didcomm"), handler)
         }
 
-        fun listen(to: URI?, handler: suspend (DidCommV2OverHttpConnection) -> Unit) {
-
-            check(to != null) { "parameter 'to' required" }
-            val remoteDidDoc = DIDDocResolverPeerDID.resolve(to.toString()).getOrNull()
-            check(remoteDidDoc != null) { "to is not resolveable" }
-            check(!remoteDidDoc.didCommServices.isEmpty()) { "remote service missing" }
-            val serviceEndpoint = URI.create(remoteDidDoc.didCommServices[0].serviceEndpoint)
-            check(serviceEndpoint.host != null && !serviceEndpoint.host.isBlank())
+        override fun listen(serviceEndpoint: URI, handler: suspend (DidCommV2OverHttpConnection) -> Unit) {
+            check(serviceEndpoint.host != null && !serviceEndpoint.host.isBlank()) { "invalid host" }
+            check(serviceEndpoint.port > 0) { "invalid port" }
             val engine =
                 embeddedServer(io.ktor.server.cio.CIO, host = serviceEndpoint.host, port = serviceEndpoint.port) {
                     routing {
                         post(serviceEndpoint.path) {
-                            val body = call.receive<String>()
-                            logger.debug { "==> POST: $body" }
-                            val unpackResult = unpack(body)
-                            logger.debug { "Message: ${unpackResult.res.message}" }
-                            logger.debug { unpackResult.res.metadata }
-                            check(unpackResult.from != null) { "'from' required to establish connection" }
-                            val connection = getConnection(URI(unpackResult.to), URI(unpackResult.from))
-                            if (connection != null) { // existing connection
-                                unpackResult.message.let {
-                                    connection._messageFlow.emit(Json.decodeFromString<Message>(it.toString()))
-                                    logger.info { "emit to flow: ${Json.encodeToString(Json.decodeFromString<Message>(it.toString()))}" }
-                                }
-                            } else { // establish new connection
-                                DidCommV2OverHttpConnection(
-                                    Role.INVITER,
-                                    URI(unpackResult.to),
-                                    URI(unpackResult.from),
-                                    URI.create(DIDDocResolverPeerDID.resolve(unpackResult.from).get().didCommServices[0].serviceEndpoint),
-                                    unpackResult.res.message.pthid?.let{UUID.fromString(it)}
-                                ).also {
-                                    connections[it.id] = it
-                                }.use {
-                                    it.state = ConnectionState.RELATIONSHIP_ESTABLISHED
-                                    launch {
-                                        handler(it)
+                            runCatching {
+                                val body = call.receive<String>()
+                                logger.debug { "==> POST: $body" }
+                                val unpackResult = unpack(body)
+                                logger.debug { "Message: ${unpackResult.res.message}" }
+                                logger.debug { unpackResult.res.metadata }
+                                check(unpackResult.from != null) { "'from' required to establish connection" }
+                                val connection = getConnection(URI(unpackResult.to), URI(unpackResult.from))
+                                if (connection != null) { // existing connection
+                                    unpackResult.message.let {
+                                        connection.channel.send(Json.decodeFromJsonElement(it))
+                                        logger.info { "send to channel: ${Json.encodeToString(it)}" }
+                                    }
+                                } else { // establish new connection
+                                    DidCommV2OverHttpConnection(
+                                        Role.INVITER,
+                                        URI(unpackResult.to),
+                                        URI(unpackResult.from),
+                                        unpackResult.res.message.pthid?.let { it }
+                                    ).also {
+                                        connections[it.id] = it
+                                    }.use {
+                                        it.state = ConnectionState.RELATIONSHIP_ESTABLISHED
+                                        launch {
+                                            handler(it)
+                                        }
                                     }
                                 }
+                            }.onFailure {
+                                call.respond(HttpStatusCode.BadRequest, it.message ?: "bad request")
+                                logger.debug { "<== ${HttpStatusCode.Created}" }
+                            }.onSuccess {
+                                call.respond(HttpStatusCode.Created)
+                                logger.debug { "<== ${HttpStatusCode.Created}" }
                             }
-                            call.respond(HttpStatusCode.Created)
-                            logger.debug { "<== ${HttpStatusCode.Created}" }
                         }
                         staticResources("/static", "files")
                         get("/") {
@@ -127,47 +142,59 @@ class DidCommV2OverHttpConnection private constructor(
             engines.put("${serviceEndpoint.host}:${serviceEndpoint.port}", engine)
         }
 
-        fun stopListening(to: URI?) {
-            val serviceEndPoint = to ?: createUri("0.0.0.0", 8090, "/didcomm")
-            check(serviceEndPoint.host != null && !serviceEndPoint.host.isBlank())
-            engines.filter {
-                "${serviceEndPoint.host}:${serviceEndPoint.port}" == it.key
-            }.values.forEach { it.stop() }
+        override fun stopListening(serviceEndpoint: URI?) {
+            if (serviceEndpoint == null) {
+                engines.values.forEach { it.stop() }
+            } else {
+                val key = "${serviceEndpoint.host}:${serviceEndpoint.port}"
+                engines.filter { it.key == key }.values.forEach { it.stop() }
+            }
         }
 
-        var pthid : String? = null
+        var pthid: String? = null
 
-        suspend fun connect(
-            to: URI?,
-            from: URI?,
-            invitationId: UUID?,
+        override suspend fun connect(
+            ownUri: URI?,
+            invitationId: String?,
+            firstProtocolMessage: Message?,
+            handler: suspend (DidCommV2OverHttpConnection) -> Unit
+        ) {
+            connect(
+                URI.create(createPeerDID(serviceEndpoint = createUri("127.0.0.1", 8090, "/didcomm").toString())),
+                ownUri,
+                invitationId,
+                firstProtocolMessage,
+                handler
+            )
+        }
+
+        override suspend fun connect(
+            remoteUri: URI,
+            ownUri: URI?,
+            invitationId: String?,
             firstProtocolMessage: Message?,
             handler: suspend (DidCommV2OverHttpConnection) -> Unit
         ) { // establish new connection
-            from ?: throw IllegalArgumentException("parameter 'from' required")
-            to ?: throw IllegalArgumentException("parameter 'to' required")
-            val ownDidDoc = DIDDocResolverPeerDID.resolve(from.toString()).getOrNull()
-            check(ownDidDoc != null) { "from is not resolveable" }
-            val remoteDidDoc = DIDDocResolverPeerDID.resolve(to.toString()).getOrNull()
-            check(remoteDidDoc != null) { "to is not resolveable" }
-            check(!remoteDidDoc.didCommServices.isEmpty()) { "remote service missing" }
+            ownUri ?: throw IllegalArgumentException("parameter 'from' required")
             DidCommV2OverHttpConnection(
                 Role.INVITEE,
-                from,
-                to,
-                URI.create(remoteDidDoc.didCommServices[0].serviceEndpoint),
-                invitationId ?: UUID.randomUUID()
+                ownUri,
+                remoteUri,
+                invitationId
             ).also {
+                if (!engines.containsKey("${it.ownServiceEndpoint.host}:${it.ownServiceEndpoint.port}")) {
+                    listen(it.ownServiceEndpoint) {} // start engine with empty handler - new connection are teared down
+                }
                 connections[it.id] = it
             }.use { connection ->
                 connection.state = ConnectionState.RELATIONSHIP_ESTABLISHED
                 pthid = invitationId?.toString()
-                if(firstProtocolMessage!=null){
+                if (firstProtocolMessage != null) {
                     connection.send(firstProtocolMessage)
-                }else{
+                } else {
                     connection.send(
                         Message(
-                            JsonObject(mapOf("invitationId" to JsonPrimitive(invitationId?.toString()))),
+                            JsonObject(mapOf("invitationId" to JsonPrimitive(invitationId))),
                             MessageType.INVITATION_ACCEPT
                         )
                     )
@@ -196,7 +223,7 @@ class DidCommV2OverHttpConnection private constructor(
                 setBody(packedMsg.packedMessage)
             }
 
-        }.onFailure { logger.info {"could not sent: ${it.message}"} }
+        }.onFailure { logger.info { "could not sent: ${it.message}" } }
 
     }
 
@@ -210,8 +237,6 @@ class DidCommV2OverHttpConnection private constructor(
     override fun close() {
         state = ConnectionState.RELATIONSHIP_ESTABLISHED
     }
-
-
 }
 
 

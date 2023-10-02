@@ -11,7 +11,6 @@ import org.didcommx.didcomm.utils.toJson
 import org.didcommx.peerdid.DIDCommServicePeerDID
 import org.didcommx.peerdid.DIDDocPeerDID
 import org.didcommx.peerdid.VerificationMaterialFormatPeerDID
-import org.didcommx.peerdid.resolvePeerDID
 import java.util.*
 
 object DIDDocResolverPeerDID : DIDDocResolver {

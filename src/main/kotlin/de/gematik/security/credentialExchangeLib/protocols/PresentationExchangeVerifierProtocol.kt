@@ -5,14 +5,12 @@ import de.gematik.security.credentialExchangeLib.connection.ConnectionFactory
 import de.gematik.security.credentialExchangeLib.connection.Message
 import de.gematik.security.credentialExchangeLib.connection.MessageType
 import de.gematik.security.credentialExchangeLib.json
-import de.gematik.security.credentialExchangeLib.serializer.UUIDSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import java.net.URI
 import java.security.InvalidParameterException
-import java.util.*
 
 class PresentationExchangeVerifierProtocol private constructor(connection: Connection) : Protocol(connection) {
 
@@ -30,7 +28,7 @@ class PresentationExchangeVerifierProtocol private constructor(connection: Conne
     @Serializable
     data class ProtocolState(
         var state: State = State.INITIALIZED,
-        var invitationId: @Serializable(with = UUIDSerializer::class) UUID? = null,
+        var invitationId: String? = null,
         var offer: PresentationOffer? = null,
         var request: PresentationRequest? = null,
         var submit: PresentationSubmit? = null,
@@ -67,9 +65,9 @@ class PresentationExchangeVerifierProtocol private constructor(connection: Conne
 
         override suspend fun connect(
             connectionFactory: ConnectionFactory<*>,
-            to: URI?,
+            to: URI,
             from: URI?,
-            invitationId: UUID?,
+            invitationId: String?,
             firstProtocolMessage: Message?,
             handler: suspend (PresentationExchangeVerifierProtocol) -> Unit
         ) {
