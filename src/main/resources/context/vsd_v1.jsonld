@@ -80,6 +80,10 @@
         "postBoxAddress": {
           "@id": "https://gematik.de/vsd#insurantPostBoxAddress",
           "@type": "@id"
+        },
+        "portrait": {
+          "@id": "https://gematik.de/vsd#insurantPotrait",
+          "@type": "https://gematik.de/vsd#Portrait"
         }
       }
     },

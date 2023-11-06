@@ -19,7 +19,8 @@ data class Insurant(
     val gender: Gender,
     val academicTitel: String? = null,
     val streetAddress: StreetAddress? = null,
-    val postBoxAddress: PostBoxAddress? = null
+    val postBoxAddress: PostBoxAddress? = null,
+    val portrait: String? = null //base64 encoded jpeg image
 ) : LdObject(type = listOf("Insurant"))
 
 @Serializable

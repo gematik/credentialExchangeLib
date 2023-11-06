@@ -230,7 +230,7 @@ class DidCommV2OverHttpConnection private constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun receive(): Message {
         val message = super.receive()
-        logger.info { "receive from flow: ${Json.encodeToString(message)}" }
+        logger.info { "receive from channel: ${Json.encodeToString(message)}" }
         return message
     }
 
