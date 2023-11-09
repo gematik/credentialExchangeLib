@@ -230,11 +230,13 @@ class ProtocolTests {
             it.sendOffer(
                 PresentationOffer(
                     UUID.randomUUID().toString(),
-                    inputDescriptor = Descriptor(
-                        UUID.randomUUID().toString(),
-                        Credential(
-                            atContext = Credential.DEFAULT_JSONLD_CONTEXTS + URI("https://w3id.org/vaccination/v1"),
-                            type = Credential.DEFAULT_JSONLD_TYPES + "VaccinationCertificate"
+                    inputDescriptor = listOf(
+                        Descriptor(
+                            UUID.randomUUID().toString(),
+                            Credential(
+                                atContext = Credential.DEFAULT_JSONLD_CONTEXTS + URI("https://w3id.org/vaccination/v1"),
+                                type = Credential.DEFAULT_JSONLD_TYPES + "VaccinationCertificate"
+                            )
                         )
                     )
                 )
@@ -248,7 +250,7 @@ class ProtocolTests {
                     definitionId = UUID.randomUUID(),
                     descriptorMap = listOf(
                         PresentationSubmission.DescriptorMapEntry(
-                            (presentationRequest as PresentationRequest).inputDescriptor.id,
+                            (presentationRequest as PresentationRequest).inputDescriptor[0].id,
                             ClaimFormat.LDP_VC,
                             path = "\$.verifiableCredential[0]"
                         )
@@ -256,7 +258,7 @@ class ProtocolTests {
                 ),
                 verifiableCredential = listOf(credential.deepCopy().apply {
                     sign(ldProofIssuer, keyPairIssuer.privateKey!!)
-                }.derive((presentationRequest as PresentationRequest).inputDescriptor.frame))
+                }.derive(presentationRequest.inputDescriptor[0].frame))
             ).apply { sign(ldProofHolder, keyPairHolder.privateKey!!) }
 
             it.submitPresentation(

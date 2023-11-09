@@ -9,7 +9,7 @@ import java.net.URI
 public class JsonLdObject(
     private val content: Map<String, JsonElement>
 ) : Map<String, JsonElement> by content, LdObject(
-    content.get("id")?.jsonPrimitive?.content,
+    content.get("id")?.let{if(it is JsonPrimitive) it.jsonPrimitive.content else null},
     content.get("@context").let{
         when(it){
             is JsonArray -> it.map { URI(it.jsonPrimitive.content) }

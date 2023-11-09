@@ -166,6 +166,7 @@ fun Map<String, Any?>.toJsonObject(): JsonObject {
     return JsonObject(entries.fold(mutableMapOf()) { map, entry ->
         val value = entry.value
         when (value) {
+            null -> map[entry.key] = JsonNull
             is Boolean -> map[entry.key] = JsonPrimitive(value)
             is Long -> map[entry.key] = JsonPrimitive(value)
             is Double -> map[entry.key] = JsonPrimitive(value)
@@ -181,6 +182,7 @@ fun Map<String, Any?>.toJsonObject(): JsonObject {
 fun List<Any?>.toJsonArray(): JsonArray {
     return JsonArray(fold(mutableListOf()) { list, value ->
         when (value) {
+            null -> list.add(JsonNull)
             is Boolean -> list.add(JsonPrimitive(value))
             is Long -> list.add(JsonPrimitive(value))
             is Double -> list.add(JsonPrimitive(value))

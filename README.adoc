@@ -16,7 +16,7 @@ skinparam component {
 [credential exchange protocols] <<implemented>> as Protocols
 [connections] <<implemented>> as Connections
 [WsConnection] <<implemented>> as WsConnection
-[DIDCommConnection] as DIDComm
+[DIDCommConnection] <<implemented>> as DIDComm
 [didcomm-jvm SICPA] <<implemented>> as SICPA
 [kotlin serialization] <<implemented>> as Serialization
 [ktor] <<implemented>> as ktor

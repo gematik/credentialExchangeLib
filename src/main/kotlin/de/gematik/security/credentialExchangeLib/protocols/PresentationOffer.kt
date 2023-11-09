@@ -7,12 +7,12 @@ import java.net.URI
 class PresentationOffer : LdObject {
     constructor(
         id: String? = null,
-        inputDescriptor: Descriptor,
+        inputDescriptor: List<Descriptor>,
     ) : super (id, DEFAULT_JSONLD_CONTEXTS, DEFAULT_JSONLD_TYPES){
         this.inputDescriptor = inputDescriptor
     }
 
-    val inputDescriptor: Descriptor
+    val inputDescriptor: List<Descriptor>
 
     companion object : Defaults() {
         override val DEFAULT_JSONLD_CONTEXTS = listOf(
