@@ -22,6 +22,7 @@ import kotlinx.serialization.json.*
 import mu.KotlinLogging
 import org.didcommx.didcomm.diddoc.DIDDoc
 import java.net.URI
+import java.util.UUID
 import kotlin.collections.set
 import kotlin.jvm.optionals.getOrNull
 
@@ -31,7 +32,8 @@ class DidCommV2OverHttpConnection private constructor(
     role: Role,
     var ownDid: URI,
     var remoteDid: URI,
-    invitationId: String?
+    invitationId: String?,
+    val thid: String? = null
 ) : Connection(role, invitationId) {
 
     enum class ConnectionState {
@@ -76,10 +78,12 @@ class DidCommV2OverHttpConnection private constructor(
 
         private val client = HttpClient(CIO)
 
-        fun getConnection(ownDid: URI, remoteDid: URI): DidCommV2OverHttpConnection? {
+        fun getConnection(
+            thid: String
+        ): DidCommV2OverHttpConnection? {
             return connections.values.firstOrNull {
                 (it as? DidCommV2OverHttpConnection)?.let {
-                    (it.ownDid == ownDid) && (it.remoteDid == remoteDid)
+                    (it.thid == thid)
                 } ?: false
             } as? DidCommV2OverHttpConnection
         }
@@ -95,6 +99,7 @@ class DidCommV2OverHttpConnection private constructor(
                 embeddedServer(io.ktor.server.cio.CIO, host = serviceEndpoint.host, port = serviceEndpoint.port) {
                     routing {
                         post(serviceEndpoint.path) {
+                            // handling incoming message
                             runCatching {
                                 val body = call.receive<String>()
                                 logger.debug { "==> POST: $body" }
@@ -102,18 +107,21 @@ class DidCommV2OverHttpConnection private constructor(
                                 logger.debug { "Message: ${unpackResult.res.message}" }
                                 logger.debug { unpackResult.res.metadata }
                                 check(unpackResult.from != null) { "'from' required to establish connection" }
-                                val connection = getConnection(URI(unpackResult.to), URI(unpackResult.from))
-                                if (connection != null) { // existing connection
+                                val connection = unpackResult.res.message.thid?.let { getConnection(it) }
+                                if (connection != null) {
+                                    // message related to existing thread (connection)
                                     unpackResult.message.let {
                                         connection.channel.send(Json.decodeFromJsonElement(it))
                                         logger.info { "send to channel: ${Json.encodeToString(it)}" }
                                     }
-                                } else { // establish new connection
+                                } else {
+                                    // create new thread (connection)
                                     DidCommV2OverHttpConnection(
                                         Role.INVITER,
                                         URI(unpackResult.to),
                                         URI(unpackResult.from),
-                                        unpackResult.res.message.pthid?.let { it }
+                                        unpackResult.res.message.pthid,
+                                        unpackResult.res.message.thid
                                     ).also {
                                         connections[it.id] = it
                                     }.use {
@@ -123,12 +131,16 @@ class DidCommV2OverHttpConnection private constructor(
                                         }
                                     }
                                 }
-                            }.onFailure {
-                                call.respond(HttpStatusCode.BadRequest, it.message ?: "bad request")
-                                logger.debug { "<== ${HttpStatusCode.Created}" }
+                            }.onFailure { throwable ->
+                                HttpStatusCode.BadRequest.let {
+                                    call.respond(it, throwable.message ?: "bad request")
+                                    logger.debug { "<== $it" }
+                                }
                             }.onSuccess {
-                                call.respond(HttpStatusCode.Created)
-                                logger.debug { "<== ${HttpStatusCode.Created}" }
+                                HttpStatusCode.Created.let {
+                                    call.respond(it)
+                                    logger.debug { "<== $it" }
+                                }
                             }
                         }
                         staticResources("/static", "files")
@@ -151,8 +163,6 @@ class DidCommV2OverHttpConnection private constructor(
             }
         }
 
-        var pthid: String? = null
-
         override suspend fun connect(
             ownUri: URI?,
             invitationId: String?,
@@ -174,13 +184,14 @@ class DidCommV2OverHttpConnection private constructor(
             invitationId: String?,
             firstProtocolMessage: Message?,
             handler: suspend (DidCommV2OverHttpConnection) -> Unit
-        ) { // establish new connection
+        ) { // establish new connection and thread
             ownUri ?: throw IllegalArgumentException("parameter 'from' required")
             DidCommV2OverHttpConnection(
                 Role.INVITEE,
                 ownUri,
                 remoteUri,
-                invitationId
+                invitationId,
+                UUID.randomUUID().toString()  // new thread
             ).also {
                 if (!engines.containsKey("${it.ownServiceEndpoint.host}:${it.ownServiceEndpoint.port}")) {
                     listen(it.ownServiceEndpoint) {} // start engine with empty handler - new connection are teared down
@@ -188,7 +199,6 @@ class DidCommV2OverHttpConnection private constructor(
                 connections[it.id] = it
             }.use { connection ->
                 connection.state = ConnectionState.RELATIONSHIP_ESTABLISHED
-                pthid = invitationId?.toString()
                 if (firstProtocolMessage != null) {
                     connection.send(firstProtocolMessage)
                 } else {
@@ -210,7 +220,8 @@ class DidCommV2OverHttpConnection private constructor(
             val packedMsg = pack(
                 body = Json.encodeToJsonElement<Message>(message) as JsonObject,
                 type = "https://gematik.de/credential-exchange/v1",
-                pthid = pthid,
+                pthid = invitationId,
+                thid = thid,
                 from = ownDid.toString(),
                 to = remoteDid.toString(),
                 protectSender = false
@@ -223,7 +234,8 @@ class DidCommV2OverHttpConnection private constructor(
                 setBody(packedMsg.packedMessage)
             }
 
-        }.onFailure { logger.info { "could not sent: ${it.message}" } }
+        }.onSuccess { logger.info { "receive: ${it.status}" } }
+            .onFailure { logger.info { "could not sent: ${it.message}" } }
 
     }
 
@@ -235,7 +247,7 @@ class DidCommV2OverHttpConnection private constructor(
     }
 
     override fun close() {
-        state = ConnectionState.RELATIONSHIP_ESTABLISHED
+        state = ConnectionState.RELATIONSHIP_CLOSED
     }
 }
 

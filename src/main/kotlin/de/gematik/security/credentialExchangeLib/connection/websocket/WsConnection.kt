@@ -111,7 +111,7 @@ class WsConnection private constructor(val session: DefaultWebSocketSession, rol
                         logger.info { "receive: ${Json.encodeToString(message)}" }
                         val invitationId = message.content.getOrDefault("invitationId", null)?.jsonPrimitive?.contentOrNull
                         // create connection, start connection and hand over to handler
-                        WsConnection(this, Role.INVITER, invitationId?.let{it}).also {
+                        WsConnection(this, Role.INVITER, invitationId).also {
                             it.job = launch { it.start() }
                             connections[it.id] = it
                         }.use {

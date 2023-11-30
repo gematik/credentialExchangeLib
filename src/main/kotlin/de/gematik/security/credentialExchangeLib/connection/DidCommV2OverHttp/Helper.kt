@@ -100,6 +100,7 @@ fun pack(
     from: String? = null,
     signFrom: String? = null,
     pthid: String? = null,
+    thid: String? = null,
     protectSender: Boolean = true
 ): PackEncryptedResult {
     val didComm = DIDComm(DIDDocResolverPeerDID, credentialExchangeLib.secretResolver)
@@ -107,7 +108,9 @@ fun pack(
         id = UUID.randomUUID().toString(),
         body = body.toAnyMap(),
         type = type
-    ).pthid(pthid).build()
+    ).pthid(pthid)
+        .thid(thid)
+        .build()
     var builder = PackEncryptedParams
         .builder(message, to)
         .forward(false)
