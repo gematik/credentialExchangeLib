@@ -23,7 +23,7 @@ sealed class Protocol(val connection: Connection) : Closeable {
     val id : UUID = UUID.randomUUID()
 
     init{
-        logger.info { "new context: $id" }
+        logger.info { "new protocol context: $id" }
     }
 
     abstract suspend fun receive() : LdObject

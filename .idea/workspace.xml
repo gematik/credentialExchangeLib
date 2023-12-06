@@ -24,8 +24,8 @@
     <list default="true" id="246e1cc3-192b-491f-8ba1-e76025f33fb5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/DidCommV2OverHttp/DidCommV2OverHttpConnection.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/DidCommV2OverHttp/DidCommV2OverHttpConnection.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/DidCommV2OverHttp/Helper.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/DidCommV2OverHttp/Helper.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/websocket/WsConnection.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/websocket/WsConnection.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Protocol.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Protocol.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -381,7 +381,8 @@
       <workItem from="1699545455764" duration="24000" />
       <workItem from="1700496564346" duration="3958000" />
       <workItem from="1700569261651" duration="4587000" />
-      <workItem from="1701179273415" duration="14391000" />
+      <workItem from="1701179273415" duration="17220000" />
+      <workItem from="1701424749985" duration="2215000" />
     </task>
     <task id="LOCAL-00001" summary="initial check in">
       <created>1683117220289</created>
@@ -726,7 +727,7 @@
       <option name="project" value="LOCAL" />
       <updated>1694099433023</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -755,7 +756,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="chore: add component diagramto README.adoc" />
     <MESSAGE value="feat: support of ECDSA SecP256R1 including necessary refactory" />
     <MESSAGE value="feat: support of EdDSA Ed25519" />
     <MESSAGE value="chore: optimize imports" />
@@ -780,7 +780,8 @@
     <MESSAGE value="chore: WsConnection logging" />
     <MESSAGE value="fix: connection handling and use of latest didcomm artifacts" />
     <MESSAGE value="feat: add portrait to insurant data" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add portrait to insurant data" />
+    <MESSAGE value="feat: thread handling (parameter thid) in DidCommV2OverHttpConnection" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: thread handling (parameter thid) in DidCommV2OverHttpConnection" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -43,10 +43,10 @@ class WsConnection private constructor(val session: DefaultWebSocketSession, rol
             val message = kotlin.runCatching {
                 when (session) {
                     is DefaultClientWebSocketSession -> session.receiveDeserialized<Message>().also {
-                        logger.info { "receive (client): ${Json.encodeToString(it)}" }
+                        logger.info { "==> receive (client): ${Json.encodeToString(it)}" }
                     }
                     is DefaultWebSocketServerSession -> session.receiveDeserialized<Message>().also {
-                        logger.info { "receive (server): ${Json.encodeToString(it)}" }
+                        logger.info { "==> receive (server): ${Json.encodeToString(it)}" }
                     }
                     else -> throw IllegalStateException("wrong session type")
                 }
@@ -75,7 +75,7 @@ class WsConnection private constructor(val session: DefaultWebSocketSession, rol
             }.getOrNull()
             message ?: continue
             channel.send(message)
-            logger.info { "send to channel: ${Json.encodeToString(message)}" }
+            logger.debug { "send to channel: ${Json.encodeToString(message)}" }
 
         }
     }
@@ -108,7 +108,7 @@ class WsConnection private constructor(val session: DefaultWebSocketSession, rol
                     webSocket(serviceEndpoint.path) {// new connection
                         // first message is always 'invitation accept' - > set invitationId
                         val message = receiveDeserialized<Message>()
-                        logger.info { "receive: ${Json.encodeToString(message)}" }
+                        logger.info { "==> receive (server): ${Json.encodeToString(message)}" }
                         val invitationId = message.content.getOrDefault("invitationId", null)?.jsonPrimitive?.contentOrNull
                         // create connection, start connection and hand over to handler
                         WsConnection(this, Role.INVITER, invitationId).also {
@@ -156,10 +156,10 @@ class WsConnection private constructor(val session: DefaultWebSocketSession, rol
                     ),
                     MessageType.INVITATION_ACCEPT
                 )
-                logger.info { "send: ${Json.encodeToString(invitationAccept)}" }
+                logger.info { "<== send (client): ${Json.encodeToString(invitationAccept)}" }
                 this.sendSerialized(invitationAccept)
                 firstProtocolMessage?.let {
-                    logger.info { "send: ${Json.encodeToString(firstProtocolMessage)}" }
+                    logger.info { "<== send (client): ${Json.encodeToString(firstProtocolMessage)}" }
                     this.sendSerialized(firstProtocolMessage)
                 }
                 WsConnection(this, Role.INVITEE, invitationId).also {
@@ -205,11 +205,11 @@ class WsConnection private constructor(val session: DefaultWebSocketSession, rol
         runCatching {
             when (session) {
                 is DefaultClientWebSocketSession -> {
-                    logger.info { "send (client): ${Json.encodeToString(message)}" }
+                    logger.info { "<== send (client): ${Json.encodeToString(message)}" }
                     session.sendSerialized(message)
                 }
                 is DefaultWebSocketServerSession -> {
-                    logger.info { "send (server): ${Json.encodeToString(message)}" }
+                    logger.info { "<== send (server): ${Json.encodeToString(message)}" }
                     session.sendSerialized(message)
                 }
             }

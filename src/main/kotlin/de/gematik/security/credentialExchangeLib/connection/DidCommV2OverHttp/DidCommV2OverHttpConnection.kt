@@ -102,17 +102,17 @@ class DidCommV2OverHttpConnection private constructor(
                             // handling incoming message
                             runCatching {
                                 val body = call.receive<String>()
-                                logger.debug { "==> POST: $body" }
+                                logger.info { "==> POST: $body" }
                                 val unpackResult = unpack(body)
-                                logger.debug { "Message: ${unpackResult.res.message}" }
-                                logger.debug { unpackResult.res.metadata }
+                                logger.info { "Message: ${unpackResult.res.message}" }
+                                logger.info { unpackResult.res.metadata }
                                 check(unpackResult.from != null) { "'from' required to establish connection" }
                                 val connection = unpackResult.res.message.thid?.let { getConnection(it) }
                                 if (connection != null) {
                                     // message related to existing thread (connection)
                                     unpackResult.message.let {
                                         connection.channel.send(Json.decodeFromJsonElement(it))
-                                        logger.info { "send to channel: ${Json.encodeToString(it)}" }
+                                        logger.debug { "send to channel: ${Json.encodeToString(it)}" }
                                     }
                                 } else {
                                     // create new thread (connection)
@@ -134,12 +134,12 @@ class DidCommV2OverHttpConnection private constructor(
                             }.onFailure { throwable ->
                                 HttpStatusCode.BadRequest.let {
                                     call.respond(it, throwable.message ?: "bad request")
-                                    logger.debug { "<== $it" }
+                                    logger.info { "<== $it" }
                                 }
                             }.onSuccess {
                                 HttpStatusCode.Created.let {
                                     call.respond(it)
-                                    logger.debug { "<== $it" }
+                                    logger.info { "<== $it" }
                                 }
                             }
                         }
@@ -215,7 +215,6 @@ class DidCommV2OverHttpConnection private constructor(
     }
 
     override suspend fun send(message: Message) {
-        logger.info { "send: ${Json.encodeToString(message)}" }
         runCatching {
             val packedMsg = pack(
                 body = Json.encodeToJsonElement<Message>(message) as JsonObject,
@@ -227,6 +226,7 @@ class DidCommV2OverHttpConnection private constructor(
                 protectSender = false
             )
 
+            logger.info { "<== send: ${Json.encodeToString(message)}" }
             client.post(remoteServiceEndpoint.toURL()) {
                 io.ktor.http.headers {
                     append(HttpHeaders.ContentType, "application/didcomm-enc-env;v2")
@@ -234,7 +234,7 @@ class DidCommV2OverHttpConnection private constructor(
                 setBody(packedMsg.packedMessage)
             }
 
-        }.onSuccess { logger.info { "receive: ${it.status}" } }
+        }.onSuccess { logger.info { "==> receive: ${it.status}" } }
             .onFailure { logger.info { "could not sent: ${it.message}" } }
 
     }
@@ -242,7 +242,7 @@ class DidCommV2OverHttpConnection private constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun receive(): Message {
         val message = super.receive()
-        logger.info { "receive from channel: ${Json.encodeToString(message)}" }
+        logger.debug { "receive from channel: ${Json.encodeToString(message)}" }
         return message
     }
 
