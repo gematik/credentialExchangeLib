@@ -1,4 +1,347 @@
 = Credential Exchange Library for kotlin
+:sectnums:
+:toc:
+:toclevels: 4
+
+The "`credential exchange library for kotlin`" implemenents a technology stack that allows to implements issuer, holder and verifier of the eco system described in chapter 1.2 of the "Verifiable Credentials Data Model" <<vcdm>>. It can be used on top of jvm or android. The main goal of the library is to provide a lightweight and modular system which can be flexible customized according to the needs of specific use cases and the existing environment of the customer. The current version of the library supports the following features:
+
+* W3C verifiable credentials and presentations as described in chapter 3 "Core Data Model" of "Verifiable Credentials Data Model v2.0" <<vcdm>>
+* Protocols to issue credentials (issuer - holder) and to present them (holder - verifier) based on the mechanisms described in "Presentation Exchange 2.0" <<presentation-exchange>> and the corresponding ARIES RFC's which define a specific implementation of the credential issueing protocol   <<issue-credential>> and the presentation proof protocol  <<present-proof>>. Please note that implementented protocols are ARIES specific. The current library is closely following the ARIES RFC's, but is not interoperable with ARIES, in order to prevent limiting the library to the functionality of ARIES. E.g. ARIES is not supporting querying credentials and presentation using JSON-LD-Framing. Further, it is assuming DIDComm to establish and maintain connections. Instead, this library implements some common mechanisms (e.g. web sockets, DidComm, JSON-LD-FRAMING, ...) without to be restricted to these implementtations.
+* JSON <<json>> and JSON-LD <<json-ld>> to serialize, deserialize and normalize credentials, presentations and exchange protocol messages.
+* JSON-LD-Framing <<json-ld-framing>> to selectively query credentials and presentations
+* Invitations
+** different transport mechanisms (QR-Code, NFC, BLE)
+** different service types (DidCommV2, WebSocket)
+* Interchangeable connection management:
+** DidCommV2
+** WebSockets
+* generic, message based signature and proofing scheme in order to support selective disclosure with different signature algorithms even post quantum cryptography
+* different proof types and signature machanisms to support a wide range of use cases:
+** Ecdsa secp256r1 to support:
+*** high level of assurance with hardware protected keys
+*** hardware based cryptoboxes for device binding including key attestation
+*** biometric protected keys for holder binding using device and biometric binding
+*** asynchronous signing to allow user interaction for biometric confirmation (fingerprint and face id)
+** Ecdsa secp256k1 to support interoperability with eco-systems based on Koblitz curve cryptosystems
+** BBS+ for zero knowledge based selective disclosure
+** Dillithium to support post quantum signatures. This library demonstrates post quantum signatures in combination with selective disclosure.
+* The layered architecture allows to combine the different technologies according to project requirement (e.g. The library allows to implement a wallet which request credentials using WebSockets and presents them using DidComm). A presentation can contain an authentication proof based on secp256r1 to implement holder binding based on device and biometric binding and BBS+ proof to allow selective disclosure.
+
+== Overview
+The library implements the necessary protocols to issue credentials from the issuer to the holder and to present credentials from the holder to the verifier. The library can be used in the backend to implement cloud agents or in the frontend to implement mobile agents. Please note that an agent can act in different roles (E.g. an issuer can act as verifier to collect claims about the holder before issuing a credential; a verifier can act as holder in order to proof that he is authorized to requests and verify claims about the holder etc.) Nevertheless, this specification will refer to a specific agent by using the role which reflects its primary purpose.
+
+[plantuml]
+.ecosystem overview - <<vcdm>>
+----
+@startuml
+[Issuer] <<agent>>
+[Holder] <<agent>>
+[Verifier] <<agent>>
+[Issuer] -right- [Holder] : Issue Credentials
+[Holder] -right- [Verifier] : Present Proof
+[Issuer] -down- [Verifiable Data Registry] : Verify Identifiers
+[Holder] -down- [Verifiable Data Registry] : Register Identifiers
+[Verifier] -down- [Verifiable Data Registry] : Verify Identifiers
+@enduml
+----
+
+The library doesn't make any assumptions about the "Verifiable Data Registry". DID's are used as identifier. The library implements did:peer and did:key which don't require a verifiable data registry. In order to support other did methods (did:web, did:indy, did:sov, did:ether) a suitable did resolver needs to be integrated to resolve the verificationMethod of the LDProof. The establishing of the trust relationships to verify identifiers (e.g. Distributed Ledgers, WEB, X509 PKI, ...) is out of scope of this library.
+
+== Issue Credential
+The issuing protocol can be initiated by the issuer or the holder. The initiation of protocols can be triggered from outside (E.g. the issuer offers a credential after he has authenticated the holder and collected enough information to issue a credential) or as nested transaction (E.g. the holder initiated the credential issuing protocol and the issuer spawns a child thread to collect credentials from the holder required to issue the requested credential. After the issuer has collected the required credentials he returns to the parent thread.)
+
+=== Issuer initiated credential issuing
+
+[plantuml]
+.issuer initiated credential issuing
+----
+@startuml
+autonumber "[0]"
+Issuer -> Holder : Invitation (invitationId, from, goal_code)
+Holder -> Holder : Scans and accepts invitation
+Issuer <-> Holder : Establishing connection
+Issuer <- Holder : Invitation Accept (invitationId)
+Issuer -> Holder : CredentialOffer(OutputDescriptor)
+Holder -> Holder : Consent
+Issuer <- Holder : CredentialRequest(InputDescriptor, HolderKey)
+Issuer -> Holder : CredentialSubmit(Credential)
+@enduml
+----
+
+==== Invitation
+The issuer (inviter) sends an invitation to the holder (invitee) to invite him to exchange a credential. The invitation message is sent by reusing an existing connection (e.g. existing DIDComm connection) or out-of-band (QR-Code, NFC, BLE, deep link, ...) encoded as oob parameter in an invitation URL. The invitation is a generalized version of the invitation defined in the didcomm V2 specification <<didcomm>>. The generalized version of the invitation allows establishing of DidComm and other connections (e.g. websockets).
+
+[source,url]
+.invitation url offering credentials issuing over a websocket
+----
+https://my-wallet.me/ssi?oob=ewogICAgImlkIjogImVkZTU2M2ExLTIxNWMtNDVjMi05YWZiLTFjM2QzNjI0NWNmNCIsCiAgICAiZnJvbSI6ICJ3c3M6Ly9oZWFsdGhpbnN1cmFuY2Vub3J0aC5jb20iLAogICAgImxhYmVsIjogIkhlYWx0aCBJbnN1cmFuY2UgTm9ydGgiLAogICAgImdvYWwiOiAiSXNzdWUgSW5zdXJhbmNlIENlcnRpZmljYXRlcyIsCiAgICAiZ29hbENvZGUiOiAiT0ZGRVJfQ1JFREVORElBTCIKfQ==
+----
+
+[source,json]
+.decoded invitation message offering credentials issuing over a websocket
+----
+{
+    "id": "ede563a1-215c-45c2-9afb-1c3d36245cf4",
+    "from": "wss://healthinsurancenorth.com",
+    "label": "Health Insurance North",
+    "goal": "Issue Insurance Certificates",
+    "goalCode": "OFFER_CREDENDIAL"
+}
+----
+
+#TODO: add an example of an invitation offering credential issuing over didcomm#
+
+* `id`: REQUIRED. Unique identifier of the invitation. The invitee sends this id back during establishing of connection in order to allow the inviter to correlate the connection request with the invitation.
+* `from`: REQUIRED. URI of the sender of the invitation. The invitee sends the invitation accept message to this URI. The scheme defines how to process the URI:
+** `did:` resolve the did document to get service endpoint and the public keys of the inviter for authentication and agreement (encryption) to establish a didcomm V2 connection - <<didcomm>>
+** `wss:` establish a secure websocket connection tunneled over Transport Layer Security - <<websocket>>
+* `label`: OPTIONAL. Describes the inviter of the message. The receiver may want to display the label to the user.
+* `goal_code`: OPTIONAL. A pre-defined code the receiver shall use in automatically deciding what to do with the out-of-band message. The library pre-defines the following goal_codes:
+** `OFFER_CREDENDIAL`: indicates that the credential issuing protocol shall be initiated by the issuer by sending a credential offer
+** `REQUEST_CREDENTIAL`: indicates that the credential issuing shall be initiated by the holder by sending a credential request
+* `goal`: OPTIONAL. A self-attested string that the receiver may want to display to the user about the context-specific goal of the out-of-band message.
+
+==== Holder accepts invitation
+
+The holder scans the invitation (QR-Code, NFC-Tag) and accepts it.
+
+==== Connection Establishing
+
+After accepting the invitation the holder and connects to the inviter specified by the invitation parameter `from` to establish a secure two-way communication. The library has implemented two connection types:
+
+* did: DidComm V2 - <<didcomm>> and
+* wss: WebSocket - <<websocket>>
+
+The library defines a generic connection object which can be extended to implement other connection types (e.g. for proximity use cases: Wifi-Direct, BLE, ...). The connection type to be used by the invitee is defined by the uri scheme of the parameter `from`.
+
+#TODO: implementation of proximity use cases using BLE or Wifi Direct to proof concept#
+
+After the connection is established the inviter and invitee can exchange message over a secure channel until the connection is closed by one of the peers.
+
+==== Invitation Accept
+
+In order to indicate to the issuer the acceptance of the message the holder sends an invitation accept message.
+[source,json]
+.invitation accept message
+----
+{
+  "invitationId": "ede563a1-215c-45c2-9afb-1c3d36245cf4"
+}
+----
+* `invitationId`: REQUIRED. The unique id of the accepted invitation. The issuer (inviter) can use this id to find the accepted invitation. If the invitation was sent via a secure channel (e.g. DidComm, postal mail, person-to-person, ...) to a specific holder (invitee) the issuer can make assumptions about him.
+* `otp`: OPTIONAL. If a higher level of assurance about the authenticity of the invitee is required the inviter can use a separate communication channel (e.g. a second postal mail, SMS, ...) to send an additional one time password to the invitee. In this case the invitee has to set the parameter `otp` to the received one time password.
+
+#TODO: support of parameter otp not yet implemented in library#
+
+==== Credential Offer
+
+The issuer sends a credential offer to the holder describing the credentials he is offering.
+
+[source,json]
+.credential offer
+----
+{
+  "id": "10c806f2-d403-46ec-879f-2b5c724f77a5",
+  "@context": "https://gematik.de/credential-exchange/v1",
+  "type": "CredentialOffer",
+  "outputDescriptor": {
+    "id": "19319fdb-6acf-4810-a28b-e14ac8d75150",
+    "frame": {
+      "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://gematik.de/vsd/v1"
+      ],
+      "type": "InsuranceCertificate"
+    }
+  }
+}
+----
+
+* `id`: OPTIONAL. Unique node identifier of the credential offer - see <<json-ld>>.
+* `@context`: REQUIRED. Defines the context of the conversation. `@context` refers to a pre-defined context which defines the semantic of the vocabulary used within the credential offer. By defining the vocabulary issuer and holder can communicate with one another more efficiently without losing accuracy - see <<json-ld>>.
+* `type`: REQUIRED. IRI specifing the type of the node (request) - see <<json-ld>>. Must be set to `CredentialOffer` which expands to `https://gematik.de/credentialexchange#CredentialOffer`
+* `outputDescriptor`: REQUIRED. Descriptor which describes the credential offered by the issuer.
+** `id`: OPTIONAL. Unique node identifier of the credential offer - see <<json-ld>>.
+** `frame`: REQUIRED. JSON-LD frame which specifies the credential - see <<json-ld-framing>>.
++
+The holder can use this frame as is to request an instance of the specified credential (in the below example a complete insurance certificate) or extend the frame to describe the requested credential more detailed (e.g. just requesting the insurant data and skip the coverage information).
+
+==== Consent
+
+The holder application (e.g. a mobile wallet) informs the user about the credential offered by issuer and asks for an consent to request the credential. The application allows the user to specify in more detail the credential he is interested in using the frame received in the credential offer and the pre-defined vocabulary. Based on the consent of the user the application creates a descriptor of the credential using JSON-LD-FRAMING - see <<json-ld-framing>>.
+
+==== Credential Request
+
+The holder sends a credential request to the issuer to request a specific credential bind to him. The library is using holder key binding to bind a credential to the holder. The library supports asynchronous signing using hardware backed, biometric protected keys. Using these features the credential can be bind to the device of the holder and his biometrics features (fingerprint or faceId).
+
+[source,json]
+.credential request
+----
+{
+  "id": "8c4d030a-0fab-402e-8ab7-59d78349b909",
+  "@context": "https://gematik.de/credential-exchange/v1",
+  "type": "CredentialRequest",
+  "outputDescriptor": {
+    "id": "19319fdb-6acf-4810-a28b-e14ac8d75150",
+    "frame": {
+      "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://gematik.de/vsd/v1"
+      ],
+      "type": "InsuranceCertificate"
+    }
+  },
+  "holderKey": "did:key:zDnaeVxoD5EKMksHPLtiubVHyQufpGCMr9GRQihE43isjbYzP"
+}
+----
+
+* `id`: OPTIONAL. Unique node identifier of the credential request - see <<json-ld>>.
+* `@context`: REQUIRED. Defines the context of the conversation. `@context` refers to a pre-defined context which defines the semantic of the vocabulary used within the credential request. By defining the vocabulary issuer and holder can communicate with one another more efficiently without losing accuracy - see <<json-ld>>.
+* `type`: REQUIRED. IRI specifing the type of the node (request) - see <<json-ld>>. Must be set to `CredentialRequest` which expands to `https://gematik.de/credentialexchange#CredentialRequest`
+* `outputDescriptor`: REQUIRED. Descriptor which describes the credential requested by the holder.
+** `id`: OPTIONAL. Unique node identifier of the credential offer - see <<json-ld>>.
+** `frame`: REQUIRED. JSON-LD frame which specifies the credential - see <<json-ld-framing>>.
++
+JSON-LD-FRAMING allows the holder to specify the requested credentials accurately. He can just specify the type of credential or specify in details which claims shall be or shall not be asserted in the credential.
+
+==== Credential Submit
+
+Finally, the issuer submits the requested credential. The holder of the insurance certificate is the insurant. Therefore, the holder key is used as insurant id binding the certifcate to the insurant.
+
+[source,json]
+.credential submit
+----
+{
+  "id": "108ab6b3-f27b-46a9-9f3a-8b0803c2f541",
+  "@context": "https://gematik.de/credential-exchange/v1",
+  "type": "CredentialSubmit",
+  "credential": {
+    "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://gematik.de/vsd/v1"
+    ],
+    "type": [
+        "VerifiableCredential",
+        "InsuranceCertificate"
+    ],
+    "credentialSubject": {
+        "type": "Insurance",
+        "insurant": {
+            "id": "did:key:zDnaeVxoD5EKMksHPLtiubVHyQufpGCMr9GRQihE43isjbYzP",
+            "type": "Insurant",
+            "insurantId": "X110403567",
+            "familyName": "Mustermann",
+            "givenName": "Max",
+            "birthDate": "1965-05-04T12:00:00Z",
+            "gender": "Male",
+            "streetAddress": {
+                "type": "StreetAddress",
+                "postalCode": 10113,
+                "location": "Berlin",
+                "street": "Kastanienalle",
+                "streetNumber": "231",
+                "country": "GER"
+            },
+            "postBoxAddress": {
+                "type": "PostBoxAddress",
+                "postalCode": 10113,
+                "location": "Berlin",
+                "postBoxNumber": "12234",
+                "country": "GER"
+            }
+        },
+        "coverage": {
+            "type": "Coverage",
+            "start": "2001-05-03T12:00:00Z",
+            "costCenter": {
+                "type": "CostCenter",
+                "identification": 109500969,
+                "countryCode": "GER",
+                "name": "Health-Insurance-North"
+            },
+            "insuranceType": "Member",
+            "reimbursement": {
+                "type": "Reimbursement",
+                "medicalCare": true,
+                "dentalCare": true,
+                "inpatientSector": true,
+                "initiatedServices": false
+            },
+            "residencyPrinciple": "Berlin",
+            "dmpMark": "CHD_CoronaryHeartDisease",
+            "selectiveContracts": {
+                "type": "SelectiveContracts",
+                "medical": "available",
+                "dental": "notUsed",
+                "contractType": {
+                    "type": "ContractType",
+                    "generalPractionerCare": true,
+                    "structuredTreatmentProgram": false,
+                    "integratedCare": false
+                }
+            },
+            "coPayment": {
+                "type": "CoPayment",
+                "status": true,
+                "validUntil": "2024-03-02T12:00:00Z"
+            },
+            "dormantBenefitsEntitlement": {
+                "type": "DormantBenefitsEntitlement",
+                "start": "2023-01-01T12:00:00Z",
+                "end": "2025-12-31T12:00:00Z",
+                "dormancyType": "complete"
+            }
+        }
+    },
+    "issuer": "did:key:zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv",
+    "issuanceDate": "2024-01-25T10:53:13Z",
+    "proof": {
+        "@context": "https://w3id.org/security/bbs/v1",
+        "type": "BbsBlsSignature2020",
+        "created": "2024-01-25T10:53:13Z",
+        "proofPurpose": "assertionMethod",
+        "verificationMethod": "did:key:zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv#zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv",
+        "proofValue": "kpYf/4s/jGFbRKfZTW99g6o7tRczMD+0VOABNYqnbmp/l7qSNmwdnq2p1yfKhmF/EFdwBUyWTRWWBSv1jGIkWVDweLOJ1BVPnPEaUJ9w3ZcyGeDpcEzVrJPZ5CwC+Mxk9O6n4gFvuJKOaKtK30j/aQ=="
+    }
+  }
+}
+----
+
+* `id`: OPTIONAL. Unique node identifier of the credential request - see <<json-ld>>.
+* `@context`: REQUIRED. Defines the context of the conversation. `@context` refers to a pre-defined context which defines the semantic of the vocabulary used within the credential request. By defining the vocabulary issuer and holder can communicate with one another more efficiently without losing accuracy - see <<json-ld>>.
+* `type`: REQUIRED. IRI specifing the type of the node (request) - see <<json-ld>>. Must be set to `CredentialSubmit` which expands to `https://gematik.de/credentialexchange#CredentialSubmit`
+* `credential`: REQUIRED. Credential as specified in <<vcdm>>.
+
+== Present Proof
+The presentation exchange protocol can be initiated by the holder or the verifier. Either the holder sends a presentation offer request to the verifier to indicated his willingness to share a presentation or the verifier send a presentation request to the holder. The triggering of the presentation exchange protocol is independent of who has engaged the communication. Instead, the triggering is pre-agreed by the parties or defined by the `goal_code` in the invitation message.
+
+=== Verifier initiated presentation exchange
+
+[plantuml]
+.verifier initiated presentation exchange
+----
+@startuml
+autonumber "[0]"
+Holder -> Verifier : Invitation (invitationId, from, goal_code)
+Verifier -> Verifier : Scans and accepts invitation
+Holder <-> Verifier : Establishing connection
+Holder <- Verifier : Invitation Accept (invitationId)
+Holder -> Verifier : PresentationOffer(InputDescriptor)
+Holder <- Verifier : PresentationRequest(InputDescriptor)
+Holder -> Holder : Consent
+Holder -> Verifier : PresentationSubmit(Credential)
+@enduml
+----
+
+==== Invitation
+==== Verifier accepts invitation
+==== Connection Establishing
+==== Invitation Accept
+==== Presentation Offer
+==== Presentation Request
+==== Consent
+==== Presentation Submit
+
 
 == Components
 
@@ -105,9 +448,9 @@ The protocol layer implements two protocols:
 
 Please note that the trustworthiness of the peer should always be verified before disclosing sensitive personal information. The peer verification can be done on different levels (e.g. in person, client/server authentication using TLS, exchanging credentials, ...). The protocol layer only specifies how to use credentials. Even this step is optional, because the verification may be provided somewhere else as explained above.
 
-==== Credential Issueing Protocol
+==== Credential Issuing Protocol
 
-The holder receives the invitation of the issuer out of band (e.g. qr-code, nfc, BlueTooth, ...). The holder (invitee) accepts the invitation by sending it back to the issuer (inviter).
+The holder receives the invitation of the issuer out of band (e.g. qr-code, nfc, BlueTooth, ...). The holder (invitee) accepts the invitation by sending a inivitation accept message back to the issuer (inviter).
 
 ===== Holder
 
@@ -217,3 +560,23 @@ Closed --> [*]
 @enduml
 ----
 
+[bibliography]
+== References
+
+* [[[vcdm]]] https://www.w3.org/TR/vc-data-model-2.0[Verifiable Credentials Data Model v2.0]. Manu Sporny, Ted Thibodeau Jr, Ivan Herman, Michael B. Jones, Gabe Cohen. 2024
+
+* [[[presentation-exchange]]] https://identity.foundation/presentation-exchange/spec/v2.0.0/[Presentation Exchange 2.0.0].Daniel Buchner, Brent Zundel, Martin Riedel, Kim Hamilton Duffy. 2022
+
+* [[[issue-credential]]] https://github.com/hyperledger/aries-rfcs/blob/main/features/0453-issue-credential-v2[Aries RFC 0453: Issue Credential Protocol 2.0]. Nikita Khateev, Stephen Klump, Stephen Curran. 2021
+
+* [[[present-proof]]] https://github.com/hyperledger/aries-rfcs/blob/main/features/0453-issue-credential-v2[Aries RFC 0454: Present Proof Protocol 2.0].  Nikita Khateev, Stephen Curran. 2021
+
+* [[[json]]] https://tools.ietf.org/html/rfc4627[The application/json Media Type for JavaScript Object Notation (JSON)]. D. Crockford. 2006
+
+* [[[json-ld]]] https://www.w3.org/TR/json-ld[JSON-LD 1.1]. Manu Sporny, Gregg Kellogg, Marcus Langhaler. 2020
+
+* [[[json-ld-framing]]] https://www.w3.org/TR/json-ld11-framing[JSON-LD 1.1 Framing]. Dave Longley, Gregg Kellogg, Pierre-Antoine Champin. 2020
+
+* [[[didcomm]]] https://identity.foundation/didcomm-messaging/spec/[DIDComm Messaging v2.x]. Sam Curren, Tobias Looker, Oliver Terbu. 2023
+
+* [[[websocket]]] https://datatracker.ietf.org/doc/html/rfc6455[RFC 6455: The WebSocket Protocol]. I.Fette, A. Melnikov. December 2011

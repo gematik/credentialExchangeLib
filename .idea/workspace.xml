@@ -23,9 +23,7 @@
   <component name="ChangeListManager">
     <list default="true" id="246e1cc3-192b-491f-8ba1-e76025f33fb5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/DidCommV2OverHttp/DidCommV2OverHttpConnection.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/DidCommV2OverHttp/DidCommV2OverHttpConnection.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/websocket/WsConnection.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/connection/websocket/WsConnection.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Protocol.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/de/gematik/security/credentialExchangeLib/protocols/Protocol.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.adoc" beforeDir="false" afterPath="$PROJECT_DIR$/README.adoc" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,27 +86,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;ktor.last.update.timestamp&quot;: &quot;1698832784033&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/rk/IntelliJIDEAProjects/didcomm-jvm&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.31034482&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;AndroidSdkUpdater&quot;,
-    &quot;two.files.diff.last.used.file&quot;: &quot;C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources/context/vaccination_v1_modified.jsonld&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "ktor.last.update.timestamp": "1698832784033",
+    "last_opened_file_path": "C:/Users/rk/IntelliJIDEAProjects/didcomm-jvm",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.31034482",
+    "settings.editor.selected.configurable": "Settings.AsciiDoc.Preview",
+    "two.files.diff.last.used.file": "C:/Users/rk/IntelliJIDEAProjects/credentialExchangeLib/src/main/resources/context/vaccination_v1_modified.jsonld",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\rk\IntelliJIDEAProjects\credentialExchangeLib\src\main\kotlin\de\gematik\security\credentialExchangeLib\crypto\dilithium" />
@@ -383,6 +381,20 @@
       <workItem from="1700569261651" duration="4587000" />
       <workItem from="1701179273415" duration="17220000" />
       <workItem from="1701424749985" duration="2215000" />
+      <workItem from="1701865069011" duration="690000" />
+      <workItem from="1701954719893" duration="1225000" />
+      <workItem from="1702400399301" duration="902000" />
+      <workItem from="1702402583354" duration="9000" />
+      <workItem from="1702461398782" duration="1343000" />
+      <workItem from="1704278349921" duration="1668000" />
+      <workItem from="1704715543452" duration="598000" />
+      <workItem from="1704730012638" duration="270000" />
+      <workItem from="1704730613622" duration="9000" />
+      <workItem from="1705925537414" duration="12282000" />
+      <workItem from="1706022839547" duration="14370000" />
+      <workItem from="1706118501260" duration="155000" />
+      <workItem from="1706168818974" duration="11730000" />
+      <workItem from="1706185139973" duration="15591000" />
     </task>
     <task id="LOCAL-00001" summary="initial check in">
       <created>1683117220289</created>
@@ -727,7 +739,7 @@
       <option name="project" value="LOCAL" />
       <updated>1694099433023</updated>
     </task>
-    <option name="localTasksCounter" value="58" />
+    <option name="localTasksCounter" value="59" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -756,7 +768,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: support of ECDSA SecP256R1 including necessary refactory" />
     <MESSAGE value="feat: support of EdDSA Ed25519" />
     <MESSAGE value="chore: optimize imports" />
     <MESSAGE value="feat: support of secp256k1" />
@@ -781,7 +792,8 @@
     <MESSAGE value="fix: connection handling and use of latest didcomm artifacts" />
     <MESSAGE value="feat: add portrait to insurant data" />
     <MESSAGE value="feat: thread handling (parameter thid) in DidCommV2OverHttpConnection" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: thread handling (parameter thid) in DidCommV2OverHttpConnection" />
+    <MESSAGE value="chore: improved logging" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: improved logging" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -845,5 +857,9 @@
         <watch expression="Protocol.getNumberOfProtocolInstances()" language="kotlin" />
       </configuration>
     </watches-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>
