@@ -3,10 +3,50 @@
 :toc:
 :toclevels: 4
 
-The "`credential exchange library for kotlin`" implemenents a technology stack that allows to implements issuer, holder and verifier of the eco system described in chapter 1.2 of the "Verifiable Credentials Data Model" <<vcdm>>. It can be used on top of jvm or android. The main goal of the library is to provide a lightweight and modular system which can be flexible customized according to the needs of specific use cases and the existing environment of the customer. The current version of the library supports the following features:
+The "`credential exchange library for kotlin`" implemenents a technology stack that allows to implements issuer, holder and verifier of the eco system described in chapter 1.2 of the "Verifiable Credentials Data Model" <<vcdm>>. It can be used on top of jvm or android. The library is an experimental implementation to proof existing and new concepts based on the following technology stack:
+[plantuml]
+.technology stack
+----
+@startuml
+
+frame "applications" {
+    [android app]<<issuer, holder, verifier>>
+    [web app]<<issuer, holder, verifier>>
+}
+
+frame "protocols" {
+    [W3C-Verifiable Credentials Data Model (Verifiable Credentials)]
+    [DIF-Manifest (Issuing Credentials)]
+    [DIF-Presentation Exchange (Exchange Presentations)]
+}
+
+frame "data integrity" {
+    [W3C-CryptoVocabulary (LD Proofs)]
+}
+
+frame "transports" {
+    [DIF-DIDComm Messaging V2]
+    [RFC-WebSockets]
+}
+
+frame "data representation" {
+    [RFC-JSON]
+    [W3C-JSON-LD]
+    [W3C-JSON-LD-Framing]
+}
+
+[web app] -down[hidden]-> [DIF-Manifest (Issuing Credentials)]
+[DIF-Manifest (Issuing Credentials)] -down[hidden]-> [W3C-CryptoVocabulary (LD Proofs)]
+[DIF-Manifest (Issuing Credentials)] -down[hidden]-> [DIF-DIDComm Messaging V2]
+[DIF-Manifest (Issuing Credentials)] -down[hidden]-> [RFC-JSON]
+@enduml
+----
+
+The goal of this library is not to implement the above-mentioned specifications completely. Instead, it uses the definitions of the specs where suitable and tries to simplify the implementation where ever possible to get a light-weight and versatile-usable library.
+The current version of the library supports the following features:
 
 * W3C verifiable credentials and presentations as described in chapter 3 "Core Data Model" of "Verifiable Credentials Data Model v2.0" <<vcdm>>
-* Protocols to issue credentials (issuer - holder) and to present them (holder - verifier) based on the mechanisms described in "Presentation Exchange 2.0" <<presentation-exchange>> and the corresponding ARIES RFC's which define a specific implementation of the credential issueing protocol   <<issue-credential>> and the presentation proof protocol  <<present-proof>>. Please note that implementented protocols are ARIES specific. The current library is closely following the ARIES RFC's, but is not interoperable with ARIES, in order to prevent limiting the library to the functionality of ARIES. E.g. ARIES is not supporting querying credentials and presentation using JSON-LD-Framing. Further, it is assuming DIDComm to establish and maintain connections. Instead, this library implements some common mechanisms (e.g. web sockets, DidComm, JSON-LD-FRAMING, ...) without to be restricted to these implementtations.
+* Protocols to issue credentials (issuer - holder) and to present them (holder - verifier) based on but not compliant to the mechanisms described in "Credential Manifest" <<credential-manifest>>, "Presentation Exchange 2.0" <<presentation-exchange>> and the corresponding ARIES RFC's which define the "credential issueing protocol 2.0"   <<issue-credential>> and the "presentation proof protocol 2.0" <<present-proof>>. The library is strictly focused on credentials using JSON-LD and uses JSON-LD framing to query credentials and presentations. ARIES doesn't support JSON-LD framing. Further, ARIES requires DIDComm to establish and maintain connections. This library is not restricted to DIDComm. Instead, it defines an abstract connection object which can be implemented using specific transports (e.g. web sockets, DidComm, ...). So the library is based on the above-mentioned specifications, but is not interoperable with ARIES.
 * JSON <<json>> and JSON-LD <<json-ld>> to serialize, deserialize and normalize credentials, presentations and exchange protocol messages.
 * JSON-LD-Framing <<json-ld-framing>> to selectively query credentials and presentations
 * Invitations
@@ -25,7 +65,9 @@ The "`credential exchange library for kotlin`" implemenents a technology stack t
 ** Ecdsa secp256k1 to support interoperability with eco-systems based on Koblitz curve cryptosystems
 ** BBS+ for zero knowledge based selective disclosure
 ** Dillithium to support post quantum signatures. This library demonstrates post quantum signatures in combination with selective disclosure.
-* The layered architecture allows to combine the different technologies according to project requirement (e.g. The library allows to implement a wallet which request credentials using WebSockets and presents them using DidComm). A presentation can contain an authentication proof based on secp256r1 to implement holder binding based on device and biometric binding and BBS+ proof to allow selective disclosure.
+* The layered architecture allows to combine the different technologies. E.g. the library allows to implement a wallet which request credentials using WebSockets and presents them using DidComm). A presentation can contain an authentication proof based on secp256r1 to implement holder binding based on device and biometric binding and BBS+ proof to allow selective disclosure.
+
+For the sake of simplicity the library doesn't support to request lists of credentials and presentations. Consequently, the corresponding properties `fullfilment` (<<credential-manifest>>) and `presentation_submission` (<<presentation-exchange>>) are not implemented. This functionality can be added later if required by more complex use cases.
 
 == Overview
 The library implements the necessary protocols to issue credentials from the issuer to the holder and to present credentials from the holder to the verifier. The library can be used in the backend to implement cloud agents or in the frontend to implement mobile agents. Please note that an agent can act in different roles (E.g. an issuer can act as verifier to collect claims about the holder before issuing a credential; a verifier can act as holder in order to proof that he is authorized to requests and verify claims about the holder etc.) Nevertheless, this specification will refer to a specific agent by using the role which reflects its primary purpose.
@@ -135,7 +177,14 @@ In order to indicate to the issuer the acceptance of the message the holder send
 
 ==== Credential Offer
 
-The issuer sends a credential offer to the holder describing the credentials he is offering.
+The issuer sends a `credential offer` to the holder describing the credentials he is offering. From a functional perspective the `credential offer` is similar to the DIF credential manifest. On the other hand they are quite different:
+
+* The credential offer uses the `@context` property to define the context and defining the version. Therefore, the property spec_version is not used.
+* The property `outputDescriptor` uses JSON-LD framing to describe the credential offered by the issuer.
+* The property `presentation_definition` is not used. Instead, if the issuer requires additional data from the holder to issue a credential he starts a nested presentation exchange protocol to collect them. This approach is more flexible, simplifies the issuing protocol and reduces the dependencies between credential issuing and presentation exchange protocol.
+* The protocol is focusing on W3C credentials and JSON-LD. Therefore, the only supported credential format is LDP_VC. A explicite `format` property is not required.
+
+The following `credential offer` offers an InsuranceCertificate. The supported content is defined by the property `frame`. The frame defines the context and the type of the credential. Further, it allows the issuer to restrict the supported claims to a subset of the claims defined in the referenced context.
 
 [source,json]
 .credential offer
@@ -164,7 +213,7 @@ The issuer sends a credential offer to the holder describing the credentials he 
 ** `id`: OPTIONAL. Unique node identifier of the credential offer - see <<json-ld>>.
 ** `frame`: REQUIRED. JSON-LD frame which specifies the credential - see <<json-ld-framing>>.
 +
-The holder can use this frame as is to request an instance of the specified credential (in the below example a complete insurance certificate) or extend the frame to describe the requested credential more detailed (e.g. just requesting the insurant data and skip the coverage information).
+The holder can use this frame as is to request an instance of the specified credential (in the below example a complete insurance certificate) or extend the frame to describe the requested credential in more detail (e.g. just requesting the insurant data and skip the coverage information).
 
 ==== Consent
 
@@ -206,7 +255,7 @@ JSON-LD-FRAMING allows the holder to specify the requested credentials accuratel
 
 ==== Credential Submit
 
-Finally, the issuer submits the requested credential. The holder of the insurance certificate is the insurant. Therefore, the holder key is used as insurant id binding the certifcate to the insurant.
+Finally, the issuer submits the requested credential. The holder of the insurance credential is the insurant. Therefore, the holder key is used as insurant id binding the credential to the insurant.
 
 [source,json]
 .credential submit
@@ -457,46 +506,57 @@ The holder receives the invitation of the issuer out of band (e.g. qr-code, nfc,
 [plantuml]
 .state diagram: credential issueing - holder
 ----
-@startuml
+
+state WaitForSubThreadClosed {
+    [*] --> SubmitPresentation : receive presentation request
+    SubmitPresentation --> PresentationSubmitted : send presentation
+    PresentationSubmitted --> [*] : close
+}
 
 [*] --> Initialized
 Initialized --> WaitForCredentialOffer : send invitation
 Initialized --> Closed : close
 WaitForCredentialOffer --> SendCredentialRequest : receive offer
 WaitForCredentialOffer --> WaitForCredential : send credential request
-WaitForCredentialOffer --> SendPresentation : receive presentation request
-SendPresentation --> WaitForCredentialOffer : send presentation
-SendPresentation --> Closed : close
 WaitForCredentialOffer --> Closed : close
 SendCredentialRequest --> WaitForCredential : send credential request
 SendCredentialRequest --> Closed : close
 WaitForCredential --> CredentialReceived : receive credential
+WaitForCredential --> WaitForSubThreadClosed : start sub-thread
+WaitForSubThreadClosed --> WaitForCredential : sub-thread close
+WaitForSubThreadClosed --> Closed : close
 WaitForCredential --> Closed : close
 CredentialReceived --> Closed : close
 Closed --> [*]
 
 @enduml
 ----
+Please note that the issuer can request additional data from the holder before issuing the credential. This is done in a sub-thread. After the requested data are collected both parties return to the parent thread.
+
 ===== Issuer
-Please note that the issuer acts as verifier if he needs additional data from the holder to issue the credential.
 
 [plantuml]
 .state diagram: credential issueing - issuer
 ----
 @startuml
+state WaitForSubThreadClosed {
+    [*] --> WaitForPresentation : send presentation request
+    WaitForPresentation --> PresentationReceived : receive presentation request
+    PresentationReceived --> [*] : close
+}
 
 [*] --> Initialized
 Initialized --> SendCredentialOffer : receive invitation
 Initialized --> Closed : close
 SendCredentialOffer --> WaitForCredentialRequest : send offer
 SendCredentialOffer --> SubmitCredential : receive request
-SendCredentialOffer --> WaitForPresentation : send presentation request
-WaitForPresentation --> SendCredentialOffer : receive presenation
-WaitForPresentation --> Closed : close
 SendCredentialOffer --> Closed : close
 WaitForCredentialRequest --> SubmitCredential : receive request
 WaitForCredentialRequest --> Closed : close
 SubmitCredential --> CredentialSubmitted : send credential
+SubmitCredential --> WaitForSubThreadClosed : start sub-thread
+WaitForSubThreadClosed --> SubmitCredential : sub-thread close
+WaitForSubThreadClosed --> Closed : close
 SubmitCredential --> Closed : close
 CredentialSubmitted --> Closed : close
 Closed --> [*]
@@ -504,66 +564,79 @@ Closed --> [*]
 @enduml
 ----
 
+Please note that the issuer acts as verifier if he needs additional data from the holder to issue the credential.
+
 ==== Presentation Exchange Protocol
 The protocol can either be started by the holder or the verifier by receiving an invitation out of band (e.g. qr-code, nfc, BlueTooth, ...) and sending it back to the invitee.
 
 ===== Holder
-Please note that the holder acts as verifier if he needs additional data from the verifier before disclosing sensitive personal data.
-
 
 [plantuml]
 .state diagram: presentation exchange - holder
 ----
-@startuml
+state WaitForSubThreadClosed {
+    [*] --> WaitForPresentation : send presentation request
+    WaitForPresentation --> PresentationReceived : receive presentation request
+    PresentationReceived --> [*] : close
+}
 
 [*] --> Initialized
 Initialized --> SendPresentationOffer : receive or send invitation
 Initialized --> Closed : close
 SendPresentationOffer --> WaitForPresentationRequest : send presentation offer
 SendPresentationOffer --> SubmitPresentation : receive presentation request
-SendPresentationOffer --> WaitForPresentation : send presentation request
 SendPresentationOffer --> Closed : close
-WaitForPresentation --> SendPresentationOffer : send presentation
-WaitForPresentation --> Closed : close
 WaitForPresentationRequest --> SubmitPresentation : receive presentation request
 WaitForPresentationRequest --> Closed : close
 SubmitPresentation --> PresentationSubmitted : send presentation
+SubmitPresentation --> WaitForSubThreadClosed : start sub-thread
+WaitForSubThreadClosed --> SubmitPresentation : sub-thread close
+WaitForSubThreadClosed --> Closed : close
 SubmitPresentation --> Closed : close
 PresentationSubmitted --> Closed : close
 Closed --> [*]
-
 @enduml
 ----
+Please note that the holder acts as verifier if he needs to authenticate the verifier before disclosing sensitive personal data (sends presentation). The authentication is handled in a separate sub-thread using the presentation exchange protocol.
+
 ===== Verifier
 
 [plantuml]
 .state diagram: presentation exchange - verifier
 ----
 @startuml
+state WaitForSubThreadClosed {
+    [*] --> SubmitPresentation : receive presentation request
+    SubmitPresentation --> PresentationSubmitted : send presentation
+    PresentationSubmitted --> [*] : close
+}
 
 [*] --> Initialized
 Initialized --> WaitForPresentationOffer : receive or send invitation
 Initialized --> Closed : close
 WaitForPresentationOffer --> SendPresentationRequest : receive presentation offer
-WaitForPresentationOffer --> SendPresentation : receive presentation request
 WaitForPresentationOffer --> WaitForPresentation : send presentation request
 WaitForPresentationOffer --> Closed : close
-SendPresentation --> WaitForPresentationOffer : send presentation
-SendPresentation --> Closed : close
 SendPresentationRequest --> WaitForPresentation : send presentation request
 SendPresentationRequest --> Closed : close
 WaitForPresentation --> PresentationReceived : receive presentation
+WaitForPresentation --> WaitForSubThreadClosed : start sub-thread
+WaitForSubThreadClosed --> WaitForPresentation : sub-thread close
+WaitForSubThreadClosed --> Closed : close
 WaitForPresentation --> Closed : close
 PresentationReceived --> Closed : close
 Closed --> [*]
 
 @enduml
 ----
+Please note that the verifier acts as holder if he has to authenticate against the holder before receiving the requested presentation.
 
 [bibliography]
 == References
 
 * [[[vcdm]]] https://www.w3.org/TR/vc-data-model-2.0[Verifiable Credentials Data Model v2.0]. Manu Sporny, Ted Thibodeau Jr, Ivan Herman, Michael B. Jones, Gabe Cohen. 2024
+
+* [[[credential-manifest]]] https://identity.foundation/credential-manifest/[Credential Manifest 1.x Editor’s Draft]. Daniel Buchner, Brent Zundel, Jace Hensley, Daniel McGrogan, Gabe Cohen, Kim Hamilton Duffy
 
 * [[[presentation-exchange]]] https://identity.foundation/presentation-exchange/spec/v2.0.0/[Presentation Exchange 2.0.0].Daniel Buchner, Brent Zundel, Martin Riedel, Kim Hamilton Duffy. 2022
 
@@ -571,7 +644,7 @@ Closed --> [*]
 
 * [[[present-proof]]] https://github.com/hyperledger/aries-rfcs/blob/main/features/0453-issue-credential-v2[Aries RFC 0454: Present Proof Protocol 2.0].  Nikita Khateev, Stephen Curran. 2021
 
-* [[[json]]] https://tools.ietf.org/html/rfc4627[The application/json Media Type for JavaScript Object Notation (JSON)]. D. Crockford. 2006
+* [[[json]]] https://tools.ietf.org/html/rfc4627[RFC4627: The application/json Media Type for JavaScript Object Notation (JSON)]. D. Crockford. 2006
 
 * [[[json-ld]]] https://www.w3.org/TR/json-ld[JSON-LD 1.1]. Manu Sporny, Gregg Kellogg, Marcus Langhaler. 2020
 

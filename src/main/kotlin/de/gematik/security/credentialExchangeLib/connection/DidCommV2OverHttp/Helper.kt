@@ -56,11 +56,13 @@ fun createPeerDID(
     val service = serviceEndpoint?.let {
         toJson(
             DIDCommServicePeerDID(
-                id = "new-id",
+                id = UUID.randomUUID().toString(),
                 type = SERVICE_DIDCOMM_MESSAGING,
-                serviceEndpoint = it,
-                routingKeys = serviceRoutingKeys ?: emptyList(),
-                accept = listOf("didcomm/v2")
+                serviceEndpoint = ServiceEndpoint(
+                    it,
+                    routingKeys = serviceRoutingKeys ?: emptyList(),
+                    accept = listOf("didcomm/v2")
+                )
             ).toDict()
         )
     }

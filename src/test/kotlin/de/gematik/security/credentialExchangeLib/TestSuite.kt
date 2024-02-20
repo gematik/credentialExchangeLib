@@ -8,10 +8,12 @@ import org.junit.platform.suite.api.Suite
     JsonLdTests::class,
     BbsProofTests::class,
     EcdsaProofTest::class,
+    Ed25519ProofTest::class,
+    DilithiumProofTest::class,
     SerializerTests::class,
     WsConnectionTests::class,
+    DidCommConnectionTests::class,
     ProtocolTests::class,
     AcapyInteropTest::class,
-    DilithiumProofTest::class
 )
 class TestSuite

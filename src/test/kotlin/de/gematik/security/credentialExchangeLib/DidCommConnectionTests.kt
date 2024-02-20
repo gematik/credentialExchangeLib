@@ -27,7 +27,7 @@ class DidCommConnectionTests {
             val response = it.receive()
             assertEquals(response.content.get("shot")?.jsonPrimitive?.content, "pong")
         }
-        // invitee receives invitation out of band, establishes connection and wait for ping
+        // invitee receives invitation out of band, establishes connection and waits for ping
         runBlocking {
             DidCommV2OverHttpConnection.connect(URI.create(didInviter), URI.create(didInvitee), invitationId.toString(), null) {
                 val response = it.receive().content.get("shot")?.jsonPrimitive?.content

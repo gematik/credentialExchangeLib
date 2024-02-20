@@ -18,7 +18,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.4.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
-    implementation("com.github.mattrglobal:bbs.signatures:1.6-SNAPSHOT")
+    // implementation("com.github.mattrglobal:bbs.signatures:1.6-SNAPSHOT")
+    implementation(fileTree("libs") { include("*.jar") })
     api("com.apicatalog:titanium-json-ld-jre8:1.3.2")
     api("org.glassfish:jakarta.json:2.0.1")
     api("io.setl:rdf-urdna:1.2")
@@ -33,7 +34,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.1")
 
     implementation ("org.didcommx:didcomm:0.3.3-SNAPSHOT")
-    implementation ("org.didcommx:peerdid:0.4.0-SNAPSHOT")
+    implementation ("org.didcommx:peerdid:0.5.0")
 
 
     testImplementation("org.junit.platform:junit-platform-suite-engine:1.9.1")

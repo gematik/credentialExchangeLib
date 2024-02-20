@@ -1,5 +1,7 @@
 package de.gematik.security.credentialExchangeLib.connection
 import kotlinx.coroutines.channels.Channel
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import java.io.Closeable
 import java.util.*
@@ -34,8 +36,10 @@ abstract class Connection(val role: Role, val invitationId: String?) : Closeable
 
     abstract suspend fun send(message: Message)
 
-    open suspend fun receive() : Message{
-        return channel.receive()
+    suspend fun receive() : Message{
+        return channel.receive().also{
+            logger.debug { "receive from channel: ${Json.encodeToString(it)}" }
+        }
     }
 
 }

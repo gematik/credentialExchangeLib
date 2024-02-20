@@ -43,9 +43,9 @@ object DIDDocResolverPeerDID : DIDDocResolver {
                             is DIDCommServicePeerDID ->
                                 DIDCommService(
                                     id = it.id,
-                                    serviceEndpoint = it.serviceEndpoint,
-                                    routingKeys = it.routingKeys,
-                                    accept = it.accept
+                                    serviceEndpoint = it.serviceEndpoint.uri,
+                                    routingKeys = it.serviceEndpoint.routingKeys,
+                                    accept = it.serviceEndpoint.accept
                                 )
                             else -> null
                         }

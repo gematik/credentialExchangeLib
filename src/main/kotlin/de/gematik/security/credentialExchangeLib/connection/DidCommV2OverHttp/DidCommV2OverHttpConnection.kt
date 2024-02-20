@@ -108,8 +108,8 @@ class DidCommV2OverHttpConnection private constructor(
                                 logger.info { unpackResult.res.metadata }
                                 check(unpackResult.from != null) { "'from' required to establish connection" }
                                 val connection = unpackResult.res.message.thid?.let { getConnection(it) }
-                                if (connection != null) {
-                                    // message related to existing thread (connection)
+                                if (connection != null && unpackResult.to == connection.ownDid.toString()) {
+                                    // message related to existing thread (connection) and incoming message
                                     unpackResult.message.let {
                                         connection.channel.send(Json.decodeFromJsonElement(it))
                                         logger.debug { "send to channel: ${Json.encodeToString(it)}" }
@@ -237,13 +237,6 @@ class DidCommV2OverHttpConnection private constructor(
         }.onSuccess { logger.info { "==> receive: ${it.status}" } }
             .onFailure { logger.info { "could not sent: ${it.message}" } }
 
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun receive(): Message {
-        val message = super.receive()
-        logger.debug { "receive from channel: ${Json.encodeToString(message)}" }
-        return message
     }
 
     override fun close() {
