@@ -1,4 +1,5 @@
 = Credential Exchange Library for kotlin
+:icons: font
 :sectnums:
 :toc:
 :toclevels: 4
@@ -67,7 +68,7 @@ The current version of the library supports the following features:
 ** Dillithium to support post quantum signatures. This library demonstrates post quantum signatures in combination with selective disclosure.
 * The layered architecture allows to combine the different technologies. E.g. the library allows to implement a wallet which request credentials using WebSockets and presents them using DidComm). A presentation can contain an authentication proof based on secp256r1 to implement holder binding based on device and biometric binding and BBS+ proof to allow selective disclosure.
 
-For the sake of simplicity the library doesn't support to request lists of credentials and presentations. Consequently, the corresponding properties `fullfilment` (<<credential-manifest>>) and `presentation_submission` (<<presentation-exchange>>) are not implemented. This functionality can be added later if required by more complex use cases.
+For the sake of simplicity the library doesn't support to request lists of credentials. Instead, the holder requests every credential separately. Consequently, the corresponding property `fullfilment` (<<credential-manifest>>) is not implemented. JSON-LD-Framing is used to specify the credentials. Consequentlty, the special syntax defined in the <<credential-manifest>> and <<presentation-exchange>> to define credential in input- and outputdescriptors is not used.
 
 == Overview
 The library implements the necessary protocols to issue credentials from the issuer to the holder and to present credentials from the holder to the verifier. The library can be used in the backend to implement cloud agents or in the frontend to implement mobile agents. Please note that an agent can act in different roles (E.g. an issuer can act as verifier to collect claims about the holder before issuing a credential; a verifier can act as holder in order to proof that he is authorized to requests and verify claims about the holder etc.) Nevertheless, this specification will refer to a specific agent by using the role which reflects its primary purpose.
@@ -116,22 +117,20 @@ The issuer (inviter) sends an invitation to the holder (invitee) to invite him t
 [source,url]
 .invitation url offering credentials issuing over a websocket
 ----
-https://my-wallet.me/ssi?oob=ewogICAgImlkIjogImVkZTU2M2ExLTIxNWMtNDVjMi05YWZiLTFjM2QzNjI0NWNmNCIsCiAgICAiZnJvbSI6ICJ3c3M6Ly9oZWFsdGhpbnN1cmFuY2Vub3J0aC5jb20iLAogICAgImxhYmVsIjogIkhlYWx0aCBJbnN1cmFuY2UgTm9ydGgiLAogICAgImdvYWwiOiAiSXNzdWUgSW5zdXJhbmNlIENlcnRpZmljYXRlcyIsCiAgICAiZ29hbENvZGUiOiAiT0ZGRVJfQ1JFREVORElBTCIKfQ==
+https://my-wallet.me/ssi?oob=ewogICJpZCI6ICI5ZDk5MDNjOC04ZDRjLTQ0YTMtYTRhOS1hMWQwMmY1ZmFiNzciLAogICJmcm9tIjogIndzczovL3ByYXhpcy1zb21tZXJnYXJ0ZW4uZGU6ODA5MCIsCiAgImxhYmVsIjogIlByYXhpcyBTb21tZXJnYXJ0ZW4iLAogICJnb2FsIjogIklzc3VlIFZhY2NpbmF0aW9uIENlcnRpZmljYXRlIiwKICAiZ29hbENvZGUiOiAiT0ZGRVJfQ1JFREVORElBTCIKfQ==
 ----
 
 [source,json]
 .decoded invitation message offering credentials issuing over a websocket
 ----
 {
-    "id": "ede563a1-215c-45c2-9afb-1c3d36245cf4",
-    "from": "wss://healthinsurancenorth.com",
-    "label": "Health Insurance North",
-    "goal": "Issue Insurance Certificates",
-    "goalCode": "OFFER_CREDENDIAL"
+  "id": "9d9903c8-8d4c-44a3-a4a9-a1d02f5fab77",
+  "from": "wss://praxis-sommergarten.de:8090",
+  "label": "Praxis Sommergarten",
+  "goal": "Issue Vaccination Certificate",
+  "goalCode": "OFFER_CREDENDIAL"
 }
 ----
-
-#TODO: add an example of an invitation offering credential issuing over didcomm#
 
 * `id`: REQUIRED. Unique identifier of the invitation. The invitee sends this id back during establishing of connection in order to allow the inviter to correlate the connection request with the invitation.
 * `from`: REQUIRED. URI of the sender of the invitation. The invitee sends the invitation accept message to this URI. The scheme defines how to process the URI:
@@ -154,6 +153,8 @@ After accepting the invitation the holder and connects to the inviter specified 
 * did: DidComm V2 - <<didcomm>> and
 * wss: WebSocket - <<websocket>>
 
+The above-mentioned invitation requests to establish a secure web-socket connection `wss` to the host `healthinsurancenorth.com`.
+
 The library defines a generic connection object which can be extended to implement other connection types (e.g. for proximity use cases: Wifi-Direct, BLE, ...). The connection type to be used by the invitee is defined by the uri scheme of the parameter `from`.
 
 #TODO: implementation of proximity use cases using BLE or Wifi Direct to proof concept#
@@ -167,7 +168,7 @@ In order to indicate to the issuer the acceptance of the message the holder send
 .invitation accept message
 ----
 {
-  "invitationId": "ede563a1-215c-45c2-9afb-1c3d36245cf4"
+  "invitationId": "9d9903c8-8d4c-44a3-a4a9-a1d02f5fab77"
 }
 ----
 * `invitationId`: REQUIRED. The unique id of the accepted invitation. The issuer (inviter) can use this id to find the accepted invitation. If the invitation was sent via a secure channel (e.g. DidComm, postal mail, person-to-person, ...) to a specific holder (invitee) the issuer can make assumptions about him.
@@ -184,23 +185,23 @@ The issuer sends a `credential offer` to the holder describing the credentials h
 * The property `presentation_definition` is not used. Instead, if the issuer requires additional data from the holder to issue a credential he starts a nested presentation exchange protocol to collect them. This approach is more flexible, simplifies the issuing protocol and reduces the dependencies between credential issuing and presentation exchange protocol.
 * The protocol is focusing on W3C credentials and JSON-LD. Therefore, the only supported credential format is LDP_VC. A explicite `format` property is not required.
 
-The following `credential offer` offers an InsuranceCertificate. The supported content is defined by the property `frame`. The frame defines the context and the type of the credential. Further, it allows the issuer to restrict the supported claims to a subset of the claims defined in the referenced context.
+The following `credential offer` offers a VaccinationCertificate. The supported content is defined by the property `frame`. The frame defines the context and the type of the credential. Further, it allows the issuer to restrict the supported claims to a subset of the claims defined in the referenced context using LD-Framing (see <<json-ld-framing>>.
 
 [source,json]
 .credential offer
 ----
 {
-  "id": "10c806f2-d403-46ec-879f-2b5c724f77a5",
+  "id": "53825166-796f-428f-9783-7768a04e01b3",
   "@context": "https://gematik.de/credential-exchange/v1",
   "type": "CredentialOffer",
   "outputDescriptor": {
-    "id": "19319fdb-6acf-4810-a28b-e14ac8d75150",
+    "id": "9ce38bcc-1ac0-4f18-99eb-df179888bc03",
     "frame": {
       "@context": [
         "https://www.w3.org/2018/credentials/v1",
-        "https://gematik.de/vsd/v1"
+        "https://w3id.org/vaccination/v1"
       ],
-      "type": "InsuranceCertificate"
+      "type": "VaccinationCertificate"
     }
   }
 }
@@ -217,32 +218,35 @@ The holder can use this frame as is to request an instance of the specified cred
 
 ==== Consent
 
-The holder application (e.g. a mobile wallet) informs the user about the credential offered by issuer and asks for an consent to request the credential. The application allows the user to specify in more detail the credential he is interested in using the frame received in the credential offer and the pre-defined vocabulary. Based on the consent of the user the application creates a descriptor of the credential using JSON-LD-FRAMING - see <<json-ld-framing>>.
+The holder application (e.g. a mobile wallet) informs the user about the credential offered by issuer and asks for a consent to request the credential. The application allows the user to specify in more detail the credential he is interested in using the frame received in the credential offer. Based on the consent of the user the application creates a descriptor of the credential using JSON-LD-FRAMING - see <<json-ld-framing>>.
 
 ==== Credential Request
 
-The holder sends a credential request to the issuer to request a specific credential bind to him. The library is using holder key binding to bind a credential to the holder. The library supports asynchronous signing using hardware backed, biometric protected keys. Using these features the credential can be bind to the device of the holder and his biometrics features (fingerprint or faceId).
+The holder sends a credential request to the issuer to request the consented credential. Further the holder specifies a `holderKey` that will be used by the issuer to bind the credential to the holder. The library supports asynchronous signing using hardware backed, biometric protected keys. Using these features the credential can be bind to the device of the holder and his biometrics features (fingerprint or faceId).
 
 [source,json]
 .credential request
 ----
 {
-  "id": "8c4d030a-0fab-402e-8ab7-59d78349b909",
+  "id": "2d615ff6-87f0-4cbe-bfed-f38449c79997",
   "@context": "https://gematik.de/credential-exchange/v1",
   "type": "CredentialRequest",
   "outputDescriptor": {
-    "id": "19319fdb-6acf-4810-a28b-e14ac8d75150",
+    "id": "9ce38bcc-1ac0-4f18-99eb-df179888bc03",
     "frame": {
       "@context": [
         "https://www.w3.org/2018/credentials/v1",
-        "https://gematik.de/vsd/v1"
+        "https://w3id.org/vaccination/v1"
       ],
-      "type": "InsuranceCertificate"
+      "type": "VaccinationCertificate"
     }
   },
-  "holderKey": "did:key:zDnaeVxoD5EKMksHPLtiubVHyQufpGCMr9GRQihE43isjbYzP"
+  "holderKey": "did:key:zDnaeWHPMWj9Q2gjQurBgY9wd7GM8jm94sX54S33BSfqCATvM" <1>
 }
 ----
+<1> holder key used by the issuer to bind the issued credential to the holder
+
+properties:
 
 * `id`: OPTIONAL. Unique node identifier of the credential request - see <<json-ld>>.
 * `@context`: REQUIRED. Defines the context of the conversation. `@context` refers to a pre-defined context which defines the semantic of the vocabulary used within the credential request. By defining the vocabulary issuer and holder can communicate with one another more efficiently without losing accuracy - see <<json-ld>>.
@@ -252,109 +256,68 @@ The holder sends a credential request to the issuer to request a specific creden
 ** `frame`: REQUIRED. JSON-LD frame which specifies the credential - see <<json-ld-framing>>.
 +
 JSON-LD-FRAMING allows the holder to specify the requested credentials accurately. He can just specify the type of credential or specify in details which claims shall be or shall not be asserted in the credential.
+* `holderKey`: cryptographic material which the holder controls and the issuer can use to bind the issued credential to the holder.
 
 ==== Credential Submit
 
-Finally, the issuer submits the requested credential. The holder of the insurance credential is the insurant. Therefore, the holder key is used as insurant id binding the credential to the insurant.
+Finally, the issuer submits the requested credential. The vaccination credential is bound to the recipient of the vaccination by setting the recipient id to the holderKey.
 
 [source,json]
 .credential submit
 ----
 {
-  "id": "108ab6b3-f27b-46a9-9f3a-8b0803c2f541",
+  "id": "2bc472db-c1c6-4370-b26d-e5147f233876",
   "@context": "https://gematik.de/credential-exchange/v1",
   "type": "CredentialSubmit",
   "credential": {
     "@context": [
-        "https://www.w3.org/2018/credentials/v1",
-        "https://gematik.de/vsd/v1"
+      "https://www.w3.org/2018/credentials/v1",
+      "https://w3id.org/vaccination/v1"
     ],
     "type": [
-        "VerifiableCredential",
-        "InsuranceCertificate"
+      "VerifiableCredential",
+      "VaccinationCertificate"
     ],
     "credentialSubject": {
-        "type": "Insurance",
-        "insurant": {
-            "id": "did:key:zDnaeVxoD5EKMksHPLtiubVHyQufpGCMr9GRQihE43isjbYzP",
-            "type": "Insurant",
-            "insurantId": "X110403567",
-            "familyName": "Mustermann",
-            "givenName": "Max",
-            "birthDate": "1965-05-04T12:00:00Z",
-            "gender": "Male",
-            "streetAddress": {
-                "type": "StreetAddress",
-                "postalCode": 10113,
-                "location": "Berlin",
-                "street": "Kastanienalle",
-                "streetNumber": "231",
-                "country": "GER"
-            },
-            "postBoxAddress": {
-                "type": "PostBoxAddress",
-                "postalCode": 10113,
-                "location": "Berlin",
-                "postBoxNumber": "12234",
-                "country": "GER"
-            }
-        },
-        "coverage": {
-            "type": "Coverage",
-            "start": "2001-05-03T12:00:00Z",
-            "costCenter": {
-                "type": "CostCenter",
-                "identification": 109500969,
-                "countryCode": "GER",
-                "name": "Health-Insurance-North"
-            },
-            "insuranceType": "Member",
-            "reimbursement": {
-                "type": "Reimbursement",
-                "medicalCare": true,
-                "dentalCare": true,
-                "inpatientSector": true,
-                "initiatedServices": false
-            },
-            "residencyPrinciple": "Berlin",
-            "dmpMark": "CHD_CoronaryHeartDisease",
-            "selectiveContracts": {
-                "type": "SelectiveContracts",
-                "medical": "available",
-                "dental": "notUsed",
-                "contractType": {
-                    "type": "ContractType",
-                    "generalPractionerCare": true,
-                    "structuredTreatmentProgram": false,
-                    "integratedCare": false
-                }
-            },
-            "coPayment": {
-                "type": "CoPayment",
-                "status": true,
-                "validUntil": "2024-03-02T12:00:00Z"
-            },
-            "dormantBenefitsEntitlement": {
-                "type": "DormantBenefitsEntitlement",
-                "start": "2023-01-01T12:00:00Z",
-                "end": "2025-12-31T12:00:00Z",
-                "dormancyType": "complete"
-            }
-        }
+      "type": "VaccinationEvent",
+      "order": "3/3",
+      "batchNumber": "hlh",
+      "dateOfVaccination": "2024-02-21T12:00:00Z",
+      "administeringCentre": "Praxis Sommergarten",
+      "healthProfessional": "883110000015376",
+      "countryOfVaccination": "GE",
+      "nextVaccinationDate": "2024-08-21T12:00:00Z",
+      "recipient": {
+        "id": "did:key:zDnaeWHPMWj9Q2gjQurBgY9wd7GM8jm94sX54S33BSfqCATvM", <1>
+        "type": "VaccineRecipient",
+        "birthDate": "1965-05-04T12:00:00Z",
+        "familyName": "Mustermann",
+        "givenName": "Max",
+        "gender": "Male"
+      },
+      "vaccine": {
+        "type": "Vaccine",
+        "atcCode": "J07BX03",
+        "medicalProductName": "Bimervax",
+        "marketingAuthorizationHolder": "HIPRA Human Health S.L.U."
+      }
     },
     "issuer": "did:key:zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv",
-    "issuanceDate": "2024-01-25T10:53:13Z",
+    "issuanceDate": "2024-02-21T11:27:26Z",
     "proof": {
-        "@context": "https://w3id.org/security/bbs/v1",
-        "type": "BbsBlsSignature2020",
-        "created": "2024-01-25T10:53:13Z",
-        "proofPurpose": "assertionMethod",
-        "verificationMethod": "did:key:zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv#zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv",
-        "proofValue": "kpYf/4s/jGFbRKfZTW99g6o7tRczMD+0VOABNYqnbmp/l7qSNmwdnq2p1yfKhmF/EFdwBUyWTRWWBSv1jGIkWVDweLOJ1BVPnPEaUJ9w3ZcyGeDpcEzVrJPZ5CwC+Mxk9O6n4gFvuJKOaKtK30j/aQ=="
+      "@context": "https://w3id.org/security/bbs/v1",
+      "type": "BbsBlsSignature2020",
+      "created": "2024-02-21T11:27:26Z",
+      "proofPurpose": "assertionMethod",
+      "verificationMethod": "did:key:zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv#zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv",
+      "proofValue": "uOa4nfIpBY695dc9bo0akhzKAkqU9g4yz+00SaCF/ACgaQhEEwZQmTnEw9zdbIDQCxhHBjUk/tipv32d93RyIlnQaiy9xlYA/qxilfQ23HYNMOalZYCLP8lVlEFQh0MhEHFOsybSoHuUIP8COvap4g=="
     }
   }
 }
 ----
+<1> credential is bound to the vaccination recipient by setting his id to the holder key
+
+properties:
 
 * `id`: OPTIONAL. Unique node identifier of the credential request - see <<json-ld>>.
 * `@context`: REQUIRED. Defines the context of the conversation. `@context` refers to a pre-defined context which defines the semantic of the vocabulary used within the credential request. By defining the vocabulary issuer and holder can communicate with one another more efficiently without losing accuracy - see <<json-ld>>.
@@ -364,10 +327,10 @@ Finally, the issuer submits the requested credential. The holder of the insuranc
 == Present Proof
 The presentation exchange protocol can be initiated by the holder or the verifier. Either the holder sends a presentation offer request to the verifier to indicated his willingness to share a presentation or the verifier send a presentation request to the holder. The triggering of the presentation exchange protocol is independent of who has engaged the communication. Instead, the triggering is pre-agreed by the parties or defined by the `goal_code` in the invitation message.
 
-=== Verifier initiated presentation exchange
+=== Holder initiated presentation exchange
 
 [plantuml]
-.verifier initiated presentation exchange
+.holder initiated presentation exchange
 ----
 @startuml
 autonumber "[0]"
@@ -383,14 +346,277 @@ Holder -> Verifier : PresentationSubmit(Credential)
 ----
 
 ==== Invitation
+[source,json]
+.decoded invitation message offering to present vaccination certificate over didcomm
+----
+{
+  "id": "131ba536-040b-4efd-a1bd-f1cffc1c5e9e",
+  "from": "did:peer:2.Ez6LScFUqjx36MtH5y8TNWVDSXmtD8PFU6XicsWXGvGwpyWdW.Vz6MkvejenJQzJXQPUVcJk2g7ruyg283jfx7oJHmAZvvieyn2.SeyJpZCI6IjhkMGI3NjI1LTRjZWUtNDJkYi1iYzA5LWEyYmY1NDE3ZGNjOSIsInQiOiJkbSIsInMiOnsidXJpIjoiaHR0cDovLzE5Mi4xNjguMTc4LjEwMjo5MDk1L2RpZGNvbW0iLCJyIjpbXSwiYSI6WyJkaWRjb21tL3YyIl19fQ",
+  "label": "Mobile Wallet 2",
+  "goal": "Present VaccinationCertificate",
+  "goalCode": "OFFER_PRESENTATION"
+}
+----
+
 ==== Verifier accepts invitation
+
+The verifier accepts the invitation using the same procedure as described in chapter <<_holder_accepts_invitation>>
+
 ==== Connection Establishing
+
+The connection is established as described in chapter <<_connection_establishing>>, but this time the property `from` of the invitation requests a didcomm connection to a specific peer did `did:peer`. The verifier resolves the did to get the did document and establishes the connection to the service point defined in the did document.
+
 ==== Invitation Accept
+
+The verifier sends an invitation accept as described in chapter <<_invitation_accept>>.
+
 ==== Presentation Offer
+
+[source,json]
+.presentation offer offering an insurant certificate and vaccination certificate
+----
+{
+  "id": "658b1626-b701-4b9f-a36b-813e85a7840d",
+  "@context": "https://gematik.de/credential-exchange/v1",
+  "type": "PresentationOffer",
+  "inputDescriptor": [
+    {
+      "id": "39755ad8-a4ee-4ac6-929d-52d8203a102a",
+      "frame": { <1>
+        "@context": [
+          "https://www.w3.org/2018/credentials/v1",
+          "https://w3id.org/vaccination/v1"
+        ],
+        "type": [
+          "VerifiableCredential",
+          "VaccinationCertificate"
+        ]
+      }
+    },
+    {
+      "id": "4e933ab1-e536-4692-a6dd-db3c6da600e2",
+      "frame": { <2>
+        "@context": [
+          "https://www.w3.org/2018/credentials/v1",
+          "https://gematik.de/vsd/v1"
+        ],
+        "type": [
+          "VerifiableCredential",
+          "InsuranceCertificate"
+        ]
+      }
+    }
+  ]
+}
+----
+
+<1> frame specifying vaccination certificate
+<2> frame specifying insurant certificate
+
+The holder sends a presentation to indicate which credentials he is willing to share with the verifier. The holder uses JSON-LD framing to define the type of the credentials as well as the claims which he is willing to disclose. In the above example the holder is willing to share his insurance certificate and his vaccination certificate with all contained claims.
+
 ==== Presentation Request
+
+[source,json]
+.presentation request requesting proof of vaccination status and identity of vaccinated person
+----
+{
+  "@context": "https://gematik.de/credential-exchange/v1",
+  "type": "PresentationRequest",
+  "inputDescriptor": [<0>
+    { <1>
+      "id": "4de5606d-cede-4571-9a1b-260c0c8e62d2",
+      "frame": {
+        "@context": [
+          "https://www.w3.org/2018/credentials/v1",
+          "https://w3id.org/vaccination/v1"
+        ],
+        "type": [
+          "VerifiableCredential",
+          "VaccinationCertificate"
+        ],
+        "credentialSubject": {
+          "@explicit": true,
+          "@requireAll": true,
+          "type": [
+            "VaccinationEvent" <2>
+          ],
+          "order": [
+            "3/3" <3>
+          ],
+          "recipient": { <4>
+            "@explicit": true,
+            "type": [
+              "VaccineRecipient"
+            ],
+            "id": {
+            }
+          }
+        }
+      }
+    },
+    { <5>
+      "id": "984bb32c-70ea-4e3b-9bc3-00af747d146f",
+      "frame": {
+        "@context": [
+          "https://www.w3.org/2018/credentials/v1",
+          "https://gematik.de/vsd/v1"
+        ],
+        "type": [
+          "VerifiableCredential",
+          "InsuranceCertificate"
+        ],
+        "credentialSubject": {
+          "@explicit": true,
+          "@requireAll": true,
+          "type": [
+            "Insurance"
+          ],
+          "insurant": {
+            "@explicit": true,
+            "type": [
+              "Insurant"
+            ],
+            "id": {
+            },
+            "portrait": {
+            }
+          }
+        }
+      }
+    }
+  ]
+}
+----
+<0>  input descriptor requests two certificates:
+<1> descriptor 1 defines a vaccination certificate which must contain
+<2> a vaccination event which is
+<3> the third event of a sequence of three events and
+<4> the id of the recipient
+<5> descriptor 2 defines an insurance certificate which must contain
+<7> the id of the insurant and
+<8> his portrait
+
+The holder should only request the information he needs to fulfill the use case. In our example he requests the vaccination status (3 of 3) and the id of the vaccination recipient (holder key). Further, he requests the portrait of the insurant and the id of the insurant (holder key). Both certificates needs to be bound to the same holder to complete the authentication.
+
 ==== Consent
+
+The holder declares consent to disclose the following personal information:
+
+* vaccincation certificate
+** vaccination status
+** id of reciptient (holder key)
+* insurance certificate
+** portrait
+** id of insurant (holder key)
+
 ==== Presentation Submit
 
+[source,json]
+.presentation submit providing proof of vaccination status and identity of vaccinated person
+----
+{
+  "id": "9786cb7b-c4eb-4105-8af0-30a1ac958935",
+  "@context": "https://gematik.de/credential-exchange/v1",
+  "type": "PresentationSubmit",
+  "presentation": {
+    "id": "ae7aa203-ff6c-485c-9f43-837203915f83",
+    "@context": "https://www.w3.org/2018/credentials/v1",
+    "type": "VerifiablePresentation",
+    "presentationSubmission": {
+      "@context": "https://identity.foundation/presentation-exchange/submission/v1",
+      "type": "PresentationSubmission",
+      "definition_id": "0f11dba3-e5d8-4387-a240-bf715331a668",
+      "descriptor_map": [
+        {
+          "id": "4de5606d-cede-4571-9a1b-260c0c8e62d2",
+          "format": "ldp_vc",
+          "path": "$.verifiableCredential[0]"
+        },
+        {
+          "id": "984bb32c-70ea-4e3b-9bc3-00af747d146f",
+          "format": "ldp_vc",
+          "path": "$.verifiableCredential[1]"
+        }
+      ]
+    },
+    "verifiableCredential": [
+      {
+        "id": "urn:bnid:_:c14n0",
+        "@context": [
+          "https://www.w3.org/2018/credentials/v1",
+          "https://w3id.org/vaccination/v1"
+        ],
+        "type": [
+          "VaccinationCertificate",
+          "VerifiableCredential"
+        ],
+        "credentialSubject": {
+          "id": "urn:bnid:_:c14n1",
+          "type": "VaccinationEvent",
+          "order": "3/3",
+          "recipient": {
+            "id": "did:key:zDnaeWHPMWj9Q2gjQurBgY9wd7GM8jm94sX54S33BSfqCATvM", <1>
+            "type": "VaccineRecipient"
+          }
+        },
+        "issuer": "did:key:zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv",
+        "issuanceDate": "2024-02-21T11:27:26Z",
+        "proof": {
+          "@context": "https://w3id.org/security/bbs/v1",
+          "type": "BbsBlsSignatureProof2020",
+          "created": "2024-02-21T11:27:26Z",
+          "nonce": "DT4n2kh5k781C6XXhUd73GyChOCGg8/tDL3mU0hEDO8=",
+          "proofPurpose": "assertionMethod",
+          "verificationMethod": "did:key:zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv#zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv",
+          "proofValue": "ABsAwH8Pj9VYwOgbgWV5In1G6/9l1rX/LClIPM+8eM2WdNeQk3veUgTDtb5VQ7vY0yMfkeb8lZYnXZW7cmje8QYu13y1av1s9qkjoWK9aHdHuV5sdseaT7Ni/43hAeGvg/rIcov6gSahnFmqIZIhFDfteW00lphQ/bubEQ1qQ2yKIUSIxiyJSZSkXmPHAWJYQR180Z5GAAAAdKRpTJBXa2cdIEb5ieRmkj2+ktbKH9yIt0hNUJYj21gTz18fjsleIhYdtgTCejU5cgAAAAIJH7TNgPjyaD9zDP/qefaFBg0Sy9WjhjXNBKsmiZ1v/1mGExZkgZitLScpH3UTWYYOXOrqpkhvEFPuwNbv6a1HrZHIoMyb5I8Dsfbkpe4wiwcfhBXgkGd/yM7D4JNnIkgCv2iNtRZgjQE5URPMB0/BAAAAECCOghbL0P45xayTw/G6005rJZkFejhhSXv4a/TbFzHXPH2gwbZttQYHvA8Vx4HcwH2U2UpX1xqOvUxZuuIIxS9ak6Sa60i2kz+Gzd7LtbBrVryGectBULZRRwycP6cWNiU2WoouZedZcuUfRm2uDtxDq1EjDv/Q6GJJk2UMciDbECJ3KWEIXIaoplO2otS2xTwkU0I1P+NGnhA74kqP13JbtSLKFJmF2kc2PXy/t0qA/7HV1mnS8ebSQEJvoQcPNigHwFMHsPK0+f1VZRjAzKw4zJum19vvyRnjO8Z6+m0WYBN+c1kdeCLxI0NRn3T7lNwvE64NyvEa0YdFfCg9HvlOIdrm8Q3ImtwvIiw5st60/zNCJAHs/WHlT/XiEOZxlSXPZCuNNdTPJa7T/F/0H2Qc9+uCiYlkOPcpBor9SxFia6XE5hn8wHk2HLY5FX/UmnDyvlGJP2cCoS637/GbG9ZaY7BTMguMJ8SwdpBuq/o0PECbTpN1YJN4RuqgcZpWuR/0TBVYBqlCI3Z2lsHc+kTp3/nRdFKIkx4upitGgsd+WGwkl3TJfwu9iAirhumHnwDSZHJ7kBUXBxAFk4qtSqkGfEHr6+611uTlcg8yNTKOVHLD7nCIWPV38IhH0oxrgGV6CqHc4J9RQj41dmt1a1N4eHrIws7aKMD9doP7+/tv"
+        }
+      },
+      {
+        "id": "urn:bnid:_:c14n0",
+        "@context": [
+          "https://www.w3.org/2018/credentials/v1",
+          "https://gematik.de/vsd/v1"
+        ],
+        "type": [
+          "InsuranceCertificate",
+          "VerifiableCredential"
+        ],
+        "credentialSubject": {
+          "id": "urn:bnid:_:c14n5",
+          "type": "Insurance",
+          "insurant": {
+            "id": "did:key:zDnaeWHPMWj9Q2gjQurBgY9wd7GM8jm94sX54S33BSfqCATvM", <1>
+            "type": "Insurant",
+            "https://gematik.de/vsd#insurantPotrait": null
+          }
+        },
+        "issuer": "did:key:zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv",
+        "issuanceDate": "2024-02-21T11:26:40Z",
+        "proof": {
+          "@context": "https://w3id.org/security/bbs/v1",
+          "type": "BbsBlsSignatureProof2020",
+          "created": "2024-02-21T11:26:40Z",
+          "nonce": "qlzt30XMt2BAouuw/IuIu4iofG6jjDHfxc3Uc64t4Rs=",
+          "proofPurpose": "assertionMethod",
+          "verificationMethod": "did:key:zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv#zUC78bhyjquwftxL92uP5xdUA7D7rtNQ43LZjvymncP2KTXtQud1g9JH4LYqoXZ6fyiuDJ2PdkNU9j6cuK1dsGjFB2tEMvTnnHP7iZJomBmmY1xsxBqbPsCMtH6YmjP4ocfGLwv",
+          "proofValue": "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"
+        }
+      }
+    ],
+    "proof": {
+      "@context": "https://www.w3.org/2018/credentials/v1",
+      "type": "EcdsaSecp256r1Signature2019",
+      "creator": "did:key:zDnaeWHPMWj9Q2gjQurBgY9wd7GM8jm94sX54S33BSfqCATvM", <1>
+      "created": "2024-02-21T11:28:08Z",
+      "proofPurpose": "authentication",
+      "verificationMethod": "did:key:zDnaeWHPMWj9Q2gjQurBgY9wd7GM8jm94sX54S33BSfqCATvM#zDnaeWHPMWj9Q2gjQurBgY9wd7GM8jm94sX54S33BSfqCATvM", <1>
+      "proofValue": "p/9uIYg3QPy/gFppz3ren7yhlb6FWk2YuH/Qg/eZCPhNWd7tp0fQOg2X92KGTn5bzzNZbU6tXkJtd41e6m6/sg=="
+    }
+  }
+}
+----
+<1> By using the holderKey to provide the authentication proof the holder proofs that he is the legitimated recipient of the vaccination and the legitimated insurant. By using a hardware backed key `EcdsaSecp256r1Signature2019`, which is physically bound to  a specific device and protected by biometric features (fingerprint or faceid), the presentation of the credentials by another person as the legitimated holder will fail.
 
 == Components
 
