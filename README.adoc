@@ -857,6 +857,21 @@ Closed --> [*]
 ----
 Please note that the verifier acts as holder if he has to authenticate against the holder before receiving the requested presentation.
 
+== JSON-LD
+=== Contexts
+== Credentials
+=== Credential Querying using JSON-LD-Framing
+== Presentations
+=== Holder Binding
+=== Selective Disclosure
+== LD-Proof
+=== Authentication Proofs
+=== Assertion Proofs
+== LD-Signatures
+=== Hardware-backed, biometric protected keys
+=== Key Attestation
+=== Post Quantum Cryptography
+
 [bibliography]
 == References
 
