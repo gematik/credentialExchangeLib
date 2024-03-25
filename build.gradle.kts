@@ -11,6 +11,7 @@ version = "0.3.0-SNAPSHOT"
 repositories {
     mavenLocal()
     mavenCentral()
+    maven("https://maven.scijava.org/content/repositories/public/")
 }
 
 dependencies {
@@ -51,7 +52,7 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(8)
+    jvmToolchain(11)
 }
 
 java {

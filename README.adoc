@@ -1,8 +1,43 @@
-= Credential Exchange Library for kotlin
+
+:doctype: book
 :icons: font
-:sectnums:
-:toc:
-:toclevels: 4
+ifndef::env-github[]
+image::Gematik_Logo_Flag_With_Background.png[logo,width=200,height=47,role=right]
+endif::[]
+ifdef::env-github[]
+++++
+<img align="right" width="250" height="47" src="Gematik_Logo_Flag_With_Background.png"/> <br/>
+++++
+endif::[]
+
+= Credential Exchange Library for kotlin
+
+++++
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#about-the-project">About The Project</a></li>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#issue-credential">Issue Credential</a></li>
+    <li><a href="#present-proof">Present Proof</a></li>
+    <li><a href="#components">Components</a></li>
+    <li><a href="#communication-stack">Communication Stack</a></li>
+    <li><a href="#json-ld">JSON-LD</a></li>
+    <li><a href="#credentials">Credentials</a></li>
+    <li><a href="#presentations">Presentations</a></li>
+    <li><a href="#ld-proof">LD-Proof</a></li>
+    <li><a href="#ld-signatures">LD-Signatures</a></li>
+    <li><a href="#references">References</a></li>
+    <li><a href="#prerequisites">Prerequisites</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+  </ol>
+</details>
+++++
+
+== About The Project
+
+This Work ist part of a discontinued collaboration within https://idunion.org/projekt/?lang=en[IDUnion project].
 
 The "`credential exchange library for kotlin`" implemenents a technology stack that allows to implements issuer, holder and verifier of the eco system described in chapter 1.2 of the "Verifiable Credentials Data Model" <<vcdm>>. It can be used on top of jvm or android. The library is an experimental implementation to proof existing and new concepts based on the following technology stack:
 [plantuml]
@@ -895,6 +930,11 @@ Please note that the verifier acts as holder if he has to authenticate against t
 
 * [[[websocket]]] https://datatracker.ietf.org/doc/html/rfc6455[RFC 6455: The WebSocket Protocol]. I.Fette, A. Melnikov. December 2011
 
+== Prerequisites
+This repository depends on a not yet published version 0.3.3 of `org.didcommx:didcomm`, so get https://github.com/sicpa-dlab/didcomm-jvm[didcomm-jvm] build and publish to MavenLocal before.
+
+== Contributing
+This project is part of a proof of concept which is no longer being maintained.
 
 == License
 
